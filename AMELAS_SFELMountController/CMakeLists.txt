@@ -196,6 +196,11 @@ endif()
 # Setup the server launcher.
 macro_setup_deploy_launcher("${APP_SERVER}" "${INSTALL_BIN}" "${LIB_DEPS_SET}")
 
+# In mingw better do static linking of the libgcc, libwinpthread and libstd.
+if (MINGW)
+    target_link_libraries(${APP_SERVER} PRIVATE -static-libgcc -static-libstdc++ -static -lpthread)
+endif()
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 # **********************************************************************************************************************
@@ -205,5 +210,82 @@ macro_setup_deploy_launcher("${APP_SERVER}" "${INSTALL_BIN}" "${LIB_DEPS_SET}")
 # Add the diferents subprojects directories.
 add_subdirectory(examples)
 add_subdirectory(testing)
+
+# **********************************************************************************************************************
+# INSTALLATION PART
+
+# Installation process for windows.
+if(WIN32)
+
+    # Get the path to the external libs.
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        if(MINGW)
+            set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug)
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+            set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug)
+        else()
+            message(FATAL_ERROR "Compiler not supported by default.")
+        endif()
+    else()
+        if(MINGW)
+            set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/mingw-x86_64_release)
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+            set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/msvc-x86_64_release)
+        else()
+            message(FATAL_ERROR "Compiler not supported by default.")
+        endif()
+    endif()
+
+    # Install the include files of LibAmelasInterface.
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/includes/
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/includes/${LIB_FULL_NAME}
+            PATTERN "*.txt" EXCLUDE)
+
+    # Install the include files of LibZMQUtils.
+    install(DIRECTORY ${ZMQUTILS_PATH}/includes/LibZMQUtils
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/includes/)
+
+    # Install the include files of ZMQ.
+    install(DIRECTORY ${ZMQUTILS_PATH}/includes/zmq
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/includes/)
+
+    # Install the binaries  of LibZMQUtils to the specified install directory.
+    install(TARGETS ${LIB_FULL_NAME}
+            LIBRARY DESTINATION ${INSTALL_LIB}
+            RUNTIME DESTINATION ${INSTALL_LIB})
+
+    # Install the binaries of the external libs to the specified install directory.
+    install(DIRECTORY ${EXTERNAL_LIBS_PATH}/
+            DESTINATION ${INSTALL_LIB}
+            FILES_MATCHING PATTERN "*.dll")
+
+
+
+    # Install the lib files for msvc.
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+
+        # External libs
+        install(DIRECTORY ${EXTERNAL_LIBS_PATH}/
+                DESTINATION ${INSTALL_LIB}
+                FILES_MATCHING PATTERN "*.lib")
+
+        # Install the LibAmelasInterface.lib file to the specified library directory.
+        install(FILES ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${LIB_FULL_NAME}.lib
+                DESTINATION ${INSTALL_LIB})
+
+    endif()
+
+    # Runtime artifacts.
+    install(IMPORTED_RUNTIME_ARTIFACTS ${LIB_FULL_NAME}
+            RUNTIME_DEPENDENCY_SET ${LIB_DEPS_SET}
+            DESTINATION ${INSTALL_BIN})
+
+    # Install the external dependencies.
+    install(RUNTIME_DEPENDENCY_SET ${LIB_DEPS_SET}
+            PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+            DIRECTORIES ${EXTERNAL_LIBS_PATH} ${INSTALL_LIB}
+            DESTINATION ${INSTALL_BIN})
+
+endif()
 
 # **********************************************************************************************************************

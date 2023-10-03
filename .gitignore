@@ -1,6 +1,6 @@
 # Folders.
 *build*/
-product/
+product*/
 
 # Docs.
 LibZMQUtils-GeneratingDocs/
