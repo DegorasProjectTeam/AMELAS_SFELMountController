@@ -80,6 +80,10 @@ struct AltAzPos final : public zmqutils::utils::Serializable
 
     LIBAMELAS_EXPORT AltAzPos();
 
+    LIBAMELAS_EXPORT AltAzPos(const AltAzPos& pos) = default;
+
+    LIBAMELAS_EXPORT AltAzPos& operator =(const AltAzPos& pos) = default;
+
     LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
 
     LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;

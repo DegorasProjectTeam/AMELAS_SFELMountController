@@ -32,7 +32,7 @@ namespace amelas{
 namespace controller{
 
 AmelasController::AmelasController() :
-    home_pos_({-1,-1})
+    home_pos_(-1,-1)
 {}
 
 AmelasError AmelasController::setHomePosition(const AltAzPos &pos)
@@ -78,7 +78,7 @@ AmelasError AmelasController::getHomePosition(AltAzPos &pos)
     std::cout<<"-> GET_HOME_POSITION"<<std::endl;
     std::cout<<"Time: "<<zmqutils::utils::currentISO8601Date()<<std::endl;
     std::cout << std::string(100, '-') << std::endl;
-
+    
     return AmelasError::SUCCESS;
 }
 

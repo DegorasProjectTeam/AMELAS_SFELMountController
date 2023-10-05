@@ -259,11 +259,8 @@ if(WIN32)
             DESTINATION ${INSTALL_LIB}
             FILES_MATCHING PATTERN "*.dll")
 
-
-
     # Install the lib files for msvc.
     if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-
         # External libs
         install(DIRECTORY ${EXTERNAL_LIBS_PATH}/
                 DESTINATION ${INSTALL_LIB}
@@ -272,7 +269,6 @@ if(WIN32)
         # Install the LibAmelasInterface.lib file to the specified library directory.
         install(FILES ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${LIB_FULL_NAME}.lib
                 DESTINATION ${INSTALL_LIB})
-
     endif()
 
     # Runtime artifacts.

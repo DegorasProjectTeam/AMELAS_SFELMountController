@@ -65,6 +65,18 @@ public:
     // TODO
     //virtual void prepareRequest() = 0;
 
+
+//     LIBAMELAS_EXPORT  doSetHomePosition()
+//     {
+
+//     }
+
+
+
+
+
+
+
     LIBAMELAS_EXPORT ~AmelasControllerClient() override;
 
 protected:

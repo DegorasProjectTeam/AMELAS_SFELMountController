@@ -75,7 +75,6 @@ using CommandType = std::int32_t;   ///< Type used for the BaseServerCommand enu
 using ResultType = std::int32_t;    ///< Type used for the BaseServerResult enumeration.
 
 // TODO getServerInfo
-// TODO getServerTime
 // TODO Control the maximum number of clients.
 // TODO Dinamic configuration for the constants.
 
