@@ -60,6 +60,14 @@
  */
 int main(int, char**)
 {
+
+    // MAIN SERVER APP
+    // GLOBAL CONFIG
+    // AMELAS SERVER
+    // ETC
+    // WARNING: WINDOWS PROCESS MODE
+
+
     // Nampesaces.
     using amelas::communication::AmelasControllerServer;
     using amelas::communication::AmelasServerCommand;

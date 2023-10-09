@@ -56,8 +56,7 @@ namespace zmqutils{
 
 // =====================================================================================================================
 using common::ServerCommand;
-using common::ServerResult;
-using common::ClientResult;
+using common::OperationResult;
 using common::CommandReply;
 using common::CommandType;
 using common::RequestData;
@@ -90,15 +89,15 @@ public:
 
     LIBZMQUTILS_EXPORT bool isWorking() const;
 
-    LIBZMQUTILS_EXPORT ClientResult doConnect(bool auto_alive = false);
+    LIBZMQUTILS_EXPORT OperationResult doConnect(bool auto_alive = false);
 
-    LIBZMQUTILS_EXPORT ClientResult doDisconnect();
+    LIBZMQUTILS_EXPORT OperationResult doDisconnect();
 
-    LIBZMQUTILS_EXPORT ClientResult doAlive();
+    LIBZMQUTILS_EXPORT OperationResult doAlive();
 
-    LIBZMQUTILS_EXPORT ClientResult doGetServerTime(std::string& datetime);
+    LIBZMQUTILS_EXPORT OperationResult doGetServerTime(std::string& datetime);
 
-    LIBZMQUTILS_EXPORT ClientResult sendCommand(const RequestData&, CommandReply&);
+    LIBZMQUTILS_EXPORT OperationResult sendCommand(const RequestData&, CommandReply&);
 
     /**
      * @brief Virtual destructor to ensure proper cleanup when the derived class is destroyed.
@@ -130,7 +129,7 @@ protected:
 
 private:
 
-    ClientResult recvFromSocket(CommandReply&repl, zmq::socket_t *recv_socket, zmq::socket_t *close_socket);
+    OperationResult recvFromSocket(CommandReply&repl, zmq::socket_t *recv_socket, zmq::socket_t *close_socket);
 
     void deleteSockets();
 
@@ -165,8 +164,8 @@ private:
     mutable std::mutex client_close_mtx_;       ///< Safety mutex for closing client.
 
     // Futures for receiving response from send command and auto alive
-    std::future<common::ClientResult> fut_recv_send_;   ///< Future that stores the client recv status for send command.
-    std::future<common::ClientResult> fut_recv_alive_;  ///< Future that stores the client recv status for auto alive.
+    std::future<common::OperationResult> fut_recv_send_;   ///< Future that stores the recv status for send command.
+    std::future<common::OperationResult> fut_recv_alive_;  ///< Future that stores the recv status for auto alive.
 
     // Auto alive functionality.
     std::future<void> auto_alive_future_;

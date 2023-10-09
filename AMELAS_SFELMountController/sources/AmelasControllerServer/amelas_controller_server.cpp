@@ -34,7 +34,7 @@ namespace communication{
 
 // ---------------------------------------------------------------------------------------------------------------------
 using zmqutils::common::ServerCommand;
-using zmqutils::common::ServerResult;
+using zmqutils::common::OperationResult;
 using zmqutils::common::ResultType;
 using zmqutils::utils::BinarySerializer;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ void AmelasControllerServer::processSetHomePosition(const CommandRequest& reques
     // Check the request parameters size.
     if (request.params_size == 0 || !request.params)
     {
-        reply.result = ServerResult::EMPTY_PARAMS;
+        reply.server_result = OperationResult::EMPTY_PARAMS;
         return;
     }
 
@@ -77,7 +77,7 @@ void AmelasControllerServer::processSetHomePosition(const CommandRequest& reques
     }
     catch(...)
     {
-        reply.result = ServerResult::BAD_PARAMETERS;
+        reply.server_result = OperationResult::BAD_PARAMETERS;
         return;
     }
 
@@ -85,7 +85,7 @@ void AmelasControllerServer::processSetHomePosition(const CommandRequest& reques
     ctrl_err = this->invokeCallback<controller::SetHomePositionCallback>(request, reply, pos);
 
     // Serialize parameters if all ok.
-    if(reply.result == ServerResult::COMMAND_OK)
+    if(reply.server_result == OperationResult::COMMAND_OK)
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
 }
 
@@ -99,7 +99,7 @@ void AmelasControllerServer::processGetHomePosition(const CommandRequest& reques
     ctrl_err = this->invokeCallback<controller::GetHomePositionCallback>(request, reply, pos);
 
     // Serialize parameters if all ok.
-    if(reply.result == ServerResult::COMMAND_OK)
+    if(reply.server_result == OperationResult::COMMAND_OK)
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, pos.az, pos.el);
 }
 
@@ -280,7 +280,7 @@ void AmelasControllerServer::onSendingResponse(const CommandReply &reply)
 {
     // Log.
     BinarySerializer serializer(reply.params.get(), reply.params_size);
-    size_t result = static_cast<size_t>(reply.result);
+    size_t result = static_cast<size_t>(reply.server_result);
     std::cout << std::string(100, '-') << std::endl;
     std::cout<<"<AMELAS SERVER>"<<std::endl;
     std::cout<<"-> ON SENDING RESPONSE: "<<std::endl;

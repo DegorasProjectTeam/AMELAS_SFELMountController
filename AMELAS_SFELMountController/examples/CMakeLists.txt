@@ -43,6 +43,7 @@ target_include_directories(${APP_CLIENT_EXAMPLE} PRIVATE
 if (MINGW)
    target_link_libraries(${APP_CLIENT_EXAMPLE} PRIVATE -static-libgcc -static-libstdc++ -static -lpthread)
 endif()
+
 # ----------------------------------------------------------------------------------------------------------------------
 # EXAMPLE AMELAS CONTROLLER SERVER
 

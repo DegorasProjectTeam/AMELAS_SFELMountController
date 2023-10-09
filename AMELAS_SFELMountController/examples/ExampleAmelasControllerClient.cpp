@@ -58,7 +58,7 @@ using zmqutils::utils::BinarySerializer;
 
 void parseCommand(CommandClientBase &client, const std::string &command)
 {
-    zmqutils::common::ClientResult client_result = ClientResult::COMMAND_OK;
+    zmqutils::common::OperationResult client_result = OperationResult::COMMAND_OK;
 
     char *command_str = new char[command.size()];
     std::copy(command.begin(), command.end(), command_str);
@@ -185,7 +185,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             {
                 client_result = client.doConnect();
 
-                if (client_result == ClientResult::CLIENT_STOPPED)
+                if (client_result == OperationResult::CLIENT_STOPPED)
                 {
                     delete[] command_str;
                     return;
@@ -198,7 +198,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                 std::string datetime;
                 client_result = client.doGetServerTime(datetime);
 
-                if (client_result == ClientResult::COMMAND_OK)
+                if (client_result == OperationResult::COMMAND_OK)
                 {
                     std::cout<<"Server time: "<<datetime<<std::endl;
 
@@ -212,16 +212,16 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             std::cerr << "Client Result: " << static_cast<int>(client_result)<<std::endl;
 
-            if (client_result != ClientResult::COMMAND_OK)
+            if (client_result != OperationResult::COMMAND_OK)
             {
             }
             else
             {
 
 
-                std::cout<<"Server result: "<<static_cast<int>(reply.result)<<std::endl;
+                std::cout<<"Server result: "<<static_cast<int>(reply.server_result)<<std::endl;
 
-                if(reply.result != ServerResult::COMMAND_OK)
+                if(reply.server_result != OperationResult::COMMAND_OK)
                 {
                     delete[] command_str;
                     return;

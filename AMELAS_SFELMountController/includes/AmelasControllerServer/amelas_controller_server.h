@@ -57,7 +57,7 @@ namespace communication{
 using namespace amelas::communication::common;
 using zmqutils::common::CommandReply;
 using zmqutils::common::CommandRequest;
-using zmqutils::common::ServerResult;
+using zmqutils::common::OperationResult;
 using zmqutils::common::ServerCommand;
 using zmqutils::common::HostInfo;
 using zmqutils::utils::CallbackHandler;

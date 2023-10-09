@@ -249,10 +249,15 @@ if(WIN32)
     install(DIRECTORY ${ZMQUTILS_PATH}/includes/zmq
             DESTINATION ${CMAKE_INSTALL_PREFIX}/includes/)
 
-    # Install the binaries  of LibZMQUtils to the specified install directory.
+    # Install the binaries to the specified install directory.
     install(TARGETS ${LIB_FULL_NAME}
             LIBRARY DESTINATION ${INSTALL_LIB}
             RUNTIME DESTINATION ${INSTALL_LIB})
+
+    # Install the binaries to the specified install directory.
+    install(TARGETS ${LIB_FULL_NAME}
+            LIBRARY DESTINATION ${INSTALL_LIB}
+            RUNTIME DESTINATION ${INSTALL_BIN})
 
     # Install the binaries of the external libs to the specified install directory.
     install(DIRECTORY ${EXTERNAL_LIBS_PATH}/
@@ -276,10 +281,12 @@ if(WIN32)
             RUNTIME_DEPENDENCY_SET ${LIB_DEPS_SET}
             DESTINATION ${INSTALL_BIN})
 
+    message(${CMAKE_BINARY_DIR})
+
     # Install the external dependencies.
     install(RUNTIME_DEPENDENCY_SET ${LIB_DEPS_SET}
             PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
-            DIRECTORIES ${EXTERNAL_LIBS_PATH} ${INSTALL_LIB}
+            DIRECTORIES ${EXTERNAL_LIBS_PATH} ${CMAKE_BINARY_DIR}/bin
             DESTINATION ${INSTALL_BIN})
 
 endif()

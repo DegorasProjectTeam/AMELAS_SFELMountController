@@ -58,11 +58,11 @@ namespace zmqutils{
 // =====================================================================================================================
 
 // =====================================================================================================================
-using common::ServerResultStr;
+using common::OperationResultStr;
 using common::CommandReply;
 using common::CommandRequest;
 using common::ServerCommand;
-using common::ServerResult;
+using common::OperationResult;
 using common::HostInfo;
 using common::CommandType;
 using internal_helpers::network::NetworkAdapterInfo;
@@ -218,7 +218,7 @@ using utils::UUID;
  *
  * Add a method to easily send large data divided in chunks with progress communication.
  *
- * @see ServerCommand, ServerResult, CommandRequest, CommandReply, CommandClientBase, onCustomCommandReceived
+ * @see ServerCommand, OperationResult, CommandRequest, CommandReply, CommandClientBase, onCustomCommandReceived
  */
 class CommandServerBase : public ZMQContextHandler
 {
@@ -634,7 +634,7 @@ private:
     void updateServerTimeout();
 
     // Function for receive data from the client.
-    ServerResult recvFromSocket(CommandRequest&);
+    OperationResult recvFromSocket(CommandRequest&);
 
     // Function for reset the socket.
     void resetSocket();
@@ -642,13 +642,13 @@ private:
     // INTERNAL COMMANDS.
 
     // Internal connect execution process.
-    ServerResult execReqConnect(CommandRequest&);
+    OperationResult execReqConnect(CommandRequest&);
 
     // Internal disconnect execution process.
-    ServerResult execReqDisconnect(const CommandRequest&);
+    OperationResult execReqDisconnect(const CommandRequest&);
 
     // Internal disconnect execution process.
-    ServerResult execReqGetServerTime(CommandReply& reply);
+    OperationResult execReqGetServerTime(CommandReply& reply);
 
     // -----------------------------------------------------
 

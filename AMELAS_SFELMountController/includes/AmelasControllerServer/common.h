@@ -68,7 +68,7 @@ static constexpr auto AmelasServerCommandStr = zmqutils::utils::joinArraysConste
 
 // Extend the base result strings with those of the subclass.
 static constexpr auto AmelasServerResultStr = zmqutils::utils::joinArraysConstexpr(
-    zmqutils::common::ServerResultStr,
+    zmqutils::common::OperationResultStr,
     std::array<const char*, 2>
     {
         "EMPTY_CALLBACK - The external callback for the command is empty.",

@@ -29,7 +29,7 @@ using common::AmelasServerResultStr;
 using common::AmelasServerCommand;
 using common::AmelasServerResult;
 using zmqutils::common::ServerCommand;
-using zmqutils::common::ServerResult;
+using zmqutils::common::OperationResult;
 using zmqutils::common::ResultType;
 using zmqutils::common::CommandType;
 using zmqutils::utils::BinarySerializer;
@@ -41,6 +41,7 @@ AmelasControllerClient::AmelasControllerClient(const std::string& server_endpoin
 {}
 
 AmelasControllerClient::~AmelasControllerClient(){}
+
 
 void AmelasControllerClient::onClientStart()
 {
@@ -117,8 +118,8 @@ void AmelasControllerClient::onReplyReceived(const CommandReply &reply)
 {
     // Auxiliar.
     BinarySerializer serializer(reply.params.get(), reply.params_size);
-    ResultType result = static_cast<ResultType>(reply.result);
-    std::string res_str = zmqutils::utils::getEnumString(reply.result, AmelasServerResultStr);
+    ResultType result = static_cast<ResultType>(reply.server_result);
+    std::string res_str = zmqutils::utils::getEnumString(reply.server_result, AmelasServerResultStr);
     // Log.
     std::cout << std::string(100, '-') << std::endl;
     std::cout<<"<"<<this->getClientName()<<">"<<std::endl;
@@ -160,7 +161,6 @@ void AmelasControllerClient::onClientError(const zmq::error_t& error, const std:
 }
 
 void amelas::communication::AmelasControllerClient::onInvalidMsgReceived(const CommandReply &) {}
-
 
 
 }} // END NAMESPACES.
