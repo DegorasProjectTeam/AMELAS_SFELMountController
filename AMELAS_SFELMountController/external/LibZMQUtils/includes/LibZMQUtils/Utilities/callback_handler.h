@@ -84,7 +84,7 @@ public:
     /**
      * @brief Default constructor.
      */
-    LIBZMQUTILS_EXPORT CallbackHandler() = default;
+    LIBZMQUTILS_EXPORT CallbackHandler();
 
     /**
      * @brief Deleted copy constructor.
@@ -109,7 +109,7 @@ public:
     /**
      * @brief Default destructor.
      */
-    LIBZMQUTILS_EXPORT ~CallbackHandler() = default;
+    LIBZMQUTILS_EXPORT ~CallbackHandler();
 
     /**
      * @brief Register a member function as a callback replacing the old one.

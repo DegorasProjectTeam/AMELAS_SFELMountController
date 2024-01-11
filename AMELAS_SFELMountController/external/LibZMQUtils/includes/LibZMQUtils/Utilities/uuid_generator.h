@@ -73,7 +73,7 @@ public:
     /**
      * @brief Default constructor.
      */
-    LIBZMQUTILS_EXPORT UUID() = default;
+    LIBZMQUTILS_EXPORT UUID();
 
     /**
      * @brief Returns string representation of the UUID

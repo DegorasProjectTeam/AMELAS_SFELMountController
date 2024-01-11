@@ -217,7 +217,7 @@ struct HostInfo
     /**
      * @brief Default constructor for HostInfo.
      */
-    LIBZMQUTILS_EXPORT HostInfo() = default;
+    LIBZMQUTILS_EXPORT HostInfo();
     
     /**
      * @brief Constructor for HostInfo with specific parameters.
