@@ -68,12 +68,16 @@ set(FORCE_INSTALL_DIR TRUE)
 # External dependecies path.
 set(ZMQUTILS_PATH ${CMAKE_SOURCE_DIR}/external/LibZMQUtils)
 
+# Logging library
+add_subdirectory(external/spdlog)
+
 # Define the install directory for each compiler and operating system.
 macro_prepare_install_dir(INSTALL_BIN INSTALL_LIB ${CMAKE_CURRENT_SOURCE_DIR}/../product_v${VERSION})
 
 # Generic Includes.
 include_directories(${CMAKE_SOURCE_DIR}/includes)
 include_directories(${ZMQUTILS_PATH}/includes)
+include_directories(external/spdlog/include)
 
 # **********************************************************************************************************************
 # AMELAS INTERFACE LIBRARY
@@ -132,7 +136,7 @@ endif()
 
 # In mingw better do static linking of the libgcc, libwinpthread and libstd.
 if (MINGW)
-    target_link_libraries(${LIB_FULL_NAME} PRIVATE -static-libgcc -static-libstdc++ -static -lpthread)
+    target_link_libraries(${LIB_FULL_NAME} PRIVATE -static-libgcc -static-libstdc++ -static -lpthread spdlog::spdlog)
 endif()
 
 # Set libraries. For win32 only.
@@ -146,7 +150,8 @@ if (WIN32)
             optimized ${ZMQUTILS_PATH}/lib/mingw-x86_64_release/libzmq-v142-mt-4_3_4.dll
             debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libzmq-v142-mt-4_3_4.dll
             optimized ${ZMQUTILS_PATH}/lib/mingw-x86_64_release/libsodium.dll
-            debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libsodium.dll)
+            debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libsodium.dll
+            spdlog::spdlog)
 
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
@@ -154,7 +159,8 @@ if (WIN32)
             optimized ${ZMQUTILS_PATH}/lib/msvc-x86_64_release/libzmq-v142-mt-4_3_4.lib
             debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/libzmq-v142-mt-4_3_4.lib
             optimized ${ZMQUTILS_PATH}/lib/msvc-x86_64_release/LibZMQUtils.lib
-            debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/LibZMQUtils.lib)
+            debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/LibZMQUtils.lib
+            spdlog::spdlog)
 
     else()
         message(FATAL_ERROR "Compiler not supported by default.")
