@@ -50,6 +50,13 @@
 #include <AmelasServerInterface>
 // =====================================================================================================================
 
+// LOG LIBRARY INCLUDES
+// =====================================================================================================================
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/daily_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+// =====================================================================================================================
+
 /**
  * @brief Main entry point of the program AmelasControllerServerApp.
  *
@@ -76,6 +83,20 @@ int main(int, char**)
     // Configure the console.
     zmqutils::utils::ConsoleConfig& console_cfg = zmqutils::utils::ConsoleConfig::getInstance();
     console_cfg.configureConsole(true, true, true);
+
+    // Configure the logging
+    // TODO: Cargar el nivel de log de la consola desde la configuración
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    console_sink->set_level(spdlog::level::info);
+    console_sink->set_pattern("[%^%l%$] %v");
+    // TODO: Cargar el path del log desde la configuración
+    // TODO: Cargar la hora de salto de fichero de log mediante configuración
+    // TODO: Nivel de log desde archivo de configuración
+    auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>("logs/daily.txt", 8, 0);
+    file_sink->set_level(spdlog::level::debug);
+    file_sink->set_pattern("[%^%l%$] %v");
+    spdlog::sinks_init_list sinks = {console_sink, file_sink};
+    auto logger = std::make_shared<spdlog::logger>("AmelasLogger", sinks);
 
     // Configuration variables.
     unsigned port = 9999;
