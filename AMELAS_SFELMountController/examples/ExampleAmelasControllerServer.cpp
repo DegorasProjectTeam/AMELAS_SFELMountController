@@ -52,6 +52,12 @@
 #include <AmelasServerInterface>
 // =====================================================================================================================
 
+// LOG LIBRARY INCLUDES
+// =====================================================================================================================
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+// =====================================================================================================================
+
 /**
  * @brief Main entry point of the program ExampleAmelasControllerServer.
  *
@@ -64,17 +70,22 @@ int main(int, char**)
     using amelas::communication::AmelasControllerServer;
     using amelas::communication::AmelasServerCommand;
     using amelas::controller::AmelasController;
+    using amelas::controller::AmelasControllerConfig;
 
     // Configure the console.
     zmqutils::utils::ConsoleConfig& console_cfg = zmqutils::utils::ConsoleConfig::getInstance();
     console_cfg.configureConsole(true, true, true);
+
+    // Configure the logging
+    auto logger = spdlog::stdout_color_mt("console");
 
     // Configuration variables.
     unsigned port = 9999;
     bool client_status_check = true;
 
     // Instantiate the Amelas controller.
-    AmelasController amelas_controller;
+    AmelasControllerConfig amemlas_controller_config;
+    AmelasController amelas_controller(amemlas_controller_config, logger);
 
     // Instantiate the server.
     AmelasControllerServer amelas_server(port);
