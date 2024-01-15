@@ -38,6 +38,7 @@
 #include <limits>
 #include <any>
 #include <sstream>
+#include <fstream>
 // =====================================================================================================================
 
 // ZMQUTILS INCLUDES
@@ -57,10 +58,61 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 // =====================================================================================================================
 
-// TWINCAT ADS INCLUDES
+// JSON INCLUDES
 // =====================================================================================================================
-#include <AmelasAdsClient/amelas_ads_client.h>
+#include "nlohmann/json.hpp"
 // =====================================================================================================================
+
+enum AmelasLogLevel
+{
+    critical = spdlog::level::critical,
+    error = spdlog::level::err,
+    warning = spdlog::level::warn,
+    info = spdlog::level::info,
+    debug = spdlog::level::debug,
+    trace = spdlog::level::trace
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(AmelasLogLevel, {
+    {critical, "critical"},
+    {error, "error"},
+    {warning, "warning"},
+    {info, "info"},
+    {debug, "debug"},
+    {trace, "trace"},
+})
+
+struct AmelasControllerServerLogConsoleConfig
+{
+    AmelasLogLevel level;
+};
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AmelasControllerServerLogConsoleConfig, level)
+
+struct AmelasControllerServerLogFileConfig
+{
+    AmelasLogLevel level;
+    std::string path;
+    int newFileHour;
+};
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AmelasControllerServerLogFileConfig, level, path, newFileHour)
+
+struct AmelasControllerServerLogConfig
+{
+    AmelasControllerServerLogConsoleConfig console;
+    AmelasControllerServerLogFileConfig file;
+};
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AmelasControllerServerLogConfig, console, file)
+
+struct AmelasControllerServerConfig
+{
+    amelas::controller::AmelasControllerConfig controller;
+    AmelasControllerServerLogConfig log;
+};
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AmelasControllerServerConfig, controller, log)
 
 /**
  * @brief Main entry point of the program AmelasControllerServerApp.
@@ -84,22 +136,23 @@ int main(int, char**)
     using amelas::communication::AmelasControllerServer;
     using amelas::communication::AmelasServerCommand;
     using amelas::controller::AmelasController;
-    using amelas::controller::AmelasControllerConfig;
 
     // Configure the console.
     zmqutils::utils::ConsoleConfig& console_cfg = zmqutils::utils::ConsoleConfig::getInstance();
     console_cfg.configureConsole(true, true, true);
 
+    // TODO: Load the configuration
+    std::ifstream f("config.json");
+    nlohmann::json json_config = nlohmann::json::parse(f);
+    auto config = json_config.template get<AmelasControllerServerConfig>();
+
     // Configure the logging
-    // TODO: Cargar el nivel de log de la consola desde la configuración
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    console_sink->set_level(spdlog::level::info);
+    console_sink->set_level((spdlog::level::level_enum)config.log.console.level);
     console_sink->set_pattern("[%^%l%$] %v");
-    // TODO: Cargar el path del log desde la configuración
-    // TODO: Cargar la hora de salto de fichero de log mediante configuración
-    // TODO: Nivel de log desde archivo de configuración
-    auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>("logs/daily.txt", 8, 0);
-    file_sink->set_level(spdlog::level::debug);
+    auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>(config.log.file.path, 
+                                                                            config.log.file.newFileHour, 0);
+    file_sink->set_level((spdlog::level::level_enum)config.log.file.level);
     file_sink->set_pattern("[%^%l%$] %v");
     spdlog::sinks_init_list sinks = {console_sink, file_sink};
     auto logger = std::make_shared<spdlog::logger>("AmelasLogger", sinks);
@@ -109,8 +162,7 @@ int main(int, char**)
     bool client_status_check = true;
 
     // Instantiate the Amelas controller.
-    AmelasControllerConfig amelas_controller_config;
-    AmelasController amelas_controller(amelas_controller_config, logger);
+    AmelasController amelas_controller(config.controller, logger);
 
     // Instantiate the server.
     AmelasControllerServer amelas_server(port);

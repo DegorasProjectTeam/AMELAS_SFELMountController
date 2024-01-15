@@ -1,3 +1,6 @@
 [submodule "AMELAS_SFELMountController/external/spdlog"]
 	path = AMELAS_SFELMountController/external/spdlog
 	url = ../../gabime/spdlog.git
+[submodule "AMELAS_SFELMountController/external/json"]
+	path = AMELAS_SFELMountController/external/json
+	url = ../../nlohmann/json.git

@@ -25,7 +25,7 @@ std::vector<std::string> splitString(const std::string &str, const char delim)
 AmelasAdsClient::AmelasAdsClient(const AmelasAdsClientConfig &config, const std::shared_ptr<spdlog::logger> logger) 
 : _config(config), _logger(logger)
 {
-    auto addressAndPort = splitString(_config.AmsAddress, ':');
+    auto addressAndPort = splitString(_config.amsAddress, ':');
     _adsAddress.port = (unsigned short) strtoul(addressAndPort[1].c_str(), NULL, 0);
     auto addressOctetsString = splitString(addressAndPort[0], '.');
     for (auto ii = 0; ii < 6; ii++)

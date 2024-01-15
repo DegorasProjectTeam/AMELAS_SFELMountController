@@ -68,6 +68,10 @@ set(FORCE_INSTALL_DIR TRUE)
 # External dependecies path.
 set(ZMQUTILS_PATH ${CMAKE_SOURCE_DIR}/external/LibZMQUtils)
 
+# JSON library
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(external/json)
+
 # Logging library
 add_subdirectory(external/spdlog)
 
@@ -157,6 +161,7 @@ if (WIN32)
             optimized ${ZMQUTILS_PATH}/lib/mingw-x86_64_release/libsodium.dll
             debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libsodium.dll
             spdlog::spdlog
+            nlohmann_json::nlohmann_json
             "C:/TwinCAT/AdsApi/TcAdsDll/x64/lib/TcAdsDll.lib")
 
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -167,6 +172,7 @@ if (WIN32)
             optimized ${ZMQUTILS_PATH}/lib/msvc-x86_64_release/LibZMQUtils.lib
             debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/LibZMQUtils.lib
             spdlog::spdlog
+            nlohmann_json::nlohmann_json
             "C:/TwinCAT/AdsApi/TcAdsDll/x64/lib/TcAdsDll.lib")
 
     else()
@@ -213,6 +219,11 @@ macro_setup_deploy_launcher("${APP_SERVER}" "${INSTALL_BIN}" "${LIB_DEPS_SET}")
 if (MINGW)
     target_link_libraries(${APP_SERVER} PRIVATE -static-libgcc -static-libstdc++ -static -lpthread)
 endif()
+
+# Manually copy the configuration file to the output directory
+file(GENERATE 
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/bin/config.json
+    INPUT ${CMAKE_CURRENT_SOURCE_DIR}/config/config.json )
 
 # ----------------------------------------------------------------------------------------------------------------------
 

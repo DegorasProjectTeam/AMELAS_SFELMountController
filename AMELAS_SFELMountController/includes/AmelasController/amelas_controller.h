@@ -42,6 +42,10 @@
 #include "spdlog/spdlog.h"
 // =====================================================================================================================
 
+// JSON INCLUDES
+// =====================================================================================================================
+#include "nlohmann/json.hpp"
+// =====================================================================================================================
 
 // PROJECT INCLUDES
 // =====================================================================================================================
@@ -58,8 +62,10 @@ namespace controller{
 
 struct AmelasControllerConfig
 {
-    AmelasAdsClientConfig plc_config;
+    amelas::AmelasAdsClientConfig plcConfig;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AmelasControllerConfig, plcConfig)
 
 class AmelasController
 {
