@@ -104,6 +104,12 @@ using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Ar
 using SetHomePositionCallback = std::function<AmelasError(const AltAzPos&)>;
 using GetHomePositionCallback = std::function<AmelasError(AltAzPos&)>;
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
+using SetIdlePositionCallback = std::function<AmelasError(const AltAzPos&)>;
+using SetParkPositionCallback = std::function<AmelasError(const AltAzPos&)>;
+using SetCalibrationPositionCallback = std::function<AmelasError(const AltAzPos&)>;
+using SetIdlePositionHereCallback = std::function<AmelasError()>;
+using SetParkPositionHereCallback = std::function<AmelasError()>;
+using SetCalibrationPositionHereCallback = std::function<AmelasError()>;
 
 // =====================================================================================================================
 

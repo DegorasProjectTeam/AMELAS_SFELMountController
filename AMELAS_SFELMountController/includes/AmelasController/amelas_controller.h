@@ -56,14 +56,29 @@ public:
     LIBAMELAS_EXPORT AmelasController();
 
     LIBAMELAS_EXPORT AmelasError setHomePosition(const AltAzPos& pos);
-
     LIBAMELAS_EXPORT AmelasError getHomePosition(AltAzPos& pos);
 
     LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
 
+    LIBAMELAS_EXPORT AmelasError setIdlePosition(const AltAzPos& pos);
+    LIBAMELAS_EXPORT AmelasError getIdlePosition(AltAzPos& pos);
+
+    LIBAMELAS_EXPORT AmelasError setParkPosition(const AltAzPos& pos);
+    LIBAMELAS_EXPORT AmelasError getParkPosition(AltAzPos& pos);
+
+    LIBAMELAS_EXPORT AmelasError setCalibrationPosition(const AltAzPos& pos);
+    LIBAMELAS_EXPORT AmelasError getCalibrationPosition(AltAzPos& pos);
+
+    LIBAMELAS_EXPORT AmelasError setIdlePositionHere();
+    LIBAMELAS_EXPORT AmelasError setParkPositionHere();
+    LIBAMELAS_EXPORT AmelasError setCalibrationPositionHere();
+
 private:
 
     AltAzPos home_pos_;
+    AltAzPos idle_pos_;
+    AltAzPos park_pos_;
+    AltAzPos calibration_pos_;
 
 };
 
