@@ -186,7 +186,7 @@ endif()
 
 # App config.
 set(APP_SERVER "AmelasControllerServerApp")
-set(APP_BUILD_FOLDER ${CMAKE_BINARY_DIR}/bin/Applications)
+set(APP_BUILD_FOLDER ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${APP_BUILD_FOLDER})
 
 # Get the header files for the server.

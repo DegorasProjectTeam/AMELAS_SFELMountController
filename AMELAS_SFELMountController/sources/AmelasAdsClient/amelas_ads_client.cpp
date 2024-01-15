@@ -28,7 +28,6 @@ AmelasAdsClient::AmelasAdsClient(std::shared_ptr<spdlog::logger> logger) : _logg
 
 void AmelasAdsClient::connect(const std::string &address)
 {
-   
     auto addressAndPort = splitString(address, ':');
     _adsAddress.port = (unsigned short) strtoul(addressAndPort[1].c_str(), NULL, 0);
     auto addressOctetsString = splitString(addressAndPort[0], '.');
@@ -55,7 +54,7 @@ template <typename T>
 void AmelasAdsClient::write(const std::string &symbol, const T data)
 {
     ULONG handle = getHandleFromSymbol(symbol);
-    long errorCode = AdsSyncWriteReqEx(_adsPort, &_adsAddress, ADSIGRP_SYM_VALBYHND,
+    long errorCode = AdsSyncWriteReq(&_adsAddress, ADSIGRP_SYM_VALBYHND,
                                         handle, sizeof(T), (PVOID)&data);
     if (errorCode) {
         std::ostringstream oss;
@@ -69,15 +68,14 @@ void AmelasAdsClient::write(const std::string &symbol, const T data)
 template <typename T>
 T AmelasAdsClient::read(const std::string &symbol)
 {
-    ULONG pcbReturn;
     T readValue;
     ULONG handle = getHandleFromSymbol(symbol);
     long errorCode =
-        AdsSyncReadReqEx2(_adsPort, &_adsAddress, ADSIGRP_SYM_VALBYHND, handle,
-                            sizeof(T), (PVOID)&readValue, &pcbReturn);
+        AdsSyncReadReq(&_adsAddress, ADSIGRP_SYM_VALBYHND, handle,
+                            sizeof(T), (PVOID)&readValue);
     if (errorCode) {
         std::ostringstream oss;
-        oss << "Error: AdsSyncReadReqEx2 reading symbol: " << symbol << " - Error code:" << errorCode << '\n';
+        oss << "Error: AdsSyncReadReq reading symbol: " << symbol << " - Error code:" << errorCode << '\n';
         _logger->error(oss.str());
         // TODO: Throw here
     }
@@ -90,15 +88,13 @@ ULONG AmelasAdsClient::getHandleFromSymbol(const std::string &symbol)
     {
         return _handlesCache[symbol];
     }
-    const char* c_symbol = symbol.c_str();
     ULONG handle;
-    ULONG pcbReturn;
-    long errorCode = AdsSyncReadWriteReqEx2(_adsPort, &_adsAddress, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(handle),
-                                                &handle, sizeof(c_symbol), (void *)c_symbol, &pcbReturn);
+    long errorCode = AdsSyncReadWriteReq(&_adsAddress, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(handle),
+                                                &handle, symbol.size(), (void *)symbol.c_str());
     if (errorCode)
     {
         std::ostringstream oss;
-        oss << "Error: AdsSyncReadWriteReqEx2 getting symbol: " << symbol << " - Error code:" << errorCode << '\n';
+        oss << "Error: AdsSyncReadWriteReq getting symbol: " << symbol << " - Error code:" << errorCode << '\n';
         _logger->error(oss.str());
         // TODO: Throw here
     }

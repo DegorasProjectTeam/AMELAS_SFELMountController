@@ -57,6 +57,11 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 // =====================================================================================================================
 
+// TWINCAT ADS INCLUDES
+// =====================================================================================================================
+#include <AmelasAdsClient/amelas_ads_client.h>
+// =====================================================================================================================
+
 /**
  * @brief Main entry point of the program AmelasControllerServerApp.
  *
@@ -103,7 +108,7 @@ int main(int, char**)
     bool client_status_check = true;
 
     // Instantiate the Amelas controller.
-    AmelasController amelas_controller;
+    AmelasController amelas_controller(logger);
 
     // Instantiate the server.
     AmelasControllerServer amelas_server(port);

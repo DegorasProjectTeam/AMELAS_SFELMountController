@@ -23,28 +23,24 @@
 
 #include "spdlog/spdlog.h"
 
-// PROJECT INCLUDES
-// =====================================================================================================================
-#include "libamelas_global.h"
-// =====================================================================================================================
-
 namespace amelas {
 
 class AmelasAdsClient
 {
     public:
-        LIBAMELAS_EXPORT AmelasAdsClient(std::shared_ptr<spdlog::logger> logger);
+        AmelasAdsClient(std::shared_ptr<spdlog::logger> logger);
 
-        LIBAMELAS_EXPORT void connect(const std::string &address);
-        LIBAMELAS_EXPORT void disconnect();
+        void connect(const std::string &address);
+        void disconnect();
 
-        template <typename T> 
-        LIBAMELAS_EXPORT void write(const std::string &symbol, const T data);
+        template<typename T>
+        void write(const std::string &symbol, const T data);
 
-        template <typename T>
-        LIBAMELAS_EXPORT T read(const std::string &symbol);
+        template<typename T>
+        T read(const std::string &symbol);
 
     private:
+
         ULONG getHandleFromSymbol(const std::string &symbol);
 
         std::map<std::string,ULONG> _handlesCache;
