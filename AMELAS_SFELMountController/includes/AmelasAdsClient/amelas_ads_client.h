@@ -25,12 +25,17 @@
 
 namespace amelas {
 
+struct AmelasAdsClientConfig 
+{
+    std::string AmsAddress;
+};
+
 class AmelasAdsClient
 {
     public:
-        AmelasAdsClient(std::shared_ptr<spdlog::logger> logger);
+        AmelasAdsClient(const AmelasAdsClientConfig &config, const std::shared_ptr<spdlog::logger> logger);
 
-        void connect(const std::string &address);
+        void connect();
         void disconnect();
 
         template<typename T>
@@ -40,13 +45,13 @@ class AmelasAdsClient
         T read(const std::string &symbol);
 
     private:
-
         ULONG getHandleFromSymbol(const std::string &symbol);
 
         std::map<std::string,ULONG> _handlesCache;
         long _adsPort;
         AmsAddr _adsAddress;
         const std::shared_ptr<spdlog::logger> _logger;
+        const AmelasAdsClientConfig _config;
 };
 
 }

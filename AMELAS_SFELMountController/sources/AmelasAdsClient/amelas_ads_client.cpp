@@ -22,20 +22,20 @@ std::vector<std::string> splitString(const std::string &str, const char delim)
     return result; 
 }
 
-AmelasAdsClient::AmelasAdsClient(std::shared_ptr<spdlog::logger> logger) : _logger(logger)
+AmelasAdsClient::AmelasAdsClient(const AmelasAdsClientConfig &config, const std::shared_ptr<spdlog::logger> logger) 
+: _config(config), _logger(logger)
 {
-}
-
-void AmelasAdsClient::connect(const std::string &address)
-{
-    auto addressAndPort = splitString(address, ':');
+    auto addressAndPort = splitString(_config.AmsAddress, ':');
     _adsAddress.port = (unsigned short) strtoul(addressAndPort[1].c_str(), NULL, 0);
     auto addressOctetsString = splitString(addressAndPort[0], '.');
     for (auto ii = 0; ii < 6; ii++)
     {
         _adsAddress.netId.b[ii] = (unsigned char) strtoul(addressOctetsString[ii].c_str(), NULL, 0);
     }
+}
 
+void AmelasAdsClient::connect()
+{
     _adsPort = AdsPortOpen();
 }
 

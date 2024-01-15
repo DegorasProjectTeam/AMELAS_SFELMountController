@@ -56,11 +56,17 @@ namespace amelas{
 namespace controller{
 // =====================================================================================================================
 
+struct AmelasControllerConfig
+{
+    AmelasAdsClientConfig plc_config;
+};
+
 class AmelasController
 {
 public:
 
-    LIBAMELAS_EXPORT AmelasController(std::shared_ptr<spdlog::logger> logger);
+    LIBAMELAS_EXPORT AmelasController(const AmelasControllerConfig &config, 
+                                        const std::shared_ptr<spdlog::logger> logger);
 
     LIBAMELAS_EXPORT AmelasError setHomePosition(const AltAzPos& pos);
 
@@ -69,7 +75,8 @@ public:
     LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
 
 private:
-    std::shared_ptr<spdlog::logger> _logger;
+    const AmelasControllerConfig _config;
+    const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
 
     AltAzPos home_pos_;

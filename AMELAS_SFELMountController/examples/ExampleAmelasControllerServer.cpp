@@ -70,6 +70,7 @@ int main(int, char**)
     using amelas::communication::AmelasControllerServer;
     using amelas::communication::AmelasServerCommand;
     using amelas::controller::AmelasController;
+    using amelas::controller::AmelasControllerConfig;
 
     // Configure the console.
     zmqutils::utils::ConsoleConfig& console_cfg = zmqutils::utils::ConsoleConfig::getInstance();
@@ -83,7 +84,8 @@ int main(int, char**)
     bool client_status_check = true;
 
     // Instantiate the Amelas controller.
-    AmelasController amelas_controller(logger);
+    AmelasControllerConfig amemlas_controller_config;
+    AmelasController amelas_controller(amemlas_controller_config, logger);
 
     // Instantiate the server.
     AmelasControllerServer amelas_server(port);
