@@ -22,13 +22,16 @@
 #include <TcAdsAPI.h>
 
 #include "spdlog/spdlog.h"
+#include "nlohmann/json.hpp"
 
 namespace amelas {
 
 struct AmelasAdsClientConfig 
 {
-    std::string AmsAddress;
+    std::string amsAddress;
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AmelasAdsClientConfig, amsAddress)
 
 class AmelasAdsClient
 {

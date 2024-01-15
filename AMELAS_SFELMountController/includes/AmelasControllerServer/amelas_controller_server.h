@@ -47,6 +47,11 @@
 #include "libamelas_global.h"
 // =====================================================================================================================
 
+// SPDLOG INCLUDES
+// =====================================================================================================================
+#include "spdlog/spdlog.h"
+// =====================================================================================================================
+
 // AMELAS NAMESPACES
 // =====================================================================================================================
 namespace amelas{
@@ -68,7 +73,8 @@ class AmelasControllerServer final : public zmqutils::ClbkCommandServerBase
 {
 public:
 
-    LIBAMELAS_EXPORT AmelasControllerServer(unsigned port, const std::string& local_addr = "*");
+    LIBAMELAS_EXPORT AmelasControllerServer(const std::shared_ptr<spdlog::logger> logger, unsigned port, 
+                                            const std::string& local_addr = "*");
 
     // Register callback function helper.
     template<typename... Args>
@@ -140,6 +146,8 @@ private:
 
     // Internal overrided server error callback.
     virtual void onServerError(const zmq::error_t&, const std::string& ext_info) final;
+
+    const std::shared_ptr<spdlog::logger> _logger;
 };
 
 }} // END NAMESPACES.
