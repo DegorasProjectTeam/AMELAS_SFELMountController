@@ -33,56 +33,16 @@ namespace controller{
 
 AmelasController::AmelasController(const AmelasControllerConfig &config, 
                                     const std::shared_ptr<spdlog::logger> logger) :
-    _config(config), home_pos_(-1,-1), idle_pos_(-1,-1), park_pos_(-1,-1), calibration_pos_(-1,-1), _logger(logger)
+    _config(config),
+    home_pos_(-1,-1),
+    idle_pos_(-1,-1),
+    park_pos_(-1,-1),
+    calibration_pos_(-1,-1),
+    home_pos_offset_(-1,-1),
+    wait_alt_(-1),
+    _logger(logger)
 {
     _plc = std::make_shared<amelas::AmelasAdsClient>(_config.plcConfig, _logger); 
-}
-
-AmelasError AmelasController::setHomePosition(const AltAzPos &pos)
-{
-    // Auxiliar result.
-    AmelasError error = AmelasError::SUCCESS;
-
-    // Check the provided values.
-    if (pos.az >= 360.0 ||  pos.az < 0.0 || pos.el >= 90. || pos.el < 0.)
-    {
-        error = AmelasError::INVALID_POSITION;
-    }
-    else
-    {
-        this->home_pos_ = pos;
-    }
-
-    // Do things in the hardware (PLC) or FPGA.
-    // this->doPLCSetHomePosition(isdhfkljsdhilfhlisd)
-    // WARNING: Remember use async if the tasks are computationally demanding.
-    // [...]
-
-    // Log.
-    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
-    std::cout << std::string(100, '-') << std::endl;
-    std::cout << "<AMELAS CONTROLLER>" << std::endl;
-    std::cout << "-> SET_HOME_POSITION" << std::endl;
-    std::cout << "Time: " << zmqutils::utils::currentISO8601Date() << std::endl;
-    std::cout << "Az: " << pos.az << std::endl;
-    std::cout << "El: " << pos.el << std::endl;
-    std::cout << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << std::endl;
-    std::cout << std::string(100, '-') << std::endl;
-
-    return error;
-}
-
-AmelasError AmelasController::getHomePosition(AltAzPos &pos)
-{
-    pos = this->home_pos_;
-
-    std::cout << std::string(100, '-') << std::endl;
-    std::cout << "<AMELAS CONTROLLER>" << std::endl;
-    std::cout << "-> GET_HOME_POSITION" << std::endl;
-    std::cout << "Time: " << zmqutils::utils::currentISO8601Date() << std::endl;
-    std::cout << std::string(100, '-') << std::endl;
-    
-    return AmelasError::SUCCESS;
 }
 
 AmelasError AmelasController::getDatetime(std::string &)
@@ -90,7 +50,7 @@ AmelasError AmelasController::getDatetime(std::string &)
     return AmelasError::SUCCESS;
 }
 
-AmelasError AmelasController::setIdlePosition(const AltAzPos &pos)
+AmelasError AmelasController::setPosition(const AltAzPos& pos, const std::string plcSymbol, const std::string command)
 {
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
@@ -102,136 +62,196 @@ AmelasError AmelasController::setIdlePosition(const AltAzPos &pos)
     }
     else
     {
-        this->idle_pos_ = pos;
+        if (command == "SET_HOME_POSITION")
+            this->home_pos_ = pos;
+        else if (command == "SET_IDLE_POSITION")
+            this->idle_pos_ = pos;
+        else if (command == "SET_PARK_POSITION")
+            this->park_pos_ = pos;
+        else if (command == "SET_CALIBRATION_POSITION")
+            this->calibration_pos_ = pos;
+        else if (command == "SET_HOMING_OFFSETS")
+            this->home_pos_offset_ = pos;
     }
 
-    // Do things in the hardware PLC
+    // Do things in the hardware (PLC).
+    _plc->write(plcSymbol + ".az", pos.az);
+    _plc->write(plcSymbol + ".el", pos.el);
 
     // Log.
-    
+    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << "Az: " << pos.az << '\n'
+    << "El: " << pos.el << '\n'
+    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+
     return error;
+}
+
+AmelasError AmelasController::getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command)
+{
+    if (command == "GET_HOME_POSITION")
+        pos = this->home_pos_;
+    else if (command == "GET_IDLE_POSITION")
+        pos = this->idle_pos_;
+    else if (command == "GET_PARK_POSITION")
+        pos = this->park_pos_;
+    else if (command == "GET_CALIBRATION_POSITION")
+        pos = this->calibration_pos_;
+    else if (command == "GET_HOMING_OFFSETS")
+        pos = this->home_pos_offset_;
+
+    // Log.
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+    
+    return AmelasError::SUCCESS;
+}
+
+AmelasError AmelasController::setHomePosition(const AltAzPos &pos)
+{
+    const std::string symbol = "MAIN.HomePosition";
+    const std::string command = "SET_HOME_POSITION";
+    return setPosition(pos, symbol, command);
+}
+
+AmelasError AmelasController::getHomePosition(AltAzPos &pos)
+{
+    const std::string symbol = "MAIN.HomePosition";
+    const std::string command = "GET_HOME_POSITION";
+    return getPosition(pos, symbol, command);
+}
+
+AmelasError AmelasController::setIdlePosition(const AltAzPos &pos)
+{
+    const std::string symbol = "MAIN.IdlePosition";
+    const std::string command = "SET_IDLE_POSITION";
+    return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getIdlePosition(AltAzPos &pos)
 {
-    pos = this->idle_pos_;
-
-    // Log.
-    
-    return AmelasError::SUCCESS;
+    const std::string symbol = "MAIN.IdlePosition";
+    const std::string command = "GET_IDLE_POSITION";
+    return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setParkPosition(const AltAzPos &pos)
 {
-    // Auxiliar result.
-    AmelasError error = AmelasError::SUCCESS;
-
-    // Check the provided values.
-    if (pos.az >= 360.0 ||  pos.az < 0.0 || pos.el >= 90. || pos.el < 0.)
-    {
-        error = AmelasError::INVALID_POSITION;
-    }
-    else
-    {
-        this->park_pos_ = pos;
-    }
-
-    // Do things in the hardware PLC
-
-    // Log.
-    
-    return error;
+    const std::string symbol = "MAIN.ParkPosition";
+    const std::string command = "SET_PARK_POSITION";
+    return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getParkPosition(AltAzPos &pos)
 {
-    pos = this->park_pos_;
-
-    // Log.
-    
-    return AmelasError::SUCCESS;
+    const std::string symbol = "MAIN.ParkPosition";
+    const std::string command = "GET_PARK_POSITION";
+    return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setCalibrationPosition(const AltAzPos &pos)
 {
-    // Auxiliar result.
-    AmelasError error = AmelasError::SUCCESS;
-
-    // Check the provided values.
-    if (pos.az >= 360.0 ||  pos.az < 0.0 || pos.el >= 90. || pos.el < 0.)
-    {
-        error = AmelasError::INVALID_POSITION;
-    }
-    else
-    {
-        this->calibration_pos_ = pos;
-    }
-
-    // Do things in the hardware PLC
-
-    // Log.
-    
-    return error;
+    const std::string symbol = "MAIN.CalibrationPosition";
+    const std::string command = "SET_CALIBRATION_POSITION";
+    return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getCalibrationPosition(AltAzPos &pos)
 {
-    pos = this->calibration_pos_;
-
-    // Log.
-    
-    return AmelasError::SUCCESS;
+    const std::string symbol = "MAIN.CalibrationPosition";
+    const std::string command = "GET_CALIBRATION_POSITION";
+    return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setIdlePositionHere()
 {
-    // Auxiliar result.
-    AmelasError error = AmelasError::SUCCESS;
-
-    // this->idle_pos_.az = _plc->read<double>("az_idle");
-    // this->idle_pos_.el = _plc->read<double>("el_idle");
-
-    // Do things in the hardware PLC
-    // _plc->write<double>("az_idle", this->idle_pos_.az);
-    // _plc->write<double>("el_idle", this->idle_pos_.el);
-
-    // Log.
-    
-    return error;
+    AltAzPos pos(_plc->read<double>("MAIN.CurrentPosition.az"), _plc->read<double>("MAIN.CurrentPosition.el"));
+    return setIdlePosition(pos);
 }
 
 AmelasError AmelasController::setParkPositionHere()
 {
-    // Auxiliar result.
-    AmelasError error = AmelasError::SUCCESS;
-
-    // this->park_pos_.az = _plc->read<double>("az_park");
-    // this->park_pos_.el = _plc->read<double>("el_park");
-
-    // Do things in the hardware PLC
-    // _plc->write<double>("az_park", this->park_pos_.az);
-    // _plc->write<double>("el_park", this->park_pos_.el);
-
-    // Log.
-    
-    return error;
+    AltAzPos pos(_plc->read<double>("MAIN.CurrentPosition.az"), _plc->read<double>("MAIN.CurrentPosition.el"));
+    return setParkPosition(pos);
 }
 
 AmelasError AmelasController::setCalibrationPositionHere()
 {
+    AltAzPos pos(_plc->read<double>("MAIN.CurrentPosition.az"), _plc->read<double>("MAIN.CurrentPosition.el"));
+    return setCalibrationPosition(pos);
+}
+
+AmelasError AmelasController::setHomingOffsets(const AltAzAdj& pos)
+{
+    const std::string symbol = "MAIN.HomePositionOffsets";
+    const std::string command = "SET_HOMING_OFFSETS";
+    return setPosition(pos, symbol, command);
+}
+
+AmelasError AmelasController::getHomingOffsets(AltAzAdj &pos)
+{
+    const std::string symbol = "MAIN.HomePositionOffsets";
+    const std::string command = "GET_HOMING_OFFSETS";
+    return getPosition(pos, symbol, command);
+}
+
+AmelasError AmelasController::setWaitAlt(const double& alt)
+{
+    const std::string plcSymbol = "MAIN.WaitAlt";
+    const std::string command = "SET_WAIT_ALT";
+
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    // this->calibration_pos_.az = _plc->read<double>("az_calibration");
-    // this->calibration_pos_.el = _plc->read<double>("el_calibration");
+    this->wait_alt_ = alt;
 
-    // Do things in the hardware PLC
-    // _plc->write<double>("az_calibration", this->calibration_pos_.az);
-    // _plc->write<double>("el_calibration", this->calibration_pos_.el);
+    // Do things in the hardware (PLC).
+    _plc->write(plcSymbol, alt);
 
     // Log.
-    
+    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << "Alt: " << alt << '\n'
+    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+
     return error;
+}
+
+AmelasError AmelasController::getWaitAlt(double& alt)
+{
+    const std::string plcSymbol = "MAIN.WaitAlt";
+    const std::string command = "GET_WAIT_ALT";
+
+    alt = this->wait_alt_;
+
+    // Log.
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+    
+    return AmelasError::SUCCESS;
 }
 
 // =====================================================================================================================

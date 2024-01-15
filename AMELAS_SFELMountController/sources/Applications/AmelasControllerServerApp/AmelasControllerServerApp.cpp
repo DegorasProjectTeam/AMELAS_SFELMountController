@@ -182,6 +182,58 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getHomePosition);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_IDLE_POS,
+                                             &amelas_controller,
+                                             &AmelasController::setIdlePosition);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_IDLE_POS,
+                                             &amelas_controller,
+                                             &AmelasController::getIdlePosition);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_PARK_POS,
+                                             &amelas_controller,
+                                             &AmelasController::setParkPosition);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PARK_POS,
+                                             &amelas_controller,
+                                             &AmelasController::getParkPosition);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_POS,
+                                             &amelas_controller,
+                                             &AmelasController::setCalibrationPosition);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_CALIBRATION_POS,
+                                             &amelas_controller,
+                                             &AmelasController::getCalibrationPosition);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_IDLE_POS_HERE,
+                                             &amelas_controller,
+                                             &AmelasController::setIdlePositionHere);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_PARK_POS_HERE,
+                                             &amelas_controller,
+                                             &AmelasController::setParkPositionHere);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_POS_HERE,
+                                             &amelas_controller,
+                                             &AmelasController::setCalibrationPositionHere);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOMING_OFFSETS,
+                                             &amelas_controller,
+                                             &AmelasController::setHomingOffsets);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
+                                             &amelas_controller,
+                                             &AmelasController::getHomingOffsets);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_WAIT_ALT,
+                                             &amelas_controller,
+                                             &AmelasController::setWaitAlt);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_WAIT_ALT,
+                                             &amelas_controller,
+                                             &AmelasController::getWaitAlt);
+
     // ---------------------------------------
 
     // Start the server.

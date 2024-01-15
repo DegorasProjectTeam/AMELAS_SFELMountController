@@ -96,6 +96,9 @@ struct AltAzPos final : public zmqutils::utils::Serializable
     double el;
 };
 
+using AltAzAdj = AltAzPos;
+using AltAzVel = AltAzPos;
+
 // Generic callback.
 template<typename... Args>
 using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Args...);

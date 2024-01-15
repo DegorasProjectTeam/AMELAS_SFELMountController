@@ -74,10 +74,10 @@ public:
     LIBAMELAS_EXPORT AmelasController(const AmelasControllerConfig &config, 
                                         const std::shared_ptr<spdlog::logger> logger);
 
+    LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
+
     LIBAMELAS_EXPORT AmelasError setHomePosition(const AltAzPos& pos);
     LIBAMELAS_EXPORT AmelasError getHomePosition(AltAzPos& pos);
-
-    LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
 
     LIBAMELAS_EXPORT AmelasError setIdlePosition(const AltAzPos& pos);
     LIBAMELAS_EXPORT AmelasError getIdlePosition(AltAzPos& pos);
@@ -92,7 +92,16 @@ public:
     LIBAMELAS_EXPORT AmelasError setParkPositionHere();
     LIBAMELAS_EXPORT AmelasError setCalibrationPositionHere();
 
+    LIBAMELAS_EXPORT AmelasError setHomingOffsets(const AltAzAdj& pos);
+    LIBAMELAS_EXPORT AmelasError getHomingOffsets(AltAzAdj& pos);
+    
+    LIBAMELAS_EXPORT AmelasError setWaitAlt(const double& alt);
+    LIBAMELAS_EXPORT AmelasError getWaitAlt(double& alt);
+
 private:
+    AmelasError setPosition(const AltAzPos& pos, const std::string plcSymbol, const std::string command);
+    AmelasError getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command);
+
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
@@ -101,6 +110,8 @@ private:
     AltAzPos idle_pos_;
     AltAzPos park_pos_;
     AltAzPos calibration_pos_;
+    AltAzAdj home_pos_offset_;
+    double wait_alt_;
 
 };
 

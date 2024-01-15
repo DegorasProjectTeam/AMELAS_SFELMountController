@@ -41,16 +41,29 @@ namespace common{
 // WARNING: In our approach, the server commands must be always in order.
 enum class AmelasServerCommand : zmqutils::common::CommandType
 {
-    REQ_SET_HOME_POSITION = 33,
-    REQ_GET_HOME_POSITION = 34,
-    END_IMPL_COMMANDS     = 35,
-    END_AMELAS_COMMANDS   = 50
+    REQ_SET_HOME_POSITION        = 33,
+    REQ_GET_HOME_POSITION        = 34,
+    REQ_SET_IDLE_POS             = 36,
+    REQ_GET_IDLE_POS             = 37,
+    REQ_SET_PARK_POS             = 38,
+    REQ_GET_PARK_POS             = 39,
+    REQ_SET_CALIBRATION_POS      = 40,
+    REQ_GET_CALIBRATION_POS      = 41,
+    REQ_SET_IDLE_POS_HERE        = 42,
+    REQ_SET_PARK_POS_HERE        = 43,
+    REQ_SET_CALIBRATION_POS_HERE = 44,
+    REQ_SET_HOMING_OFFSETS       = 45,
+    REQ_GET_HOMING_OFFSETS       = 46,
+    REQ_SET_WAIT_ALT             = 47,
+    REQ_GET_WAIT_ALT             = 48,
+    END_IMPL_COMMANDS            = 35,
+    END_AMELAS_COMMANDS          = 50
 };
 
 // Specific subclass errors (0 to 30 are reserved for the base server).
 enum class AmelasServerResult : zmqutils::common::ResultType
 {
-    EMPTY_CALLBACK = 31,
+    EMPTY_CALLBACK   = 31,
     INVALID_CALLBACK = 32
 };
 
