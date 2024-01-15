@@ -1,0 +1,17 @@
+{
+    "controller": {
+        "plcConfig": {
+            "amsAddress": "169.254.38.61.1.1:851"
+        }
+    },
+    "log": {
+        "console": {
+            "level": "info"
+        },
+        "file": {
+            "level": "info",
+            "path": "logs/daily.txt",
+            "newFileHour": 8
+        }
+    }
+}
