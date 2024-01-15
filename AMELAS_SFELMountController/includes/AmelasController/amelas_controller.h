@@ -37,10 +37,17 @@
 #include <LibZMQUtils/Utils>
 // =====================================================================================================================
 
+// SPDLOG INCLUDES
+// =====================================================================================================================
+#include "spdlog/spdlog.h"
+// =====================================================================================================================
+
+
 // PROJECT INCLUDES
 // =====================================================================================================================
 #include "common.h"
 #include "libamelas_global.h"
+#include "AmelasAdsClient/amelas_ads_client.h"
 // =====================================================================================================================
 
 // AMELAS NAMESPACES
@@ -49,11 +56,17 @@ namespace amelas{
 namespace controller{
 // =====================================================================================================================
 
+struct AmelasControllerConfig
+{
+    AmelasAdsClientConfig plc_config;
+};
+
 class AmelasController
 {
 public:
 
-    LIBAMELAS_EXPORT AmelasController();
+    LIBAMELAS_EXPORT AmelasController(const AmelasControllerConfig &config, 
+                                        const std::shared_ptr<spdlog::logger> logger);
 
     LIBAMELAS_EXPORT AmelasError setHomePosition(const AltAzPos& pos);
     LIBAMELAS_EXPORT AmelasError getHomePosition(AltAzPos& pos);
@@ -74,6 +87,9 @@ public:
     LIBAMELAS_EXPORT AmelasError setCalibrationPositionHere();
 
 private:
+    const AmelasControllerConfig _config;
+    const std::shared_ptr<spdlog::logger> _logger;
+    std::shared_ptr<AmelasAdsClient> _plc;
 
     AltAzPos home_pos_;
     AltAzPos idle_pos_;

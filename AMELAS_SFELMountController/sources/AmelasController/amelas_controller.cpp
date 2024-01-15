@@ -31,9 +31,12 @@
 namespace amelas{
 namespace controller{
 
-AmelasController::AmelasController() :
-    home_pos_(-1,-1), idle_pos_(-1,-1), park_pos_(-1,-1), calibration_pos_(-1,-1)
-{}
+AmelasController::AmelasController(const AmelasControllerConfig &config, 
+                                    const std::shared_ptr<spdlog::logger> logger) :
+    _config(config), home_pos_(-1,-1), idle_pos_(-1,-1), park_pos_(-1,-1), calibration_pos_(-1,-1), _logger(logger)
+{
+    _plc = std::make_shared<amelas::AmelasAdsClient>(_config.plc_config, _logger); 
+}
 
 AmelasError AmelasController::setHomePosition(const AltAzPos &pos)
 {

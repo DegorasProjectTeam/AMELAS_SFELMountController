@@ -78,6 +78,8 @@ macro_prepare_install_dir(INSTALL_BIN INSTALL_LIB ${CMAKE_CURRENT_SOURCE_DIR}/..
 include_directories(${CMAKE_SOURCE_DIR}/includes)
 include_directories(${ZMQUTILS_PATH}/includes)
 include_directories(external/spdlog/include)
+# Beckhoff's TwinCAT ADS
+include_directories("C:/TwinCAT/AdsApi/TcAdsDll/Include")
 
 # **********************************************************************************************************************
 # AMELAS INTERFACE LIBRARY
@@ -90,18 +92,21 @@ set(LIB_DEPS_SET ${LIB_FULL_NAME}_deps)
 # Get the header files.
 file(GLOB_RECURSE HEADERS
     includes/*.h
+    includes/AmelasAdsClient/*.h
     includes/AmelasController/*.h
     includes/AmelasControllerServer/*.h
     includes/AmelasControllerClient/*.h)
 
 # Get the template files.
 file(GLOB_RECURSE TEMPLTS
+    includes/AmelasAdsClient/*.tpp
     includes/AmelasController/*.tpp
     includes/AmelasControllerServer/*.tpp
     includes/AmelasControllerClient/*.tpp)
 
 # Get the source files.
 file(GLOB_RECURSE SOURCES
+    sources/AmelasAdsClient/*.cpp
     sources/AmelasController/*.cpp
     sources/AmelasControllerServer/*.cpp
     sources/AmelasControllerClient/*.cpp)
@@ -136,7 +141,7 @@ endif()
 
 # In mingw better do static linking of the libgcc, libwinpthread and libstd.
 if (MINGW)
-    target_link_libraries(${LIB_FULL_NAME} PRIVATE -static-libgcc -static-libstdc++ -static -lpthread spdlog::spdlog)
+    target_link_libraries(${LIB_FULL_NAME} PRIVATE -static-libgcc -static-libstdc++ -static -lpthread)
 endif()
 
 # Set libraries. For win32 only.
@@ -151,7 +156,8 @@ if (WIN32)
             debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libzmq-v142-mt-4_3_4.dll
             optimized ${ZMQUTILS_PATH}/lib/mingw-x86_64_release/libsodium.dll
             debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libsodium.dll
-            spdlog::spdlog)
+            spdlog::spdlog
+            "C:/TwinCAT/AdsApi/TcAdsDll/x64/lib/TcAdsDll.lib")
 
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
@@ -160,7 +166,8 @@ if (WIN32)
             debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/libzmq-v142-mt-4_3_4.lib
             optimized ${ZMQUTILS_PATH}/lib/msvc-x86_64_release/LibZMQUtils.lib
             debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/LibZMQUtils.lib
-            spdlog::spdlog)
+            spdlog::spdlog
+            "C:/TwinCAT/AdsApi/TcAdsDll/x64/lib/TcAdsDll.lib")
 
     else()
         message(FATAL_ERROR "Compiler not supported by default.")
@@ -179,7 +186,7 @@ endif()
 
 # App config.
 set(APP_SERVER "AmelasControllerServerApp")
-set(APP_BUILD_FOLDER ${CMAKE_BINARY_DIR}/bin/Applications)
+set(APP_BUILD_FOLDER ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${APP_BUILD_FOLDER})
 
 # Get the header files for the server.
