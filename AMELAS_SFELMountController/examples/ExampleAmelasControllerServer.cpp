@@ -88,7 +88,7 @@ int main(int, char**)
     AmelasController amelas_controller(amemlas_controller_config, logger);
 
     // Instantiate the server.
-    AmelasControllerServer amelas_server(port);
+    AmelasControllerServer amelas_server(logger, port);
 
     // Disable or enables the client status checking.
     amelas_server.setClientStatusCheck(client_status_check);

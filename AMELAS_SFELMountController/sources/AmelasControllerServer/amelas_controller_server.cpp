@@ -39,8 +39,10 @@ using zmqutils::common::ResultType;
 using zmqutils::utils::BinarySerializer;
 // ---------------------------------------------------------------------------------------------------------------------
 
-AmelasControllerServer::AmelasControllerServer(unsigned int port, const std::string &local_addr) :
-    ClbkCommandServerBase(port, local_addr)
+AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::logger> logger, unsigned int port, 
+                                                const std::string &local_addr) :
+    ClbkCommandServerBase(port, local_addr),
+    _logger(logger)
 {
     // Register each internal specific process function in the base server.
 
