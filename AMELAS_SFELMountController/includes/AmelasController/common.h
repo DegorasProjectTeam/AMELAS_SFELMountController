@@ -99,6 +99,29 @@ struct AltAzPos final : public zmqutils::utils::Serializable
 using AltAzAdj = AltAzPos;
 using AltAzVel = AltAzPos;
 
+struct MeteoData final : public zmqutils::utils::Serializable
+{
+    LIBAMELAS_EXPORT MeteoData(double press, double temp, double hr);
+
+    LIBAMELAS_EXPORT MeteoData();
+
+    LIBAMELAS_EXPORT MeteoData(const MeteoData& meteo) = default;
+
+    LIBAMELAS_EXPORT MeteoData& operator =(const MeteoData& pos) = default;
+
+    LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
+
+    LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;
+
+    LIBAMELAS_EXPORT size_t serializedSize() const final;
+
+    LIBAMELAS_EXPORT ~MeteoData() final;
+
+    double press;
+    double temp;
+    double hr;
+};
+
 // Generic callback.
 template<typename... Args>
 using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Args...);
@@ -133,6 +156,9 @@ using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
 
 using SetWaitAltCallback = std::function<AmelasError(const double&)>;
 using GetWaitAltCallback = std::function<AmelasError(double&)>;
+
+using SetMeteoData = std::function<AmelasError(const MeteoData&)>;
+using GetMeteoData = std::function<AmelasError(MeteoData&)>;
 
 // =====================================================================================================================
 

@@ -53,6 +53,28 @@ size_t AltAzPos::serializedSize() const
 
 AltAzPos::~AltAzPos(){}
 
+MeteoData::MeteoData(double press, double temp, double hr):
+    press(press), temp(temp), hr(hr){}
+
+MeteoData::MeteoData(): press(-1), temp(-1), hr(-1){}
+
+size_t MeteoData::serialize(zmqutils::utils::BinarySerializer &serializer) const
+{
+    return serializer.write(press, temp, hr);
+}
+
+void MeteoData::deserialize(zmqutils::utils::BinarySerializer &serializer)
+{
+    serializer.read(press, temp, hr);
+}
+
+size_t MeteoData::serializedSize() const
+{
+    return (2*sizeof(uint64_t) + sizeof(double)*3);
+}
+
+MeteoData::~MeteoData(){}
+
 // =====================================================================================================================
 
 

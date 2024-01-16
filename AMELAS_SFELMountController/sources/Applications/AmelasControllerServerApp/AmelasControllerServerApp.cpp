@@ -250,6 +250,14 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getSlewSpeed);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_METEO_DATA,
+                                             &amelas_controller,
+                                             &AmelasController::setMeteoData);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_METEO_DATA,
+                                             &amelas_controller,
+                                             &AmelasController::getMeteoData);
+
     // ---------------------------------------
 
     // Start the server.

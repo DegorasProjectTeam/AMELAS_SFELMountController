@@ -104,6 +104,9 @@ public:
     LIBAMELAS_EXPORT AmelasError setWaitAlt(const double& alt);
     LIBAMELAS_EXPORT AmelasError getWaitAlt(double& alt);
 
+    LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo);
+    LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
+
 private:
     AmelasError setPosition(const AltAzPos& pos, const std::string plcSymbol, const std::string command);
     AmelasError getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command);
@@ -121,6 +124,7 @@ private:
     AltAzPos calibration_pos_;
     AltAzAdj home_pos_offset_;
     double wait_alt_;
+    MeteoData meteo_;
 
 };
 

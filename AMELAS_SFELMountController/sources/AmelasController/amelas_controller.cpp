@@ -36,13 +36,14 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
     _config(config),
     tracking_adjusts_(false),
     mount_power_(false),
-    slew_speed_(-1, -1),
+    slew_speed_(-1,-1),
     home_pos_(-1,-1),
     idle_pos_(-1,-1),
     park_pos_(-1,-1),
     calibration_pos_(-1,-1),
     home_pos_offset_(-1,-1),
     wait_alt_(-1),
+    meteo_(-1,-1,-1),
     _logger(logger)
 {
     _plc = std::make_shared<amelas::AmelasAdsClient>(_config.plcConfig, _logger); 
@@ -353,6 +354,54 @@ AmelasError AmelasController::getWaitAlt(double& alt)
     const std::string command = "GET_WAIT_ALT";
 
     alt = this->wait_alt_;
+
+    // Log.
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+    
+    return AmelasError::SUCCESS;
+}
+
+AmelasError AmelasController::setMeteoData(const MeteoData& meteo)
+{
+    const std::string symbol = "MAIN.MeteoData";
+    const std::string command = "SET_METEO_DATA";
+
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    this->meteo_.press = _plc->read<double>(symbol + ".press");
+    this->meteo_.temp  = _plc->read<double>(symbol + ".temp");
+    this->meteo_.hr    = _plc->read<double>(symbol + ".hr");
+
+    // Log.
+    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << "Press: " << meteo.press << '\n'
+    << "Temp: " << meteo.temp << '\n'
+    << "HR: " << meteo.hr << '\n'
+    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+
+    return error;
+}
+
+AmelasError AmelasController::getMeteoData(MeteoData& meteo)
+{
+    const std::string symbol = "MAIN.MeteoData";
+    const std::string command = "SET_METEO_DATA";
+
+    meteo = this->meteo_;
 
     // Log.
     std::ostringstream oss;
