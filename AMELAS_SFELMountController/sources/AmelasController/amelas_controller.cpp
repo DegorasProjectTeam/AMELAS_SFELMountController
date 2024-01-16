@@ -81,15 +81,21 @@ AmelasError AmelasController::setEnable(const bool& enable, const std::string pl
     std::ostringstream oss;
 
     // TODO: Check the provided values
-    if (command == "EN_TRACK_ADJ") {
+    if (command == "EN_TRACK_ADJ")
+    {
         this->tracking_adjusts_ = enable;
-        oss << "Track adj.: " << enable << '\n'; }
-    else if (command == "EN_MOUNT_POWER") {
+        oss << "Track adj.: " << enable << '\n';
+    }
+    else if (command == "EN_MOUNT_POWER")
+    {
         this->mount_power_ = enable;
-        oss << "Mount power: " << enable << '\n'; }
-    else if (command == "EN_MOUNT_MODEL") {
+        oss << "Mount power: " << enable << '\n';
+    }
+    else if (command == "EN_MOUNT_MODEL")
+    {
         this->mount_model_ = enable;
-        oss << "Mount model: " << enable << '\n'; }
+        oss << "Mount model: " << enable << '\n';
+    }
 
     // Do things in the hardware (PLC).
     _plc->write(plcSymbol, enable);
