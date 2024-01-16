@@ -56,6 +56,10 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_GET_HOMING_OFFSETS       = 46,
     REQ_SET_WAIT_ALT             = 47,
     REQ_GET_WAIT_ALT             = 48,
+    REQ_SET_SLEW_SPEED           = 49,
+    // TODO: change number =========== //
+    REQ_GET_SLEW_SPEED           = 50, //
+    // =============================== //
     END_IMPL_COMMANDS            = 35,
     END_AMELAS_COMMANDS          = 50
 };

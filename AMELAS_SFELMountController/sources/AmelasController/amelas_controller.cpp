@@ -34,6 +34,7 @@ namespace controller{
 AmelasController::AmelasController(const AmelasControllerConfig &config, 
                                     const std::shared_ptr<spdlog::logger> logger) :
     _config(config),
+    slew_speed_(-1, -1),
     home_pos_(-1,-1),
     idle_pos_(-1,-1),
     park_pos_(-1,-1),
@@ -106,6 +107,55 @@ AmelasError AmelasController::getPosition(AltAzPos& pos, const std::string plcSy
         pos = this->calibration_pos_;
     else if (command == "GET_HOMING_OFFSETS")
         pos = this->home_pos_offset_;
+
+    // Log.
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+    
+    return AmelasError::SUCCESS;
+}
+
+AmelasError AmelasController::setSlewSpeed(const AltAzVel &vel)
+{
+    const std::string symbol = "MAIN.SlewSpeed";
+    const std::string command = "SET_SLEW_SPEED";
+
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    this->slew_speed_ = vel;
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol + ".az", vel.az);
+    _plc->write(symbol + ".el", vel.el);
+
+    // Log.
+    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << "Az: " << vel.az << '\n'
+    << "El: " << vel.el << '\n'
+    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+
+    return error;
+}
+
+AmelasError AmelasController::getSlewSpeed(AltAzVel &vel)
+{
+    const std::string symbol = "MAIN.SlewSpeed";
+    const std::string command = "GET_SLEW_SPEED";
+
+    vel = this->slew_speed_;
 
     // Log.
     std::ostringstream oss;

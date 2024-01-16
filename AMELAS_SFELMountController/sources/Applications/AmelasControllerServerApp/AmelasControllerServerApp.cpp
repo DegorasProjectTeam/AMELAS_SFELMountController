@@ -234,6 +234,14 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getWaitAlt);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_SLEW_SPEED,
+                                             &amelas_controller,
+                                             &AmelasController::setSlewSpeed);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_SLEW_SPEED,
+                                             &amelas_controller,
+                                             &AmelasController::getSlewSpeed);
+
     // ---------------------------------------
 
     // Start the server.

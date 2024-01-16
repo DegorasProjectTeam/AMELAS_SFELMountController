@@ -104,15 +104,32 @@ template<typename... Args>
 using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Args...);
 
 // Callback function type aliases
+using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
+
+using SetSlewSpeedCallback = std::function<AmelasError(const AltAzVel&)>;
+using GetSlewSpeedCallback = std::function<AmelasError(AltAzVel&)>;
+
 using SetHomePositionCallback = std::function<AmelasError(const AltAzPos&)>;
 using GetHomePositionCallback = std::function<AmelasError(AltAzPos&)>;
-using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
+
 using SetIdlePositionCallback = std::function<AmelasError(const AltAzPos&)>;
+using GetIdlePositionCallback = std::function<AmelasError(AltAzPos&)>;
+
 using SetParkPositionCallback = std::function<AmelasError(const AltAzPos&)>;
+using GetParkPositionCallback = std::function<AmelasError(AltAzPos&)>;
+
 using SetCalibrationPositionCallback = std::function<AmelasError(const AltAzPos&)>;
+using GetCalibrationPositionCallback = std::function<AmelasError(AltAzPos&)>;
+
 using SetIdlePositionHereCallback = std::function<AmelasError()>;
 using SetParkPositionHereCallback = std::function<AmelasError()>;
 using SetCalibrationPositionHereCallback = std::function<AmelasError()>;
+
+using SetHomingOffsetsCallback = std::function<AmelasError(const AltAzAdj&)>;
+using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
+
+using SetWaitAltCallback = std::function<AmelasError(const double&)>;
+using GetWaitAltCallback = std::function<AmelasError(double&)>;
 
 // =====================================================================================================================
 
