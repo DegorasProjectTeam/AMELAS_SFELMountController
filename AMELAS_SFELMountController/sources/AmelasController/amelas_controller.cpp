@@ -46,6 +46,7 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
     mount_model_(false),
     meteo_(-1,-1,-1),
     track_pos_offset_(-1,-1),
+    track_time_bias_(-1),
     _logger(logger)
 {
     _plc = std::make_shared<amelas::AmelasAdsClient>(_config.plcConfig, _logger); 
@@ -433,6 +434,44 @@ AmelasError AmelasController::getTrackPosOffset(AltAzAdj& pos)
     const std::string symbol = "MAIN.TrackPosOffset";
     const std::string command = "GET_TRACK_POS_OFFSET";
     return getPosition(pos, symbol, command);
+}
+
+AmelasError AmelasController::setTrackTimeBias(const double& time)
+{
+    const std::string symbol = "MAIN.TrackTimeBias";
+    const std::string command = "SET_TRACK_TIME_BIAS";
+
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    // TODO: Check the provided values
+    this->track_time_bias_ = time;
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, time);
+
+    // Log.
+    std::ostringstream oss;
+    oss << "Track time bias: " << time << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+AmelasError AmelasController::getTrackTimeBias(double& time)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.TrackTimeBias";
+    const std::string command = "GET_TRACK_TIME_BIAS";
+
+    time = this->track_time_bias_;
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
 }
 
 // =====================================================================================================================

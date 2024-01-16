@@ -120,6 +120,9 @@ public:
 
     LIBAMELAS_EXPORT AmelasError setTrackPosOffset(const AltAzAdj& pos);
     LIBAMELAS_EXPORT AmelasError getTrackPosOffset(AltAzAdj& pos);
+    
+    LIBAMELAS_EXPORT AmelasError setTrackTimeBias(const double& time);
+    LIBAMELAS_EXPORT AmelasError getTrackTimeBias(double& time);
     //=====================================================================================================================
 
 private:
@@ -144,6 +147,7 @@ private:
     double mount_model_;
     MeteoData meteo_;
     AltAzAdj track_pos_offset_;
+    double track_time_bias_;
 
 };
 

@@ -282,6 +282,14 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getTrackPosOffset);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS,
+                                             &amelas_controller,
+                                             &AmelasController::setTrackTimeBias);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS,
+                                             &amelas_controller,
+                                             &AmelasController::getTrackTimeBias);
+
     // ---------------------------------------
 
     // Start the server.
