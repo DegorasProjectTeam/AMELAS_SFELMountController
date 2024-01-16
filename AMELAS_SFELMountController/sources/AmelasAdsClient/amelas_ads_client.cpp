@@ -5,6 +5,8 @@
 
 namespace amelas {
 
+std::map<ULONG, std::function<void(const bool)>> AmelasAdsClient::_boolSubscriptionCallbacks;
+
 std::vector<std::string> splitString(const std::string &str, const char delim)
 {
     std::vector<std::string> result; 
@@ -22,39 +24,100 @@ std::vector<std::string> splitString(const std::string &str, const char delim)
     return result; 
 }
 
+void getAmsAddressFromString(const std::string &str, const long adsPort, AmsAddr* addr)
+{
+    if (str.empty())
+    {
+        auto errorCode = AdsGetLocalAddressEx(adsPort, addr);
+    }
+    else
+    {
+        auto addressOctetsString = splitString(str, '.');
+        for (auto ii = 0; ii < 6; ii++)
+        {
+            addr->netId.b[ii] = (unsigned char) strtoul(addressOctetsString[ii].c_str(), NULL, 0);
+        }
+    }
+}
+
 AmelasAdsClient::AmelasAdsClient(const AmelasAdsClientConfig &config, const std::shared_ptr<spdlog::logger> logger) 
 : _config(config), _logger(logger)
 {
-    auto addressAndPort = splitString(_config.amsAddress, ':');
-    _adsAddress.port = (unsigned short) strtoul(addressAndPort[1].c_str(), NULL, 0);
-    auto addressOctetsString = splitString(addressAndPort[0], '.');
-    for (auto ii = 0; ii < 6; ii++)
-    {
-        _adsAddress.netId.b[ii] = (unsigned char) strtoul(addressOctetsString[ii].c_str(), NULL, 0);
-    }
+    _adsAddress.port = _config.port;
 }
 
 void AmelasAdsClient::connect()
 {
-    _adsPort = AdsPortOpen();
+    if (_isConnected)
+    {
+        _logger->warn("Tried to connect ads client when already connected");
+        return;
+    }
+
+    _adsPort = AdsPortOpenEx();
+    if (_adsPort == 0)
+    {
+        std::ostringstream oss;
+        oss << "Ads failed to connect to: " << _config.amsAddress << '\n';
+        _logger->error(oss.str());
+    }
+    else
+    {
+        std::ostringstream oss;
+        oss << "Ads connected to: " << _config.amsAddress << '\n';
+        _logger->info(oss.str());
+    }
+
+    getAmsAddressFromString(_config.amsAddress, _adsPort, &_adsAddress);
+
+    _isConnected = true;
 }
 
 void AmelasAdsClient::disconnect()
 {
-    long errorCode = AdsPortClose();
+    if (!_isConnected)
+    {
+        _logger->warn("Tried to disconnect ads client when already disconnected");
+        return;
+    }
+
+    // Remove all active subscriptions
+    while (!_subscriptionNotifications.empty())
+    {
+        unsubscribeAll(_subscriptionNotifications.begin()->first);
+    }
+
+    // Clear handles cache
+    _handlesCache.clear();
+    
+    long errorCode = AdsPortCloseEx(_adsPort);
     if (errorCode)
     {
         std::ostringstream oss;
-        oss << "Error: AdsPortClose: " << errorCode << '\n';
+        oss << "Error: AdsPortCloseEx: " << errorCode << '\n';
         _logger->error(oss.str());
+        // TODO: throw
     }
+    std::ostringstream oss;
+    oss << "Ads disconnected from: " << _config.amsAddress << '\n';
+    _logger->info(oss.str());
+
+    _isConnected = false;
 }
 
 template <typename T> 
 void AmelasAdsClient::write(const std::string &symbol, const T data)
 {
+    if (!_isConnected)
+    {
+        std::ostringstream oss;
+        oss << "Tried to write ads symbol: " << symbol << " while client disconnected";
+        _logger->error(oss.str());
+        // TODO: Throw here
+    }
+
     ULONG handle = getHandleFromSymbol(symbol);
-    long errorCode = AdsSyncWriteReq(&_adsAddress, ADSIGRP_SYM_VALBYHND,
+    long errorCode = AdsSyncWriteReqEx(_adsPort, &_adsAddress, ADSIGRP_SYM_VALBYHND,
                                         handle, sizeof(T), (PVOID)&data);
     if (errorCode) {
         std::ostringstream oss;
@@ -68,18 +131,109 @@ void AmelasAdsClient::write(const std::string &symbol, const T data)
 template <typename T>
 T AmelasAdsClient::read(const std::string &symbol)
 {
+    if (!_isConnected)
+    {
+        std::ostringstream oss;
+        oss << "Tried to read ads symbol: " << symbol << " while client disconnected";
+        _logger->error(oss.str());
+        // TODO: Throw here
+    }
+
     T readValue;
     ULONG handle = getHandleFromSymbol(symbol);
+    ULONG pcbReturn;
     long errorCode =
-        AdsSyncReadReq(&_adsAddress, ADSIGRP_SYM_VALBYHND, handle,
-                            sizeof(T), (PVOID)&readValue);
+        AdsSyncReadReqEx2(_adsPort, &_adsAddress, ADSIGRP_SYM_VALBYHND, handle,
+                            sizeof(T), (PVOID)&readValue, &pcbReturn);
     if (errorCode) {
         std::ostringstream oss;
-        oss << "Error: AdsSyncReadReq reading symbol: " << symbol << " - Error code:" << errorCode << '\n';
+        oss << "Error: AdsSyncReadReqEx2 reading symbol: " << symbol << " - Error code:" << errorCode << '\n';
         _logger->error(oss.str());
         // TODO: Throw here
     }
     return readValue;
+}
+
+void __stdcall AmelasAdsClient::BoolCallback(AmsAddr* pAddr, AdsNotificationHeader* pNotification, ULONG hUser)
+{
+    bool value = *(bool *)pNotification->data;
+    std::function<void(const bool)> callback = _boolSubscriptionCallbacks[hUser];
+    callback(value);
+}
+
+void AmelasAdsClient::subscribe(const std::string& symbol, std::function<void(const bool)> callback, 
+                                    const std::chrono::milliseconds period)
+{
+    if (!_isConnected)
+    {
+        std::ostringstream oss;
+        oss << "Tried to subscribe to ads symbol: " << symbol << " while client disconnected";
+        _logger->error(oss.str());
+        // TODO: Throw here
+    }
+
+    AdsNotificationAttrib notificationAttrib;
+    notificationAttrib.cbLength = 4;
+    notificationAttrib.nTransMode = ADSTRANS_SERVERONCHA;
+    notificationAttrib.nMaxDelay = 0;
+    unsigned long periodIn100ns = std::chrono::duration_cast<std::chrono::microseconds>(period).count() * 10;
+    notificationAttrib.nCycleTime = periodIn100ns;
+
+    auto variableHandle = getHandleFromSymbol(symbol);
+    _boolSubscriptionCallbacks[variableHandle] = callback;
+
+    ULONG notificationHandle;
+    auto errorCode = AdsSyncAddDeviceNotificationReqEx(_adsPort, &_adsAddress, ADSIGRP_SYM_VALBYHND, variableHandle, 
+                                                        &notificationAttrib, AmelasAdsClient::BoolCallback, 
+                                                        variableHandle, &notificationHandle);
+
+    if (errorCode) {
+        std::ostringstream oss;
+        oss << "Error: AdsSyncAddDeviceNotificationReq subscribing symbol: " << symbol << " - Error code:" << errorCode << '\n';
+        _logger->error(oss.str());
+        // TODO: Throw here
+    }
+
+    _subscriptionNotifications[variableHandle] = notificationHandle;
+}
+
+void AmelasAdsClient::unsubscribeAll(const std::string& symbol)
+{
+    if (!_isConnected)
+    {
+        std::ostringstream oss;
+        oss << "Tried to unsubscribe from ads symbol: " << symbol << " while client disconnected";
+        _logger->error(oss.str());
+        // TODO: Throw here
+    }
+
+    auto variableHandle = getHandleFromSymbol(symbol);
+    // TODO: Catch exception from unsubscribe all and rethrow with symbol information
+    unsubscribeAll(variableHandle);
+}
+
+void AmelasAdsClient::unsubscribeAll(const ULONG variableHandle)
+{
+    if (!_subscriptionNotifications.count(variableHandle))
+    {
+        // TODO: throw here
+        /*std::ostringstream oss;
+        oss << "Request to remove non-existent subscription from: " << symbol << "\n";
+        _logger->warn(oss.str());
+        return;*/
+    }
+    auto notificationHandle = _subscriptionNotifications[variableHandle];
+
+    auto errorCode = AdsSyncDelDeviceNotificationReqEx(_adsPort, &_adsAddress, notificationHandle);
+    if (errorCode) {
+        /*std::ostringstream oss;
+        oss << "AdsSyncDelDeviceNotificationReqEx unsubscribing symbol: " << symbol 
+            << " - Error code:" << errorCode << '\n';
+        _logger->error(oss.str());*/
+        // TODO: Throw here
+    }
+
+    _subscriptionNotifications.erase(variableHandle);
 }
 
 ULONG AmelasAdsClient::getHandleFromSymbol(const std::string &symbol)
@@ -89,8 +243,9 @@ ULONG AmelasAdsClient::getHandleFromSymbol(const std::string &symbol)
         return _handlesCache[symbol];
     }
     ULONG handle;
-    long errorCode = AdsSyncReadWriteReq(&_adsAddress, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(handle),
-                                                &handle, symbol.size(), (void *)symbol.c_str());
+    ULONG pcbReturn;
+    long errorCode = AdsSyncReadWriteReqEx2(_adsPort, &_adsAddress, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(handle),
+                                                &handle, symbol.size(), (void *)symbol.c_str(), &pcbReturn);
     if (errorCode)
     {
         std::ostringstream oss;

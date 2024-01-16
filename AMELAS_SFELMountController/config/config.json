@@ -1,7 +1,8 @@
 {
     "controller": {
         "plcConfig": {
-            "amsAddress": "169.254.38.61.1.1:851"
+            "amsAddress": "169.254.38.61.1.1",
+            "port": 851
         }
     },
     "log": {
