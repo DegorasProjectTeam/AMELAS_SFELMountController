@@ -290,6 +290,14 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getTrackTimeBias);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setAbsoluteAltAzMotion);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setRelativeAltAzMotion);
+
     // ---------------------------------------
 
     // Start the server.

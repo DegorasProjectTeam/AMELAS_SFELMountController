@@ -122,8 +122,6 @@ AmelasError AmelasController::setPosition(const AltAzPos& pos, const std::string
             this->calibration_pos_ = pos;
         else if (command == "SET_HOMING_OFFSETS")
             this->home_pos_offset_ = pos;
-        else if (command == "SET_SLEW_SPEED")
-            this->slew_speed_ = pos;
         else if (command == "SET_TRACK_POS_OFFSET")
             this->track_pos_offset_ = pos;
         
@@ -167,6 +165,49 @@ AmelasError AmelasController::getPosition(AltAzPos& pos, const std::string plcSy
     return error;
 }
 
+AmelasError AmelasController::setSpeed(const AltAzVel& vel, const std::string plcSymbol, const std::string command)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Check the provided values.
+    if (vel.az < 0.0 ||  vel.el < 0.0)
+    {
+        error = AmelasError::INVALID_SPEED;
+    }
+    else
+    {
+        if (command == "SET_SLEW_SPEED")
+            this->slew_speed_ = vel;
+        
+        // Do things in the hardware (PLC).
+        _plc->write(plcSymbol + ".az", vel.az);
+        _plc->write(plcSymbol + ".el", vel.el);
+    }
+
+    // Log.
+    std::ostringstream oss;
+    oss << "Az: " << vel.az << '\n'
+    << "El: " << vel.el << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+AmelasError AmelasController::getSpeed(AltAzVel& vel, const std::string plcSymbol, const std::string command)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    if (command == "GET_SLEW_SPEED")
+        vel = this->slew_speed_;
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+
 AmelasError AmelasController::enableTrackingAdjusts(const bool& enable)
 {
     const std::string symbol = "MAIN.TrackingAdjuts";
@@ -185,14 +226,14 @@ AmelasError AmelasController::setSlewSpeed(const AltAzVel &vel)
 {
     const std::string symbol = "MAIN.SlewSpeed";
     const std::string command = "SET_SLEW_SPEED";
-    return setPosition(vel, symbol, command);
+    return setSpeed(vel, symbol, command);
 }
 
 AmelasError AmelasController::getSlewSpeed(AltAzVel &vel)
 {
     const std::string symbol = "MAIN.SlewSpeed";
     const std::string command = "GET_SLEW_SPEED";
-    return getPosition(vel, symbol, command);
+    return getSpeed(vel, symbol, command);
 }
 
 AmelasError AmelasController::setHomePosition(const AltAzPos &pos)
@@ -472,6 +513,64 @@ AmelasError AmelasController::getTrackTimeBias(double& time)
     setLog(command, "", error);
     
     return error;
+}
+
+AmelasError AmelasController::setAbsoluteAltAzMotion(const AltAzPos& pos, const AltAzVel& vel)
+{
+    // Auxiliar result.
+    AmelasError error_pos = AmelasError::SUCCESS;
+    AmelasError error_vel = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.AbsoluteMotion";
+    const std::string symbol_pos = "MAIN.AltAzMotion.pos";
+    const std::string symbol_vel = "MAIN.AltAzMotion.vel";
+    const std::string command_pos = "SET_ABS_ALTAZ_MOTION (POS)";
+    const std::string command_vel = "SET_ABS_ALTAZ_MOTION (VEL)";
+
+    error_pos = setPosition(pos, symbol_pos, command_pos);
+    error_vel = setSpeed(vel, symbol_vel, command_vel);
+
+    if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::SUCCESS)
+    {
+        // Do things in the hardware (PLC).
+        _plc->write(symbol, true);
+        return AmelasError::SUCCESS;
+    }
+    else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
+        return AmelasError::INVALID_POSITION;
+    else if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::INVALID_SPEED)
+        return AmelasError::INVALID_SPEED;
+    else
+        return AmelasError::INVALID_ERROR;
+}
+
+AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos& pos, const AltAzVel& vel)
+{
+    // Auxiliar result.
+    AmelasError error_pos = AmelasError::SUCCESS;
+    AmelasError error_vel = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.RelativeMotion";
+    const std::string symbol_pos = "MAIN.AltAzMotion.pos";
+    const std::string symbol_vel = "MAIN.AltAzMotion.vel";
+    const std::string command_pos = "SET_REL_ALTAZ_MOTION (POS)";
+    const std::string command_vel = "SET_REL_ALTAZ_MOTION (VEL)";
+
+    error_pos = setPosition(pos, symbol_pos, command_pos);
+    error_vel = setSpeed(vel, symbol_vel, command_vel);
+
+    if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::SUCCESS)
+    {
+        // Do things in the hardware (PLC).
+        _plc->write(symbol, true);
+        return AmelasError::SUCCESS;
+    }
+    else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
+        return AmelasError::INVALID_POSITION;
+    else if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::INVALID_SPEED)
+        return AmelasError::INVALID_SPEED;
+    else
+        return AmelasError::INVALID_ERROR;
 }
 
 // =====================================================================================================================

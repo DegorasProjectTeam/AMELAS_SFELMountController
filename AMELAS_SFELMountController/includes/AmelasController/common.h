@@ -64,14 +64,18 @@ enum class AmelasError : std::int32_t
     INVALID_ERROR = -1,
     SUCCESS = 0,
     INVALID_POSITION = 1,
-    UNSAFE_POSITION = 2
+    UNSAFE_POSITION = 2,
+    INVALID_SPEED = 3,
+    UNSAFE_SPEED = 4
 };
 
-static constexpr std::array<const char*, 3>  ControllerErrorStr
+static constexpr std::array<const char*, 5>  ControllerErrorStr
 {
     "SUCCESS - Controller process success",
     "INVALID_POSITION - The provided position (az/alt) is invalid.",
-    "UNSAFE_POSITION - The provided position (az/alt) is unsafe."
+    "UNSAFE_POSITION - The provided position (az/alt) is unsafe.",
+    "INVALID_SPEED - The provided speed (az/alt) is invalid.",
+    "UNSAFE_SPEED - The provided speed (az/alt) is unsafe."
 };
 
 struct AltAzPos final : public zmqutils::utils::Serializable
@@ -171,6 +175,9 @@ using GetTrackPosOffsetCallback = std::function<AmelasError(AltAzAdj&)>;
 
 using SetTrackTimeBiasCallback = std::function<AmelasError(const double&)>;
 using GetTrackTimeBiasCallback = std::function<AmelasError(double&)>;
+
+using SetAbsoluteAltAzMotionCallback = std::function<AmelasError(const AltAzPos&, const AltAzVel&)>;
+using SetRelativeAltAzMotionCallback = std::function<AmelasError(const AltAzPos&, const AltAzVel&)>;
 
 // =====================================================================================================================
 

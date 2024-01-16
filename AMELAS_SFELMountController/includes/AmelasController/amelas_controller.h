@@ -123,12 +123,17 @@ public:
     
     LIBAMELAS_EXPORT AmelasError setTrackTimeBias(const double& time);
     LIBAMELAS_EXPORT AmelasError getTrackTimeBias(double& time);
+
+    LIBAMELAS_EXPORT AmelasError setAbsoluteAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
+    LIBAMELAS_EXPORT AmelasError setRelativeAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
     //=====================================================================================================================
 
 private:
     AmelasError setEnable(const bool& enable, const std::string plcSymbol, const std::string command);
     AmelasError setPosition(const AltAzPos& pos, const std::string plcSymbol, const std::string command);
     AmelasError getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command);
+    AmelasError setSpeed(const AltAzVel& vel, const std::string plcSymbol, const std::string command);
+    AmelasError getSpeed(AltAzVel& vel, const std::string plcSymbol, const std::string command);
     void setLog(const std::string command, const std::string specific, const AmelasError error);
 
     const AmelasControllerConfig _config;
