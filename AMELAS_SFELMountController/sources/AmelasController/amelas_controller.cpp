@@ -43,6 +43,7 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
     calibration_pos_(-1,-1),
     home_pos_offset_(-1,-1),
     wait_alt_(-1),
+    mount_model_(false),
     meteo_(-1,-1,-1),
     _logger(logger)
 {
@@ -54,60 +55,43 @@ AmelasError AmelasController::getDatetime(std::string &)
     return AmelasError::SUCCESS;
 }
 
-AmelasError AmelasController::enableTrackingAdjusts(const bool& enable)
+void AmelasController::setLog(const std::string command, const std::string specific, const AmelasError error)
 {
-    const std::string symbol = "MAIN.TrackingAdjuts";
-    const std::string command = "EN_TRACK_ADJ";
-
-    // Auxiliar result.
-    AmelasError error = AmelasError::SUCCESS;
-
-    // TODO: Check the provided values
-    this->tracking_adjusts_ = enable;
-
-    // Do things in the hardware (PLC).
-    _plc->write(symbol, enable);
-
-    // Log.
     std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
     std::ostringstream oss;
     oss << std::string(100, '-') << '\n'
     << "<AMELAS CONTROLLER>" << '\n'
     << "-> " << command << '\n'
     << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << "Track adj.: " << enable << '\n'
+    << specific
     << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
     << std::string(100, '-') << '\n';
     _logger->error(oss.str());
-
-    return error;
 }
 
-AmelasError AmelasController::enableMountPower(const bool& enable)
+AmelasError AmelasController::setEnable(const bool& enable, const std::string plcSymbol, const std::string command)
 {
-    const std::string symbol = "MAIN.MountPower";
-    const std::string command = "EN_MOUNT_POWER";
-
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
+    std::ostringstream oss;
+
     // TODO: Check the provided values
-    this->mount_power_ = enable;
+    if (command == "EN_TRACK_ADJ") {
+        this->tracking_adjusts_ = enable;
+        oss << "Track adj.: " << enable << '\n'; }
+    else if (command == "EN_MOUNT_POWER") {
+        this->mount_power_ = enable;
+        oss << "Mount power: " << enable << '\n'; }
+    else if (command == "EN_MOUNT_MODEL") {
+        this->mount_model_ = enable;
+        oss << "Mount model: " << enable << '\n'; }
 
     // Do things in the hardware (PLC).
-    _plc->write(symbol, enable);
+    _plc->write(plcSymbol, enable);
 
     // Log.
-    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
-    std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << "Mount power: " << enable << '\n'
-    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
+    setLog(command, oss.str(), error);
 
     return error;
 }
@@ -134,6 +118,8 @@ AmelasError AmelasController::setPosition(const AltAzPos& pos, const std::string
             this->calibration_pos_ = pos;
         else if (command == "SET_HOMING_OFFSETS")
             this->home_pos_offset_ = pos;
+        else if (command == "SET_SLEW_SPEED")
+            this->slew_speed_ = pos;
         
         // Do things in the hardware (PLC).
         _plc->write(plcSymbol + ".az", pos.az);
@@ -141,23 +127,19 @@ AmelasError AmelasController::setPosition(const AltAzPos& pos, const std::string
     }
 
     // Log.
-    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
     std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << "Az: " << pos.az << '\n'
-    << "El: " << pos.el << '\n'
-    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
+    oss << "Az: " << pos.az << '\n'
+    << "El: " << pos.el << '\n';
+    setLog(command, oss.str(), error);
 
     return error;
 }
 
 AmelasError AmelasController::getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command)
 {
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
     if (command == "GET_HOME_POSITION")
         pos = this->home_pos_;
     else if (command == "GET_IDLE_POSITION")
@@ -168,67 +150,41 @@ AmelasError AmelasController::getPosition(AltAzPos& pos, const std::string plcSy
         pos = this->calibration_pos_;
     else if (command == "GET_HOMING_OFFSETS")
         pos = this->home_pos_offset_;
+    else if (command == "GET_SLEW_SPEED")
+        pos = this->slew_speed_;
 
     // Log.
-    std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
+    setLog(command, "", error);
     
-    return AmelasError::SUCCESS;
+    return error;
+}
+
+AmelasError AmelasController::enableTrackingAdjusts(const bool& enable)
+{
+    const std::string symbol = "MAIN.TrackingAdjuts";
+    const std::string command = "EN_TRACK_ADJ";
+    setEnable(enable, symbol, command);
+}
+
+AmelasError AmelasController::enableMountPower(const bool& enable)
+{
+    const std::string symbol = "MAIN.MountPower";
+    const std::string command = "EN_MOUNT_POWER";
+    setEnable(enable, symbol, command);
 }
 
 AmelasError AmelasController::setSlewSpeed(const AltAzVel &vel)
 {
     const std::string symbol = "MAIN.SlewSpeed";
     const std::string command = "SET_SLEW_SPEED";
-
-    // Auxiliar result.
-    AmelasError error = AmelasError::SUCCESS;
-
-    // TODO: Check the provided values
-    this->slew_speed_ = vel;
-
-    // Do things in the hardware (PLC).
-    _plc->write(symbol + ".az", vel.az);
-    _plc->write(symbol + ".el", vel.el);
-
-    // Log.
-    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
-    std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << "Az: " << vel.az << '\n'
-    << "El: " << vel.el << '\n'
-    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
-
-    return error;
+    return setPosition(vel, symbol, command);
 }
 
 AmelasError AmelasController::getSlewSpeed(AltAzVel &vel)
 {
     const std::string symbol = "MAIN.SlewSpeed";
     const std::string command = "GET_SLEW_SPEED";
-
-    vel = this->slew_speed_;
-
-    // Log.
-    std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
-    
-    return AmelasError::SUCCESS;
+    return getPosition(vel, symbol, command);
 }
 
 AmelasError AmelasController::setHomePosition(const AltAzPos &pos)
@@ -334,37 +290,34 @@ AmelasError AmelasController::setWaitAlt(const double& alt)
     _plc->write(symbol, alt);
 
     // Log.
-    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
     std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << "Alt: " << alt << '\n'
-    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
+    oss << "Alt: " << alt << '\n';
+    setLog(command, oss.str(), error);
 
     return error;
 }
 
 AmelasError AmelasController::getWaitAlt(double& alt)
 {
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
     const std::string symbol = "MAIN.WaitAlt";
     const std::string command = "GET_WAIT_ALT";
 
     alt = this->wait_alt_;
 
     // Log.
-    std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
+    setLog(command, "", error);
     
-    return AmelasError::SUCCESS;
+    return error;
+}
+
+AmelasError AmelasController::enableMountModel(const bool& enable)
+{
+    const std::string symbol = "MAIN.MountModel";
+    const std::string command = "EN_MOUNT_MODEL";
+    setEnable(enable, symbol, command);
 }
 
 AmelasError AmelasController::setMeteoData(const MeteoData& meteo)
@@ -380,39 +333,29 @@ AmelasError AmelasController::setMeteoData(const MeteoData& meteo)
     this->meteo_.hr    = _plc->read<double>(symbol + ".hr");
 
     // Log.
-    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
     std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << "Press: " << meteo.press << '\n'
+    oss << "Press: " << meteo.press << '\n'
     << "Temp: " << meteo.temp << '\n'
-    << "HR: " << meteo.hr << '\n'
-    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
+    << "HR: " << meteo.hr << '\n';
+    setLog(command, oss.str(), error);
 
     return error;
 }
 
 AmelasError AmelasController::getMeteoData(MeteoData& meteo)
 {
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
     const std::string symbol = "MAIN.MeteoData";
     const std::string command = "SET_METEO_DATA";
 
     meteo = this->meteo_;
 
     // Log.
-    std::ostringstream oss;
-    oss << std::string(100, '-') << '\n'
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << std::string(100, '-') << '\n';
-    _logger->error(oss.str());
+    setLog(command, "", error);
     
-    return AmelasError::SUCCESS;
+    return error;
 }
 
 // =====================================================================================================================

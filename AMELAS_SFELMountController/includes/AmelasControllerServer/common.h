@@ -61,6 +61,7 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_GET_SLEW_SPEED           = 50, //
     REQ_EN_TRACK_ADJ             = 50, //
     REQ_EN_MOUNT_POWER           = 50, //
+    REQ_EN_MOUNT_MODEL           = 50, //
     REQ_SET_METEO_DATA           = 50, //
     REQ_GET_METEO_DATA           = 50, //
     // =============================== //

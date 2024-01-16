@@ -157,6 +157,8 @@ using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
 using SetWaitAltCallback = std::function<AmelasError(const double&)>;
 using GetWaitAltCallback = std::function<AmelasError(double&)>;
 
+using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
+
 using SetMeteoData = std::function<AmelasError(const MeteoData&)>;
 using GetMeteoData = std::function<AmelasError(MeteoData&)>;
 

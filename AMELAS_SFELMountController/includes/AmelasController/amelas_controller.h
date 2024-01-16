@@ -104,12 +104,16 @@ public:
     LIBAMELAS_EXPORT AmelasError setWaitAlt(const double& alt);
     LIBAMELAS_EXPORT AmelasError getWaitAlt(double& alt);
 
+    LIBAMELAS_EXPORT AmelasError enableMountModel(const bool& enable);
+
     LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo);
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
 
 private:
+    AmelasError setEnable(const bool& enable, const std::string plcSymbol, const std::string command);
     AmelasError setPosition(const AltAzPos& pos, const std::string plcSymbol, const std::string command);
     AmelasError getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command);
+    void setLog(const std::string command, const std::string specific, const AmelasError error);
 
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
@@ -124,6 +128,7 @@ private:
     AltAzPos calibration_pos_;
     AltAzAdj home_pos_offset_;
     double wait_alt_;
+    double mount_model_;
     MeteoData meteo_;
 
 };
