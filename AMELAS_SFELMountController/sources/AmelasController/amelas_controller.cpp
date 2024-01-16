@@ -573,6 +573,57 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos& pos, const 
         return AmelasError::INVALID_ERROR;
 }
 
+AmelasError AmelasController::setIdleMotion()
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.IdleMotion";
+    const std::string command = "SET_IDLE_MOTION";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, true);
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+
+AmelasError AmelasController::setParkMotion()
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.ParkMotion";
+    const std::string command = "SET_Park_MOTION";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, true);
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+
+AmelasError AmelasController::setCalibrationMotion()
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.CalibrationMotion";
+    const std::string command = "SET_Calibration_MOTION";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, true);
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+
 // =====================================================================================================================
 
 }} // END NAMESPACES.

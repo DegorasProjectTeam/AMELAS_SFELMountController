@@ -126,6 +126,10 @@ public:
 
     LIBAMELAS_EXPORT AmelasError setAbsoluteAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
     LIBAMELAS_EXPORT AmelasError setRelativeAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
+    
+    LIBAMELAS_EXPORT AmelasError setIdleMotion();
+    LIBAMELAS_EXPORT AmelasError setParkMotion();
+    LIBAMELAS_EXPORT AmelasError setCalibrationMotion();
     //=====================================================================================================================
 
 private:

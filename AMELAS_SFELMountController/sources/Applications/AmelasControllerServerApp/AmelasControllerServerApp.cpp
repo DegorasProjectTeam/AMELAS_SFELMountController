@@ -298,6 +298,18 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::setRelativeAltAzMotion);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_IDLE_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setIdleMotion);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_PARK_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setParkMotion);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setCalibrationMotion);
+
     // ---------------------------------------
 
     // Start the server.

@@ -73,6 +73,9 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_GET_TRACK_TIME_BIAS      = 50, //
     REQ_SET_ABS_ALTAZ_MOTION     = 50, //
     REQ_SET_REL_ALTAZ_MOTION     = 50, //
+    REQ_SET_IDLE_MOTION          = 50, //
+    REQ_SET_PARK_MOTION          = 50, //
+    REQ_SET_CALIBRATION_MOTION   = 50, //
     // =============================== //
     END_IMPL_COMMANDS            = 35,
     END_AMELAS_COMMANDS          = 50

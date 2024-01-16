@@ -179,6 +179,10 @@ using GetTrackTimeBiasCallback = std::function<AmelasError(double&)>;
 using SetAbsoluteAltAzMotionCallback = std::function<AmelasError(const AltAzPos&, const AltAzVel&)>;
 using SetRelativeAltAzMotionCallback = std::function<AmelasError(const AltAzPos&, const AltAzVel&)>;
 
+using SetIdleMotionCallback = std::function<AmelasError()>;
+using SetParkMotionCallback = std::function<AmelasError()>;
+using SetCalibrationMotionCallback = std::function<AmelasError()>;
+
 // =====================================================================================================================
 
 }} // END NAMESPACES.
