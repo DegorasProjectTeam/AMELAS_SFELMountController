@@ -166,6 +166,9 @@ using SetDoStartMotionCallback = std::function<AmelasError()>;
 using SetDoPauseMotionCallback = std::function<AmelasError()>;
 using SetDoStopMotionCallback = std::function<AmelasError()>;
 
+using SetTrackPosOffsetCallback = std::function<AmelasError(const AltAzAdj&)>;
+using GetTrackPosOffsetCallback = std::function<AmelasError(AltAzAdj&)>;
+
 // =====================================================================================================================
 
 }} // END NAMESPACES.

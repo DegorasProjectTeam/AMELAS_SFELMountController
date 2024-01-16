@@ -67,6 +67,8 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_DO_START_MOTION          = 50, //
     REQ_DO_PAUSE_MOTION          = 50, //
     REQ_DO_STOP_MOTION           = 50, //
+    REQ_SET_TRACK_POS_OFFSET     = 50, //
+    REQ_GET_TRACK_POS_OFFSET     = 50, //
     // =============================== //
     END_IMPL_COMMANDS            = 35,
     END_AMELAS_COMMANDS          = 50

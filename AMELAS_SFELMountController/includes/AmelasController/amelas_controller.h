@@ -117,6 +117,9 @@ public:
     LIBAMELAS_EXPORT AmelasError doStartMotion();
     LIBAMELAS_EXPORT AmelasError doPauseMotion();
     LIBAMELAS_EXPORT AmelasError doStopMotion();
+
+    LIBAMELAS_EXPORT AmelasError setTrackPosOffset(const AltAzAdj& pos);
+    LIBAMELAS_EXPORT AmelasError getTrackPosOffset(AltAzAdj& pos);
     //=====================================================================================================================
 
 private:
@@ -140,6 +143,7 @@ private:
     double wait_alt_;
     double mount_model_;
     MeteoData meteo_;
+    AltAzAdj track_pos_offset_;
 
 };
 

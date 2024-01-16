@@ -274,6 +274,14 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::doStopMotion);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET,
+                                             &amelas_controller,
+                                             &AmelasController::setTrackPosOffset);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET,
+                                             &amelas_controller,
+                                             &AmelasController::getTrackPosOffset);
+
     // ---------------------------------------
 
     // Start the server.

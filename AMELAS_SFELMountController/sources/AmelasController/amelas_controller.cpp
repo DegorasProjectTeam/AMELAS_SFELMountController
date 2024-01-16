@@ -45,6 +45,7 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
     wait_alt_(-1),
     mount_model_(false),
     meteo_(-1,-1,-1),
+    track_pos_offset_(-1,-1),
     _logger(logger)
 {
     _plc = std::make_shared<amelas::AmelasAdsClient>(_config.plcConfig, _logger); 
@@ -122,6 +123,8 @@ AmelasError AmelasController::setPosition(const AltAzPos& pos, const std::string
             this->home_pos_offset_ = pos;
         else if (command == "SET_SLEW_SPEED")
             this->slew_speed_ = pos;
+        else if (command == "SET_TRACK_POS_OFFSET")
+            this->track_pos_offset_ = pos;
         
         // Do things in the hardware (PLC).
         _plc->write(plcSymbol + ".az", pos.az);
@@ -154,6 +157,8 @@ AmelasError AmelasController::getPosition(AltAzPos& pos, const std::string plcSy
         pos = this->home_pos_offset_;
     else if (command == "GET_SLEW_SPEED")
         pos = this->slew_speed_;
+    else if (command == "GET_TRACK_POS_OFFSET")
+        pos = this->track_pos_offset_;
 
     // Log.
     setLog(command, "", error);
@@ -414,6 +419,20 @@ AmelasError AmelasController::doStopMotion()
     setLog(command, "", error);
     
     return error;
+}
+
+AmelasError AmelasController::setTrackPosOffset(const AltAzAdj& pos)
+{
+    const std::string symbol = "MAIN.TrackPosOffset";
+    const std::string command = "SET_TRACK_POS_OFFSET";
+    return setPosition(pos, symbol, command);
+}
+
+AmelasError AmelasController::getTrackPosOffset(AltAzAdj& pos)
+{
+    const std::string symbol = "MAIN.TrackPosOffset";
+    const std::string command = "GET_TRACK_POS_OFFSET";
+    return getPosition(pos, symbol, command);
 }
 
 // =====================================================================================================================
