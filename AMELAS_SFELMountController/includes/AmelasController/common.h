@@ -106,6 +106,9 @@ using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Ar
 // Callback function type aliases
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
 
+using EnableTrackingAdjustsCallback = std::function<AmelasError(const bool&)>;
+using EnableMountPowerCallback = std::function<AmelasError(const bool&)>;
+
 using SetSlewSpeedCallback = std::function<AmelasError(const AltAzVel&)>;
 using GetSlewSpeedCallback = std::function<AmelasError(AltAzVel&)>;
 

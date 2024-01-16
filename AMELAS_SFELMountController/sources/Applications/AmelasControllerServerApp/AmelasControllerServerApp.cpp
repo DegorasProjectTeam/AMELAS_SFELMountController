@@ -174,6 +174,14 @@ int main(int, char**)
 
     // Set the controller callbacks in the server.
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_TRACK_ADJ,
+                                             &amelas_controller,
+                                             &AmelasController::enableTrackingAdjusts);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_MOUNT_POWER,
+                                             &amelas_controller,
+                                             &AmelasController::enableMountPower);
+
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOME_POSITION,
                                              &amelas_controller,
                                              &AmelasController::setHomePosition);

@@ -34,6 +34,8 @@ namespace controller{
 AmelasController::AmelasController(const AmelasControllerConfig &config, 
                                     const std::shared_ptr<spdlog::logger> logger) :
     _config(config),
+    tracking_adjusts_(false),
+    mount_power_(false),
     slew_speed_(-1, -1),
     home_pos_(-1,-1),
     idle_pos_(-1,-1),
@@ -49,6 +51,64 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
 AmelasError AmelasController::getDatetime(std::string &)
 {
     return AmelasError::SUCCESS;
+}
+
+AmelasError AmelasController::enableTrackingAdjusts(const bool& enable)
+{
+    const std::string symbol = "MAIN.TrackingAdjuts";
+    const std::string command = "EN_TRACK_ADJ";
+
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    // TODO: Check the provided values
+    this->tracking_adjusts_ = enable;
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, enable);
+
+    // Log.
+    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << "Track adj.: " << enable << '\n'
+    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+
+    return error;
+}
+
+AmelasError AmelasController::enableMountPower(const bool& enable)
+{
+    const std::string symbol = "MAIN.MountPower";
+    const std::string command = "EN_MOUNT_POWER";
+
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    // TODO: Check the provided values
+    this->mount_power_ = enable;
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, enable);
+
+    // Log.
+    std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
+    std::ostringstream oss;
+    oss << std::string(100, '-') << '\n'
+    << "<AMELAS CONTROLLER>" << '\n'
+    << "-> " << command << '\n'
+    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+    << "Mount power: " << enable << '\n'
+    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
+    << std::string(100, '-') << '\n';
+    _logger->error(oss.str());
+
+    return error;
 }
 
 AmelasError AmelasController::setPosition(const AltAzPos& pos, const std::string plcSymbol, const std::string command)
@@ -73,11 +133,11 @@ AmelasError AmelasController::setPosition(const AltAzPos& pos, const std::string
             this->calibration_pos_ = pos;
         else if (command == "SET_HOMING_OFFSETS")
             this->home_pos_offset_ = pos;
+        
+        // Do things in the hardware (PLC).
+        _plc->write(plcSymbol + ".az", pos.az);
+        _plc->write(plcSymbol + ".el", pos.el);
     }
-
-    // Do things in the hardware (PLC).
-    _plc->write(plcSymbol + ".az", pos.az);
-    _plc->write(plcSymbol + ".el", pos.el);
 
     // Log.
     std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
@@ -128,6 +188,7 @@ AmelasError AmelasController::setSlewSpeed(const AltAzVel &vel)
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
+    // TODO: Check the provided values
     this->slew_speed_ = vel;
 
     // Do things in the hardware (PLC).
@@ -259,16 +320,17 @@ AmelasError AmelasController::getHomingOffsets(AltAzAdj &pos)
 
 AmelasError AmelasController::setWaitAlt(const double& alt)
 {
-    const std::string plcSymbol = "MAIN.WaitAlt";
+    const std::string symbol = "MAIN.WaitAlt";
     const std::string command = "SET_WAIT_ALT";
 
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
+    // TODO: Check the provided values
     this->wait_alt_ = alt;
 
     // Do things in the hardware (PLC).
-    _plc->write(plcSymbol, alt);
+    _plc->write(symbol, alt);
 
     // Log.
     std::string cmd_str = ControllerErrorStr[static_cast<size_t>(error)];
@@ -287,7 +349,7 @@ AmelasError AmelasController::setWaitAlt(const double& alt)
 
 AmelasError AmelasController::getWaitAlt(double& alt)
 {
-    const std::string plcSymbol = "MAIN.WaitAlt";
+    const std::string symbol = "MAIN.WaitAlt";
     const std::string command = "GET_WAIT_ALT";
 
     alt = this->wait_alt_;

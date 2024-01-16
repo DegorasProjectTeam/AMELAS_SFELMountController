@@ -59,6 +59,8 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_SET_SLEW_SPEED           = 49,
     // TODO: change number =========== //
     REQ_GET_SLEW_SPEED           = 50, //
+    REQ_EN_TRACK_ADJ             = 50, //
+    REQ_EN_MOUNT_POWER           = 50, //
     // =============================== //
     END_IMPL_COMMANDS            = 35,
     END_AMELAS_COMMANDS          = 50

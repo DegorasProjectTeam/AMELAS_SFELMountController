@@ -76,6 +76,9 @@ public:
 
     LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
 
+    LIBAMELAS_EXPORT AmelasError enableTrackingAdjusts(const bool& enable);
+    LIBAMELAS_EXPORT AmelasError enableMountPower(const bool& enable);
+
     LIBAMELAS_EXPORT AmelasError setSlewSpeed(const AltAzVel& vel);
     LIBAMELAS_EXPORT AmelasError getSlewSpeed(AltAzVel& vel);
 
@@ -109,6 +112,8 @@ private:
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
 
+    bool tracking_adjusts_;
+    bool mount_power_;
     AltAzVel slew_speed_;
     AltAzPos home_pos_;
     AltAzPos idle_pos_;
