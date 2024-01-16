@@ -50,6 +50,8 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
     _plc = std::make_shared<amelas::AmelasAdsClient>(_config.plcConfig, _logger); 
 }
 
+// STATUS AND CONFIGURATION RELATED FUNCTIONS
+//=====================================================================================================================
 AmelasError AmelasController::getDatetime(std::string &)
 {
     return AmelasError::SUCCESS;
@@ -351,6 +353,62 @@ AmelasError AmelasController::getMeteoData(MeteoData& meteo)
     const std::string command = "SET_METEO_DATA";
 
     meteo = this->meteo_;
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+//=====================================================================================================================
+
+// STATUS AND CONFIGURATION RELATED FUNCTIONS
+//=====================================================================================================================
+AmelasError AmelasController::doStartMotion()
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.StartMotion";
+    const std::string command = "DO_START_MOTION";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, true);
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+
+AmelasError AmelasController::doPauseMotion()
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.PauseMotion";
+    const std::string command = "DO_PAUSE_MOTION";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, true);
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+
+AmelasError AmelasController::doStopMotion()
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.StopMotion";
+    const std::string command = "DO_STOP_MOTION";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol, true);
+
+    // TODO: borrar todo lo relativo al movimiento actual
 
     // Log.
     setLog(command, "", error);

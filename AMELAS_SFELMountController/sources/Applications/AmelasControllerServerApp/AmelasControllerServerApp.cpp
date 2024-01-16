@@ -262,6 +262,18 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getMeteoData);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_START_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::doStartMotion);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_PAUSE_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::doPauseMotion);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_STOP_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::doStopMotion);
+
     // ---------------------------------------
 
     // Start the server.

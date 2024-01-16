@@ -162,6 +162,10 @@ using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
 using SetMeteoData = std::function<AmelasError(const MeteoData&)>;
 using GetMeteoData = std::function<AmelasError(MeteoData&)>;
 
+using SetDoStartMotionCallback = std::function<AmelasError()>;
+using SetDoPauseMotionCallback = std::function<AmelasError()>;
+using SetDoStopMotionCallback = std::function<AmelasError()>;
+
 // =====================================================================================================================
 
 }} // END NAMESPACES.

@@ -74,6 +74,8 @@ public:
     LIBAMELAS_EXPORT AmelasController(const AmelasControllerConfig &config, 
                                         const std::shared_ptr<spdlog::logger> logger);
 
+    // STATUS AND CONFIGURATION RELATED FUNCTIONS
+    //=====================================================================================================================
     LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
 
     LIBAMELAS_EXPORT AmelasError enableTrackingAdjusts(const bool& enable);
@@ -108,6 +110,14 @@ public:
 
     LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo);
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
+    // =====================================================================================================================
+
+    // MOTION RELATED FUNCTIONS
+    //=====================================================================================================================
+    LIBAMELAS_EXPORT AmelasError doStartMotion();
+    LIBAMELAS_EXPORT AmelasError doPauseMotion();
+    LIBAMELAS_EXPORT AmelasError doStopMotion();
+    //=====================================================================================================================
 
 private:
     AmelasError setEnable(const bool& enable, const std::string plcSymbol, const std::string command);

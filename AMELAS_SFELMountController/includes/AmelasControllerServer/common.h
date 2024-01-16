@@ -64,6 +64,9 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_EN_MOUNT_MODEL           = 50, //
     REQ_SET_METEO_DATA           = 50, //
     REQ_GET_METEO_DATA           = 50, //
+    REQ_DO_START_MOTION          = 50, //
+    REQ_DO_PAUSE_MOTION          = 50, //
+    REQ_DO_STOP_MOTION           = 50, //
     // =============================== //
     END_IMPL_COMMANDS            = 35,
     END_AMELAS_COMMANDS          = 50
