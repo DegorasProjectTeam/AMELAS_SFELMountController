@@ -84,4 +84,6 @@ class AmelasAdsClient
 
 }
 
+#include "amelas_ads_client.tpp"
+
 #endif
