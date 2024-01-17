@@ -34,19 +34,6 @@ namespace controller{
 AmelasController::AmelasController(const AmelasControllerConfig &config, 
                                     const std::shared_ptr<spdlog::logger> logger) :
     _config(config),
-    tracking_adjusts_(false),
-    mount_power_(false),
-    slew_speed_(-1,-1),
-    home_pos_(-1,-1),
-    idle_pos_(-1,-1),
-    park_pos_(-1,-1),
-    calibration_pos_(-1,-1),
-    home_pos_offset_(-1,-1),
-    wait_alt_(-1),
-    mount_model_(false),
-    meteo_(-1,-1,-1),
-    track_pos_offset_(-1,-1),
-    track_time_bias_(-1),
     _logger(logger)
 {
     _plc = std::make_shared<amelas::AmelasAdsClient>(_config.plcConfig, _logger); 
@@ -83,17 +70,14 @@ AmelasError AmelasController::setEnable(const bool &enable, const std::string pl
     // TODO: Check the provided values
     if (command == "EN_TRACK_ADJ")
     {
-        this->tracking_adjusts_ = enable;
         oss << "Track adj.: " << enable << '\n';
     }
     else if (command == "EN_MOUNT_POWER")
     {
-        this->mount_power_ = enable;
         oss << "Mount power: " << enable << '\n';
     }
     else if (command == "EN_MOUNT_MODEL")
     {
-        this->mount_model_ = enable;
         oss << "Mount model: " << enable << '\n';
     }
 
@@ -118,19 +102,6 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
     }
     else
     {
-        if (command == "SET_HOME_POSITION")
-            this->home_pos_ = pos;
-        else if (command == "SET_IDLE_POSITION")
-            this->idle_pos_ = pos;
-        else if (command == "SET_PARK_POSITION")
-            this->park_pos_ = pos;
-        else if (command == "SET_CALIBRATION_POSITION")
-            this->calibration_pos_ = pos;
-        else if (command == "SET_HOMING_OFFSETS")
-            this->home_pos_offset_ = pos;
-        else if (command == "SET_TRACK_POS_OFFSET")
-            this->track_pos_offset_ = pos;
-        
         // Do things in the hardware (PLC).
         _plc->write(plcSymbol + ".az", pos.az);
         _plc->write(plcSymbol + ".el", pos.el);
@@ -150,20 +121,7 @@ AmelasError AmelasController::getPosition(AltAzPos &pos, const std::string plcSy
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    if (command == "GET_HOME_POSITION")
-        pos = this->home_pos_;
-    else if (command == "GET_IDLE_POSITION")
-        pos = this->idle_pos_;
-    else if (command == "GET_PARK_POSITION")
-        pos = this->park_pos_;
-    else if (command == "GET_CALIBRATION_POSITION")
-        pos = this->calibration_pos_;
-    else if (command == "GET_HOMING_OFFSETS")
-        pos = this->home_pos_offset_;
-    else if (command == "GET_SLEW_SPEED")
-        pos = this->slew_speed_;
-    else if (command == "GET_TRACK_POS_OFFSET")
-        pos = this->track_pos_offset_;
+
 
     // Log.
     setLog(command, "", error);
@@ -183,9 +141,6 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
     }
     else
     {
-        if (command == "SET_SLEW_SPEED")
-            this->slew_speed_ = vel;
-        
         // Do things in the hardware (PLC).
         _plc->write(plcSymbol + ".az", vel.az);
         _plc->write(plcSymbol + ".el", vel.el);
@@ -205,8 +160,7 @@ AmelasError AmelasController::getSpeed(AltAzVel &vel, const std::string plcSymbo
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    if (command == "GET_SLEW_SPEED")
-        vel = this->slew_speed_;
+
 
     // Log.
     setLog(command, "", error);
@@ -339,7 +293,6 @@ AmelasError AmelasController::setWaitAlt(const double &alt)
     AmelasError error = AmelasError::SUCCESS;
 
     // TODO: Check the provided values
-    this->wait_alt_ = alt;
 
     // Do things in the hardware (PLC).
     _plc->write(symbol, alt);
@@ -360,7 +313,7 @@ AmelasError AmelasController::getWaitAlt(double &alt)
     const std::string symbol = "MAIN.WaitAlt";
     const std::string command = "GET_WAIT_ALT";
 
-    alt = this->wait_alt_;
+
 
     // Log.
     setLog(command, "", error);
@@ -383,9 +336,7 @@ AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    this->meteo_.press = _plc->read<double>(symbol + ".press");
-    this->meteo_.temp  = _plc->read<double>(symbol + ".temp");
-    this->meteo_.hr    = _plc->read<double>(symbol + ".hr");
+
 
     // Log.
     std::ostringstream oss;
@@ -405,7 +356,7 @@ AmelasError AmelasController::getMeteoData(MeteoData &meteo)
     const std::string symbol = "MAIN.MeteoData";
     const std::string command = "SET_METEO_DATA";
 
-    meteo = this->meteo_;
+
 
     // Log.
     setLog(command, "", error);
@@ -492,7 +443,6 @@ AmelasError AmelasController::setTrackTimeBias(const double &time)
     AmelasError error = AmelasError::SUCCESS;
 
     // TODO: Check the provided values
-    this->track_time_bias_ = time;
 
     // Do things in the hardware (PLC).
     _plc->write(symbol, time);
@@ -513,7 +463,7 @@ AmelasError AmelasController::getTrackTimeBias(double &time)
     const std::string symbol = "MAIN.TrackTimeBias";
     const std::string command = "GET_TRACK_TIME_BIAS";
 
-    time = this->track_time_bias_;
+
 
     // Log.
     setLog(command, "", error);

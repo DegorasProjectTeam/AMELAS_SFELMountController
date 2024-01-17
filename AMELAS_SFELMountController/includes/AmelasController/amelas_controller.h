@@ -143,21 +143,6 @@ private:
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
-
-    bool tracking_adjusts_;
-    bool mount_power_;
-    AltAzVel slew_speed_;
-    AltAzPos home_pos_;
-    AltAzPos idle_pos_;
-    AltAzPos park_pos_;
-    AltAzPos calibration_pos_;
-    AltAzAdj home_pos_offset_;
-    double wait_alt_;
-    double mount_model_;
-    MeteoData meteo_;
-    AltAzAdj track_pos_offset_;
-    double track_time_bias_;
-
 };
 
 }} // END NAMESPACES.

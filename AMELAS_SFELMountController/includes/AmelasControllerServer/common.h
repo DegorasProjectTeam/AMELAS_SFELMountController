@@ -57,28 +57,26 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_SET_WAIT_ALT             = 47,
     REQ_GET_WAIT_ALT             = 48,
     REQ_SET_SLEW_SPEED           = 49,
-    // TODO: change number =========== //
-    REQ_GET_SLEW_SPEED           = 50, //
-    REQ_EN_TRACK_ADJ             = 50, //
-    REQ_EN_MOUNT_POWER           = 50, //
-    REQ_EN_MOUNT_MODEL           = 50, //
-    REQ_SET_METEO_DATA           = 50, //
-    REQ_GET_METEO_DATA           = 50, //
-    REQ_DO_START_MOTION          = 50, //
-    REQ_DO_PAUSE_MOTION          = 50, //
-    REQ_DO_STOP_MOTION           = 50, //
-    REQ_SET_TRACK_POS_OFFSET     = 50, //
-    REQ_GET_TRACK_POS_OFFSET     = 50, //
-    REQ_SET_TRACK_TIME_BIAS      = 50, //
-    REQ_GET_TRACK_TIME_BIAS      = 50, //
-    REQ_SET_ABS_ALTAZ_MOTION     = 50, //
-    REQ_SET_REL_ALTAZ_MOTION     = 50, //
-    REQ_SET_IDLE_MOTION          = 50, //
-    REQ_SET_PARK_MOTION          = 50, //
-    REQ_SET_CALIBRATION_MOTION   = 50, //
-    // =============================== //
+    REQ_GET_SLEW_SPEED           = 50,
+    REQ_EN_TRACK_ADJ             = 51,
+    REQ_EN_MOUNT_POWER           = 52,
+    REQ_EN_MOUNT_MODEL           = 53,
+    REQ_SET_METEO_DATA           = 54,
+    REQ_GET_METEO_DATA           = 55,
+    REQ_DO_START_MOTION          = 56,
+    REQ_DO_PAUSE_MOTION          = 57,
+    REQ_DO_STOP_MOTION           = 58,
+    REQ_SET_TRACK_POS_OFFSET     = 59,
+    REQ_GET_TRACK_POS_OFFSET     = 60,
+    REQ_SET_TRACK_TIME_BIAS      = 61,
+    REQ_GET_TRACK_TIME_BIAS      = 62,
+    REQ_SET_ABS_ALTAZ_MOTION     = 63,
+    REQ_SET_REL_ALTAZ_MOTION     = 64,
+    REQ_SET_IDLE_MOTION          = 65,
+    REQ_SET_PARK_MOTION          = 66,
+    REQ_SET_CALIBRATION_MOTION   = 67,
     END_IMPL_COMMANDS            = 35,
-    END_AMELAS_COMMANDS          = 50
+    END_AMELAS_COMMANDS          = 68
 };
 
 // Specific subclass errors (0 to 30 are reserved for the base server).

@@ -104,9 +104,39 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending get home position command." << std::endl;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION))
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
         {
-            std::cout << "Sending set home position command." << std::endl;
+            std::cout << "Sending get idle position command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS))
+        {
+            std::cout << "Sending get park position command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_CALIBRATION_POS))
+        {
+            std::cout << "Sending get calibration position command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOMING_OFFSETS))
+        {
+            std::cout << "Sending get homing offsets position command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED))
+        {
+            std::cout << "Sending get slew speed command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET))
+        {
+            std::cout << "Sending get tracking position position offsets command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION)
+        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS)
+        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS)
+        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS)
+        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS)
+        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED)
+        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
+        {
+            std::cout << "Sending set position/velocity command." << std::endl;
 
             bool valid_params = true;
             double az = 0., el = 0.;
@@ -139,7 +169,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             if (valid_params)
             {
-                std::cout<<"Sending: " << az <<" "<<el<<std::endl;
+                std::cout << "Sending: " << az << " " << el << std::endl;
 
                 AltAzPos pos(az, el);
 
@@ -150,6 +180,99 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                 std::cout<<serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION)
+        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION))
+        {
+            std::cout << "Sending set pos-vel command." << std::endl;
+
+            bool valid_params = true;
+            double az = 0., el = 0.;
+            double az_vel = 0., el_vel = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                az = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter azimuth issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    el = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter elevation issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    az_vel = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter 3 issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    el_vel = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter elevation issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << az << " " << el << " " << az_vel << " " << el_vel << std::endl;
+
+                AltAzPos pos(az, el);
+                AltAzVel vel(az_vel, el_vel);
+
+                BinarySerializer serializer;
+
+                serializer.write(pos, vel);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos, vel);
 
                 std::cout<<std::endl;
             }
@@ -183,7 +306,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             if(command_msg.command == ServerCommand::REQ_CONNECT)
             {
-                client_result = client.doConnect();
+                client_result = client.doConnect(true);
 
                 if (client_result == OperationResult::CLIENT_STOPPED)
                 {
@@ -242,7 +365,8 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     std::cout<<"Controller error: "<<static_cast<int>(error)<<std::endl;
                 }
 
-                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION))
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
                 {
                     try
                     {
