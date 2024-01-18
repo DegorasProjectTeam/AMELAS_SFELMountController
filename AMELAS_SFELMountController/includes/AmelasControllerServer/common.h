@@ -76,7 +76,7 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_SET_PARK_MOTION          = 66,
     REQ_SET_CALIBRATION_MOTION   = 67,
     END_IMPL_COMMANDS            = 35,
-    END_AMELAS_COMMANDS          = 68
+    END_AMELAS_COMMANDS          = 69
 };
 
 // Specific subclass errors (0 to 30 are reserved for the base server).
@@ -89,12 +89,45 @@ enum class AmelasServerResult : zmqutils::common::ResultType
 // Extend the base command strings with those of the subclass.
 static constexpr auto AmelasServerCommandStr = zmqutils::utils::joinArraysConstexpr(
     zmqutils::common::ServerCommandStr,
-    std::array<const char*, 5>
+    std::array<const char*, 38>
     {
         "FUTURE_EXAMPLE",
         "FUTURE_EXAMPLE",
         "REQ_SET_HOME_POSITION",
         "REQ_GET_HOME_POSITION",
+        "FUTURE_EXAMPLE",
+        "REQ_SET_IDLE_POS",
+        "REQ_GET_IDLE_POS",
+        "REQ_SET_PARK_POS",
+        "REQ_GET_PARK_POS",
+        "REQ_SET_CALIBRATION_POS",
+        "REQ_GET_CALIBRATION_POS",
+        "REQ_SET_IDLE_POS_HERE",
+        "REQ_SET_PARK_POS_HERE",
+        "REQ_SET_CALIBRATION_POS_HERE",
+        "REQ_SET_HOMING_OFFSETS",
+        "REQ_GET_HOMING_OFFSETS",
+        "REQ_SET_WAIT_ALT",
+        "REQ_GET_WAIT_ALT",
+        "REQ_SET_SLEW_SPEED",
+        "REQ_GET_SLEW_SPEED",
+        "REQ_EN_TRACK_ADJ",
+        "REQ_EN_MOUNT_POWER",
+        "REQ_EN_MOUNT_MODEL",
+        "REQ_SET_METEO_DATA",
+        "REQ_GET_METEO_DATA",
+        "REQ_DO_START_MOTION",
+        "REQ_DO_PAUSE_MOTION",
+        "REQ_DO_STOP_MOTION",
+        "REQ_SET_TRACK_POS_OFFSET",
+        "REQ_GET_TRACK_POS_OFFSET",
+        "REQ_SET_TRACK_TIME_BIAS",
+        "REQ_GET_TRACK_TIME_BIAS",
+        "REQ_SET_ABS_ALTAZ_MOTION",
+        "REQ_SET_REL_ALTAZ_MOTION",
+        "REQ_SET_IDLE_MOTION",
+        "REQ_SET_PARK_MOTION",
+        "REQ_SET_CALIBRATION_MOTION",
         "END_DRGG_COMMANDS"
     });
 
