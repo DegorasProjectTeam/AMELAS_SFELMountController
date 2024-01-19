@@ -227,11 +227,11 @@ using SetIdlePositionHereCallback = std::function<AmelasError()>;
 using SetParkPositionHereCallback = std::function<AmelasError()>;
 using SetCalibrationPositionHereCallback = std::function<AmelasError()>;
 
-using SetHomingOffsetsCallback = std::function<AmelasError(const AltAzAdj&)>;
-using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
-
 using SetWaitAltCallback = std::function<AmelasError(const double&)>;
 using GetWaitAltCallback = std::function<AmelasError(double&)>;
+
+using SetHomingOffsetsCallback = std::function<AmelasError(const AltAzAdj&)>;
+using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
 
 using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
 
@@ -254,6 +254,8 @@ using SetRelativeAltAzMotionCallback = std::function<AmelasError(const AltAzPos&
 using SetIdleMotionCallback = std::function<AmelasError()>;
 using SetParkMotionCallback = std::function<AmelasError()>;
 using SetCalibrationMotionCallback = std::function<AmelasError()>;
+
+using DoConnectPLC = std::function<AmelasError(AltAzPos&)>;
 
 // =====================================================================================================================
 

@@ -101,6 +101,9 @@ private:
     // void processGetIdlePosition(const CommandRequest&, CommandReply&);
     void processSetAbsoluteAltAzMotion(const CommandRequest&, CommandReply&);
 
+    // template <typename ClbkT>
+    // void processSetAbsRelAltAzMotion(const CommandRequest &request, CommandReply &reply);
+
     template <typename ClbkT>
     void processSetPosition(const CommandRequest &request, CommandReply &reply);
     

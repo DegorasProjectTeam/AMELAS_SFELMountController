@@ -182,6 +182,14 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::enableMountPower);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_SLEW_SPEED,
+                                             &amelas_controller,
+                                             &AmelasController::setSlewSpeed);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_SLEW_SPEED,
+                                             &amelas_controller,
+                                             &AmelasController::getSlewSpeed);
+
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOME_POSITION,
                                              &amelas_controller,
                                              &AmelasController::setHomePosition);
@@ -226,14 +234,6 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::setCalibrationPositionHere);
 
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOMING_OFFSETS,
-                                             &amelas_controller,
-                                             &AmelasController::setHomingOffsets);
-
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
-                                             &amelas_controller,
-                                             &AmelasController::getHomingOffsets);
-
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_WAIT_ALT,
                                              &amelas_controller,
                                              &AmelasController::setWaitAlt);
@@ -242,13 +242,13 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getWaitAlt);
 
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_SLEW_SPEED,
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOMING_OFFSETS,
                                              &amelas_controller,
-                                             &AmelasController::setSlewSpeed);
+                                             &AmelasController::setHomingOffsets);
 
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_SLEW_SPEED,
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
                                              &amelas_controller,
-                                             &AmelasController::getSlewSpeed);
+                                             &AmelasController::getHomingOffsets);
 
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_MOUNT_MODEL,
                                              &amelas_controller,
@@ -309,6 +309,10 @@ int main(int, char**)
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION,
                                              &amelas_controller,
                                              &AmelasController::setCalibrationMotion);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_CONNECT_PLC,
+                                             &amelas_controller,
+                                             &AmelasController::doConnectPLC);
 
     // ---------------------------------------
 

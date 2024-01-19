@@ -105,6 +105,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // REQ_SET_ABS_ALTAZ_MOTION.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION,
                                    &AmelasControllerServer::processSetAbsoluteAltAzMotion);
+
+    // REQ_DO_CONNECT_PLC.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_CONNECT_PLC,
+                                  &AmelasControllerServer::processGetPosition<controller::DoConnectPLC>);
 }
 
 AmelasControllerServer::~AmelasControllerServer() {}
