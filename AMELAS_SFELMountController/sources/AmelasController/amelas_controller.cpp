@@ -223,28 +223,28 @@ AmelasError AmelasController::getSpeed(AltAzVel &vel, const std::string plcSymbo
 
 AmelasError AmelasController::enableTrackingAdjusts(const bool &enabled)
 {
-    const std::string symbol = "MAIN.TrackingAdjuts";
+    const std::string symbol = "MAIN.commander.TrackingAdjuts";
     const std::string command = "EN_TRACK_ADJ";
     return setEnable(enabled, symbol, command);
 }
 
 AmelasError AmelasController::enableMountPower(const bool &enabled)
 {
-    const std::string symbol = "MAIN.MountPower";
+    const std::string symbol = "MAIN.commander.MountPower";
     const std::string command = "EN_MOUNT_POWER";
     return setEnable(enabled, symbol, command);
 }
 
 AmelasError AmelasController::setSlewSpeed(const AltAzVel &vel)
 {
-    const std::string symbol = "FB_Commander.SlewSpeed";
+    const std::string symbol = "MAIN.commander.SlewSpeed";
     const std::string command = "SET_SLEW_SPEED";
     return setSpeed(vel, symbol, command);
 }
 
 AmelasError AmelasController::getSlewSpeed(AltAzVel &vel)
 {
-    const std::string symbol = "FB_Commander.SlewSpeed";
+    const std::string symbol = "MAIN.commander.SlewSpeed";
     const std::string command = "GET_SLEW_SPEED";
     return getSpeed(vel, symbol, command);
 }
@@ -265,67 +265,67 @@ AmelasError AmelasController::getHomePosition(AltAzPos &pos)
 
 AmelasError AmelasController::setIdlePosition(const AltAzPos &pos)
 {
-    const std::string symbol = "FB_Commander.IdlePosition";
+    const std::string symbol = "MAIN.commander.IdlePosition";
     const std::string command = "SET_IDLE_POSITION";
     return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getIdlePosition(AltAzPos &pos)
 {
-    const std::string symbol = "FB_Commander.IdlePosition";
+    const std::string symbol = "MAIN.commander.IdlePosition";
     const std::string command = "GET_IDLE_POSITION";
     return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setParkPosition(const AltAzPos &pos)
 {
-    const std::string symbol = "FB_Commander.ParkPosition";
+    const std::string symbol = "MAIN.commander.ParkPosition";
     const std::string command = "SET_PARK_POSITION";
     return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getParkPosition(AltAzPos &pos)
 {
-    const std::string symbol = "FB_Commander.ParkPosition";
+    const std::string symbol = "MAIN.commander.ParkPosition";
     const std::string command = "GET_PARK_POSITION";
     return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setCalibrationPosition(const AltAzPos &pos)
 {
-    const std::string symbol = "FB_Commander.CalibrationPosition";
+    const std::string symbol = "MAIN.commander.CalibrationPosition";
     const std::string command = "SET_CALIBRATION_POSITION";
     return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getCalibrationPosition(AltAzPos &pos)
 {
-    const std::string symbol = "FB_Commander.CalibrationPosition";
+    const std::string symbol = "MAIN.commander.CalibrationPosition";
     const std::string command = "GET_CALIBRATION_POSITION";
     return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setIdlePositionHere()
 {
-    AltAzPos pos(_plc->read<double>("MAIN.CurrentPosition.az"), _plc->read<double>("MAIN.CurrentPosition.el"));
+    AltAzPos pos(_plc->read<double>("MAIN.commander.CurrentPosition.az"), _plc->read<double>("MAIN.commander.CurrentPosition.el"));
     return setIdlePosition(pos);
 }
 
 AmelasError AmelasController::setParkPositionHere()
 {
-    AltAzPos pos(_plc->read<double>("MAIN.CurrentPosition.az"), _plc->read<double>("MAIN.CurrentPosition.el"));
+    AltAzPos pos(_plc->read<double>("MAIN.commander.CurrentPosition.az"), _plc->read<double>("MAIN.commander.CurrentPosition.el"));
     return setParkPosition(pos);
 }
 
 AmelasError AmelasController::setCalibrationPositionHere()
 {
-    AltAzPos pos(_plc->read<double>("MAIN.CurrentPosition.az"), _plc->read<double>("MAIN.CurrentPosition.el"));
+    AltAzPos pos(_plc->read<double>("MAIN.commander.CurrentPosition.az"), _plc->read<double>("MAIN.commander.CurrentPosition.el"));
     return setCalibrationPosition(pos);
 }
 
 AmelasError AmelasController::setWaitAlt(const double &alt)
 {
-    const std::string symbol = "MAIN.WaitAlt";
+    const std::string symbol = "MAIN.commander.WaitAlt";
     const std::string command = "SET_WAIT_ALT";
 
     // Auxiliar result.
@@ -349,7 +349,7 @@ AmelasError AmelasController::getWaitAlt(double &alt)
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.WaitAlt";
+    const std::string symbol = "MAIN.commander.WaitAlt";
     const std::string command = "GET_WAIT_ALT";
 
     alt = _plc->read<double>(symbol);
@@ -362,21 +362,21 @@ AmelasError AmelasController::getWaitAlt(double &alt)
 
 AmelasError AmelasController::setHomingOffsets(const AltAzAdj &pos)
 {
-    const std::string symbol = "MAIN.HomePositionOffsets";
+    const std::string symbol = "MAIN.commander.HomePositionOffsets";
     const std::string command = "SET_HOMING_OFFSETS";
     return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getHomingOffsets(AltAzAdj &pos)
 {
-    const std::string symbol = "MAIN.HomePositionOffsets";
+    const std::string symbol = "MAIN.commander.HomePositionOffsets";
     const std::string command = "GET_HOMING_OFFSETS";
     return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::enableMountModel(const bool &enabled)
 {
-    const std::string symbol = "MAIN.MountModel";
+    const std::string symbol = "MAIN.commander.MountModel";
     const std::string command = "EN_MOUNT_MODEL";
     return setEnable(enabled, symbol, command);
 }
@@ -388,7 +388,7 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
 
 AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
 {
-    const std::string symbol = "MAIN.MeteoData";
+    const std::string symbol = "MAIN.commander.MeteoData";
     const std::string command = "SET_METEO_DATA";
 
     // Auxiliar result.
@@ -411,7 +411,7 @@ AmelasError AmelasController::getMeteoData(MeteoData &meteo)
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.MeteoData";
+    const std::string symbol = "MAIN.commander.MeteoData";
     const std::string command = "SET_METEO_DATA";
 
     meteo.press = _plc->read<double>(symbol + ".press");
@@ -440,7 +440,7 @@ AmelasError AmelasController::doStartMotion()
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.StartMotion";
+    const std::string symbol = "MAIN.commander.StartMotion";
     const std::string command = "DO_START_MOTION";
 
     // Do things in the hardware (PLC).
@@ -458,7 +458,7 @@ AmelasError AmelasController::doPauseMotion()
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.PauseMotion";
+    const std::string symbol = "MAIN.commander.PauseMotion";
     const std::string command = "DO_PAUSE_MOTION";
 
     // Do things in the hardware (PLC).
@@ -476,7 +476,7 @@ AmelasError AmelasController::doStopMotion()
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.StopMotion";
+    const std::string symbol = "MAIN.commander.StopMotion";
     const std::string command = "DO_STOP_MOTION";
 
     // Do things in the hardware (PLC).
@@ -493,21 +493,21 @@ AmelasError AmelasController::doStopMotion()
 
 AmelasError AmelasController::setTrackPosOffset(const AltAzAdj &pos)
 {
-    const std::string symbol = "MAIN.TrackPosOffset";
+    const std::string symbol = "MAIN.commander.TrackPosOffset";
     const std::string command = "SET_TRACK_POS_OFFSET";
     return setPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::getTrackPosOffset(AltAzAdj &pos)
 {
-    const std::string symbol = "MAIN.TrackPosOffset";
+    const std::string symbol = "MAIN.commander.TrackPosOffset";
     const std::string command = "GET_TRACK_POS_OFFSET";
     return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setTrackTimeBias(const double &time)
 {
-    const std::string symbol = "MAIN.TrackTimeBias";
+    const std::string symbol = "MAIN.commander.TrackTimeBias";
     const std::string command = "SET_TRACK_TIME_BIAS";
 
     // Auxiliar result.
@@ -531,7 +531,7 @@ AmelasError AmelasController::getTrackTimeBias(double &time)
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.TrackTimeBias";
+    const std::string symbol = "MAIN.commander.TrackTimeBias";
     const std::string command = "GET_TRACK_TIME_BIAS";
 
     time = _plc->read<double>(symbol);
@@ -548,9 +548,9 @@ AmelasError AmelasController::setAbsoluteAltAzMotion(const AltAzPos &pos, const 
     AmelasError error_pos = AmelasError::SUCCESS;
     AmelasError error_vel = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.AbsoluteMotion";
-    const std::string symbol_pos = "MAIN.AltAzMotion.pos";
-    const std::string symbol_vel = "MAIN.AltAzMotion.vel";
+    const std::string symbol = "MAIN.commander.AbsoluteMotion";
+    const std::string symbol_pos = "MAIN.commander.AltAzMotion.pos";
+    const std::string symbol_vel = "MAIN.commander.AltAzMotion.vel";
     const std::string command_pos = "SET_ABS_ALTAZ_MOTION (POS)";
     const std::string command_vel = "SET_ABS_ALTAZ_MOTION (VEL)";
 
@@ -578,9 +578,9 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
     AmelasError error_pos = AmelasError::SUCCESS;
     AmelasError error_vel = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.RelativeMotion";
-    const std::string symbol_pos = "MAIN.AltAzMotion.pos";
-    const std::string symbol_vel = "MAIN.AltAzMotion.vel";
+    const std::string symbol = "MAIN.commander.RelativeMotion";
+    const std::string symbol_pos = "MAIN.commander.AltAzMotion.pos";
+    const std::string symbol_vel = "MAIN.commander.AltAzMotion.vel";
     const std::string command_pos = "SET_REL_ALTAZ_MOTION (POS)";
     const std::string command_vel = "SET_REL_ALTAZ_MOTION (VEL)";
 
@@ -610,7 +610,7 @@ AmelasError AmelasController::setIdleMotion()
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.IdleMotion";
+    const std::string symbol = "MAIN.commander.IdleMotion";
     const std::string command = "SET_IDLE_MOTION";
 
     // Do things in the hardware (PLC).
@@ -628,7 +628,7 @@ AmelasError AmelasController::setParkMotion()
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.ParkMotion";
+    const std::string symbol = "MAIN.commander.ParkMotion";
     const std::string command = "SET_Park_MOTION";
 
     // Do things in the hardware (PLC).
@@ -646,7 +646,7 @@ AmelasError AmelasController::setCalibrationMotion()
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.CalibrationMotion";
+    const std::string symbol = "MAIN.commander.CalibrationMotion";
     const std::string command = "SET_Calibration_MOTION";
 
     // Do things in the hardware (PLC).
