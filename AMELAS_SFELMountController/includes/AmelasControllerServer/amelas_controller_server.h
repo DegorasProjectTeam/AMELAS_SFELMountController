@@ -97,21 +97,17 @@ private:
     // -----------------------------------------------------------------------------------------------------------------
 
     // Process functions for all the specific commands.
-    // void processSetHomePosition(const CommandRequest&, CommandReply&);
-    // void processGetIdlePosition(const CommandRequest&, CommandReply&);
-    void processSetIdlePosHere(const CommandRequest&, CommandReply&);
-    void processDoStartMotion(const CommandRequest&, CommandReply&);
     void processSetAbsoluteAltAzMotion(const CommandRequest&, CommandReply&);
     void processSetRelativeAltAzMotion(const CommandRequest&, CommandReply&);
-
-    // template <typename ClbkT>
-    // void processSetAbsRelAltAzMotion(const CommandRequest &request, CommandReply &reply);
 
     template <typename ClbkT>
     void processSetPosition(const CommandRequest &request, CommandReply &reply);
     
     template <typename ClbkT>
     void processGetPosition(const CommandRequest &request, CommandReply &reply);
+    
+    template <typename ClbkT>
+    void processEmptyArguments(const CommandRequest &request, CommandReply &reply);
 
     // Subclass register process function helper.
     void registerRequestProcFunc(AmelasServerCommand command, AmelasRequestProcFunc func);

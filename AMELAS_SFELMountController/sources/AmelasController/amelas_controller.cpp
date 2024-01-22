@@ -464,7 +464,8 @@ AmelasError AmelasController::doPauseMotion()
 
     // Do things in the hardware (PLC).
     // _plc->write(symbol, true);
-    _plc->executeCommand(symbol);
+    // _plc->executeCommand(symbol);
+    _plc->write(symbol + ".cmd", true);
 
     // Log.
     setLog(command, "", error);
@@ -482,7 +483,8 @@ AmelasError AmelasController::doStopMotion()
 
     // Do things in the hardware (PLC).
     // _plc->write(symbol, true);
-    _plc->executeCommand(symbol);
+    // _plc->executeCommand(symbol);
+    _plc->write(symbol + ".cmd", true);
 
     // TODO: borrar todo lo relativo al movimiento actual
 
@@ -594,6 +596,7 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
         // Do things in the hardware (PLC).
         // _plc->write(symbol, true);
         // _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
         return AmelasError::SUCCESS;
     }
     else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
@@ -617,7 +620,8 @@ AmelasError AmelasController::setIdleMotion()
 
     // Do things in the hardware (PLC).
     // _plc->write(symbol, true);
-    _plc->executeCommand(symbol);
+    // _plc->executeCommand(symbol);
+    _plc->write(symbol + ".cmd", true);
 
     // Log.
     setLog(command, "", error);
@@ -635,7 +639,8 @@ AmelasError AmelasController::setParkMotion()
 
     // Do things in the hardware (PLC).
     // _plc->write(symbol, true);
-    _plc->executeCommand(symbol);
+    // _plc->executeCommand(symbol);
+    _plc->write(symbol + ".cmd", true);
 
     // Log.
     setLog(command, "", error);
@@ -653,7 +658,8 @@ AmelasError AmelasController::setCalibrationMotion()
 
     // Do things in the hardware (PLC).
     // _plc->write(symbol, true);
-    _plc->executeCommand(symbol);
+    // _plc->executeCommand(symbol);
+    _plc->write(symbol + ".cmd", true);
 
     // Log.
     setLog(command, "", error);

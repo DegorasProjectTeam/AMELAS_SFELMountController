@@ -17,6 +17,20 @@ void AmelasControllerServer::processGetPosition(const CommandRequest &request, C
 }
 
 template <typename ClbkT>
+void AmelasControllerServer::processEmptyArguments(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+template <typename ClbkT>
 void AmelasControllerServer::processSetPosition(const CommandRequest& request, CommandReply& reply)
 {
     // Auxiliar variables and containers.
