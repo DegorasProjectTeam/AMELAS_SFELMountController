@@ -154,6 +154,10 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_DO_CONNECT_PLC command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_DISCONNECT_PLC))
+        {
+            std::cout << "Sending REQ_DO_CONNECT_PLC command." << std::endl;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
         {
             std::cout << "Sending REQ_GET_PLC_REGISTERS command." << std::endl;

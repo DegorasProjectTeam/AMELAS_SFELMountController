@@ -49,15 +49,20 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
 
 // LOW LEVEL PLC REGISTERS RELATED FUNCTIONS
 //=====================================================================================================================
-AmelasError AmelasController::doConnectPLC(AltAzPos &pos)
+AmelasError AmelasController::doConnectPLC()
 {
     _plc->connect();
 
     return AmelasError::SUCCESS;
 }
 
-// TODO: AmelasError AmelasController::doConnectPLC()
-// TODO: AmelasError AmelasController::doDisconnectPLC()
+AmelasError AmelasController::doDisconnectPLC()
+{
+    _plc->disconnect();
+
+    return AmelasError::SUCCESS;
+}
+
 // TODO: AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &value)
 
 //=====================================================================================================================

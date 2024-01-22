@@ -84,10 +84,8 @@ public:
 
     // LOW LEVEL PLC REGISTERS RELATED FUNCTIONS
     //=====================================================================================================================
-    LIBAMELAS_EXPORT AmelasError doConnectPLC(AltAzPos& pos);
-
-    // TODO: LIBAMELAS_EXPORT AmelasError doConnectPLC();
-    // TODO: LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
+    LIBAMELAS_EXPORT AmelasError doConnectPLC();
+    LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
 
     // TODO: LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& value);
     //=====================================================================================================================

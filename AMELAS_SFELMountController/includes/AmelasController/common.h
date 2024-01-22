@@ -256,7 +256,8 @@ using SetIdleMotionCallback = std::function<AmelasError()>;
 using SetParkMotionCallback = std::function<AmelasError()>;
 using SetCalibrationMotionCallback = std::function<AmelasError()>;
 
-using DoConnectPLC = std::function<AmelasError(AltAzPos&)>;
+using DoConnectPLC = std::function<AmelasError()>;
+using DoDisconnectPLC = std::function<AmelasError()>;
 
 // =====================================================================================================================
 

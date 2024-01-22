@@ -318,6 +318,10 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::doConnectPLC);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_DISCONNECT_PLC,
+                                             &amelas_controller,
+                                             &AmelasController::doDisconnectPLC);
+
     // ---------------------------------------
 
     // Start the server.
