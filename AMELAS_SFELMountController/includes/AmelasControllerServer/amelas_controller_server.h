@@ -98,6 +98,9 @@ private:
 
     // Process functions for all the specific commands.
     template <typename ClbkT>
+    void processSetEnable(const CommandRequest &request, CommandReply &reply);
+
+    template <typename ClbkT>
     void processSetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);
     
     template <typename ClbkT>
