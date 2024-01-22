@@ -46,6 +46,14 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
 {
     // Register each internal specific process function in the base server.
 
+    // REQ_SET_SLEW_SPEED.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_SLEW_SPEED,
+                                  &AmelasControllerServer::processSetPosition<controller::SetSlewSpeedCallback>);
+
+    // REQ_GET_SLEW_SPEED.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_SLEW_SPEED,
+                                  &AmelasControllerServer::processGetPosition<controller::GetSlewSpeedCallback>);
+
     // REQ_SET_HOME_POSITION
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_HOME_POSITION,
                                   &AmelasControllerServer::processSetPosition<controller::SetHomePositionCallback>);
@@ -74,6 +82,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CALIBRATION_POS,
                                   &AmelasControllerServer::processSetPosition<controller::SetCalibrationPositionCallback>);
 
+    // REQ_SET_IDLE_POS_HERE.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_IDLE_POS_HERE,
+                                  &AmelasControllerServer::processSetIdlePosHere);
+
     // REQ_GET_CALIBRATION_POS.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_CALIBRATION_POS,
                                   &AmelasControllerServer::processGetPosition<controller::GetCalibrationPositionCallback>);
@@ -86,13 +98,9 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
                                   &AmelasControllerServer::processGetPosition<controller::GetHomingOffsetsCallback>);
 
-    // REQ_SET_SLEW_SPEED.
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_SLEW_SPEED,
-                                  &AmelasControllerServer::processSetPosition<controller::SetSlewSpeedCallback>);
-
-    // REQ_GET_SLEW_SPEED.
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_SLEW_SPEED,
-                                  &AmelasControllerServer::processGetPosition<controller::GetSlewSpeedCallback>);
+    // REQ_DO_START_MOTION.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_START_MOTION,
+                                  &AmelasControllerServer::processDoStartMotion);
 
     // REQ_SET_TRACK_POS_OFFSET.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET,
@@ -105,6 +113,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // REQ_SET_ABS_ALTAZ_MOTION.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION,
                                    &AmelasControllerServer::processSetAbsoluteAltAzMotion);
+
+    // REQ_SET_REL_ALTAZ_MOTION.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION,
+                                   &AmelasControllerServer::processSetRelativeAltAzMotion);
 
     // REQ_DO_CONNECT_PLC.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_CONNECT_PLC,
@@ -176,6 +188,67 @@ void AmelasControllerServer::processSetAbsoluteAltAzMotion(const CommandRequest 
 
     // Now we will process the command in the controller.
     ctrl_err = this->invokeCallback<controller::SetAbsoluteAltAzMotionCallback>(request, reply, pos, vel);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+void AmelasControllerServer::processSetRelativeAltAzMotion(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    // Position struct.
+    controller::AltAzPos pos;
+    controller::AltAzVel vel;
+
+    // Check the request parameters size.
+    if (request.params_size == 0 || !request.params)
+    {
+        reply.server_result = OperationResult::EMPTY_PARAMS;
+        return;
+    }
+
+    // Try to read the parameters data.
+    try
+    {
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, pos, vel);
+    }
+    catch(...)
+    {
+        reply.server_result = OperationResult::BAD_PARAMETERS;
+        return;
+    }
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<controller::SetRelativeAltAzMotionCallback>(request, reply, pos, vel);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+void AmelasControllerServer::processDoStartMotion(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<controller::SetDoStartMotionCallback>(request, reply);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+void AmelasControllerServer::processSetIdlePosHere(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<controller::SetIdlePositionHereCallback>(request, reply);
 
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)

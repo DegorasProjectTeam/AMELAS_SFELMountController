@@ -445,7 +445,8 @@ AmelasError AmelasController::doStartMotion()
 
     // Do things in the hardware (PLC).
     // _plc->write(symbol, true);
-    _plc->executeCommand(symbol);
+    // _plc->executeCommand(symbol);
+    _plc->write(symbol + ".cmd", true);
 
     // Log.
     setLog(command, "", error);
@@ -561,7 +562,8 @@ AmelasError AmelasController::setAbsoluteAltAzMotion(const AltAzPos &pos, const 
     {
         // Do things in the hardware (PLC).
         // _plc->write(symbol, true);
-        _plc->executeCommand(symbol);
+        // _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
         return AmelasError::SUCCESS;
     }
     else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
@@ -591,7 +593,7 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
     {
         // Do things in the hardware (PLC).
         // _plc->write(symbol, true);
-        _plc->executeCommand(symbol);
+        // _plc->executeCommand(symbol);
         return AmelasError::SUCCESS;
     }
     else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
