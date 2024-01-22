@@ -166,7 +166,7 @@ public:
 
     LIBAMELAS_EXPORT AmelasError setAbsoluteAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
     LIBAMELAS_EXPORT AmelasError setRelativeAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
-    // TODO: LIBAMELAS_EXPORT AmelasError setContAltAzMotion(const AltAzVel &vel, const double& time);
+    LIBAMELAS_EXPORT AmelasError setContAltAzMotion(const AltAzVel &vel);
 
     // TODO: LIBAMELAS_EXPORT AmelasError setHomingMotion();
     LIBAMELAS_EXPORT AmelasError setIdleMotion();

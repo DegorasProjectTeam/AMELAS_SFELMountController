@@ -624,6 +624,65 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             valid = valid_params;
 
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CON_ALTAZ_MOTION))
+        {
+            std::cout << "Sending REQ_SET_CON_ALTAZ_MOTION command." << std::endl;
+
+            bool valid_params = true;
+            double az = 0., el = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                az = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter azimuth issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    el = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter elevation issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << az << " " << el << std::endl;
+
+                AltAzPos pos(az, el);
+
+                BinarySerializer serializer;
+
+                serializer.write(pos);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_MOTION))
         {
             std::cout << "Sending REQ_SET_HOMING_MOTION command." << std::endl;

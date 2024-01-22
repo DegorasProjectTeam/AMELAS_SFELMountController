@@ -99,6 +99,7 @@ private:
     // Process functions for all the specific commands.
     void processSetAbsoluteAltAzMotion(const CommandRequest&, CommandReply&);
     void processSetRelativeAltAzMotion(const CommandRequest&, CommandReply&);
+    void processSetContAltAzMotion(const CommandRequest&, CommandReply&);
 
     template <typename ClbkT>
     void processSetPosition(const CommandRequest &request, CommandReply &reply);

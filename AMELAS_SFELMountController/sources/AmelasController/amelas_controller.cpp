@@ -566,6 +566,7 @@ AmelasError AmelasController::setAbsoluteAltAzMotion(const AltAzPos &pos, const 
         // _plc->write(symbol, true);
         // _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
+        AmelasMotionMode ::ABSOLUTE_MOTION;
         return AmelasError::SUCCESS;
     }
     else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
@@ -597,6 +598,7 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
         // _plc->write(symbol, true);
         // _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
+        AmelasMotionMode ::RELATIVE_MOTION;
         return AmelasError::SUCCESS;
     }
     else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
@@ -607,7 +609,31 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
         return AmelasError::INVALID_ERROR;
 }
 
-// TODO: AmelasError AmelasController::setContAltAzMotion(const AltAzVel &vel, const double &time)
+AmelasError AmelasController::setContAltAzMotion(const AltAzVel &vel)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.commander.moveVelocityCmd";
+    const std::string symbol_vel = "MAIN.commander.moveVelocity";
+    const std::string command_vel = "SET_REL_ALTAZ_MOTION (VEL)";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol_vel + ".Azimuth", vel.az);
+    _plc->write(symbol_vel + ".Elevation", vel.el);
+    _plc->write(symbol + ".cmd", true);
+
+    AmelasMotionMode::CONTINUOUS;
+
+    // Log.
+    std::ostringstream oss;
+    oss << "Az: " << vel.az << '\n'
+    << "El: " << vel.el << '\n';
+    setLog(command_vel, oss.str(), error);
+
+    return error;
+}
+
 // TODO: AmelasError AmelasController::setHomingMotion()
 
 AmelasError AmelasController::setIdleMotion()
@@ -622,6 +648,7 @@ AmelasError AmelasController::setIdleMotion()
     // _plc->write(symbol, true);
     // _plc->executeCommand(symbol);
     _plc->write(symbol + ".cmd", true);
+    AmelasMotionMode ::TO_IDLE;
 
     // Log.
     setLog(command, "", error);
@@ -641,6 +668,7 @@ AmelasError AmelasController::setParkMotion()
     // _plc->write(symbol, true);
     // _plc->executeCommand(symbol);
     _plc->write(symbol + ".cmd", true);
+    AmelasMotionMode ::TO_PARK;
 
     // Log.
     setLog(command, "", error);
@@ -660,6 +688,7 @@ AmelasError AmelasController::setCalibrationMotion()
     // _plc->write(symbol, true);
     // _plc->executeCommand(symbol);
     _plc->write(symbol + ".cmd", true);
+    AmelasMotionMode ::TO_CALIBRATION;
 
     // Log.
     setLog(command, "", error);

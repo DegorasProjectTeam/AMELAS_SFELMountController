@@ -298,6 +298,10 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::setRelativeAltAzMotion);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CON_ALTAZ_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setContAltAzMotion);
+
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_IDLE_MOTION,
                                              &amelas_controller,
                                              &AmelasController::setIdleMotion);
