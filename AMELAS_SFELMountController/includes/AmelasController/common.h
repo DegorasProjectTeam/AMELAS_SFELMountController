@@ -183,7 +183,7 @@ struct MeteoData final : public zmqutils::utils::Serializable
 
     LIBAMELAS_EXPORT MeteoData(const MeteoData& meteo) = default;
 
-    LIBAMELAS_EXPORT MeteoData& operator =(const MeteoData& pos) = default;
+    LIBAMELAS_EXPORT MeteoData& operator =(const MeteoData& meteo) = default;
 
     LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
 
@@ -196,6 +196,74 @@ struct MeteoData final : public zmqutils::utils::Serializable
     double press;
     double temp;
     double hr;
+};
+
+struct WGS84Coords final : public zmqutils::utils::Serializable
+{
+    LIBAMELAS_EXPORT WGS84Coords(double lat, double lon, double alt);
+
+    LIBAMELAS_EXPORT WGS84Coords();
+
+    LIBAMELAS_EXPORT WGS84Coords(const WGS84Coords& WGS84) = default;
+
+    LIBAMELAS_EXPORT WGS84Coords& operator =(const WGS84Coords& WGS84) = default;
+
+    LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
+
+    LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;
+
+    LIBAMELAS_EXPORT size_t serializedSize() const final;
+
+    LIBAMELAS_EXPORT ~WGS84Coords() final;
+
+    double lat;
+    double lon;
+    double alt;
+};
+
+struct ECEFCoords final : public zmqutils::utils::Serializable
+{
+    LIBAMELAS_EXPORT ECEFCoords(double x, double y, double z);
+
+    LIBAMELAS_EXPORT ECEFCoords();
+
+    LIBAMELAS_EXPORT ECEFCoords(const ECEFCoords& ECEF) = default;
+
+    LIBAMELAS_EXPORT ECEFCoords& operator =(const ECEFCoords& ECEF) = default;
+
+    LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
+
+    LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;
+
+    LIBAMELAS_EXPORT size_t serializedSize() const final;
+
+    LIBAMELAS_EXPORT ~ECEFCoords() final;
+
+    double x;
+    double y;
+    double z;
+};
+
+struct StationLocation final : public zmqutils::utils::Serializable
+{
+    LIBAMELAS_EXPORT StationLocation(WGS84Coords wgs84, ECEFCoords ecef);
+
+    LIBAMELAS_EXPORT StationLocation();
+
+    LIBAMELAS_EXPORT StationLocation(const StationLocation& location) = default;
+
+    LIBAMELAS_EXPORT StationLocation& operator =(const StationLocation& location) = default;
+
+    LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
+
+    LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;
+
+    LIBAMELAS_EXPORT size_t serializedSize() const final;
+
+    LIBAMELAS_EXPORT ~StationLocation() final;
+
+    WGS84Coords wgs84;
+    ECEFCoords ecef;
 };
 
 // Generic callback.
