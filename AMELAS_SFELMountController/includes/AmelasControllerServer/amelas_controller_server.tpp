@@ -102,7 +102,7 @@ void AmelasControllerServer::processSetAbsRelAltAzMotion(const CommandRequest &r
 }
 
 template <typename ClbkT>
-void AmelasControllerServer::processSetEnable(const CommandRequest& request, CommandReply& reply)
+void AmelasControllerServer::processSetBool(const CommandRequest& request, CommandReply& reply)
 {
     // Auxiliar variables and containers.
     controller::AmelasError ctrl_err;

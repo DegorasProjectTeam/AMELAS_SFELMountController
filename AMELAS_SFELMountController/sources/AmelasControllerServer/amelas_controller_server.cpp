@@ -48,15 +48,15 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     
     // REQ_EN_TRACK_ADJ.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_TRACK_ADJ,
-                                  &AmelasControllerServer::processSetEnable<controller::EnableTrackingAdjustsCallback>);
+                                  &AmelasControllerServer::processSetBool<controller::EnableTrackingAdjustsCallback>);
     
     // REQ_EN_MOUNT_POWER.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_MOUNT_POWER,
-                                  &AmelasControllerServer::processSetEnable<controller::EnableMountPowerCallback>);
+                                  &AmelasControllerServer::processSetBool<controller::EnableMountPowerCallback>);
     
     // REQ_EN_MOUNT_MODEL.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_MOUNT_MODEL,
-                                  &AmelasControllerServer::processSetEnable<controller::EnableMountModelCallback>);
+                                  &AmelasControllerServer::processSetBool<controller::EnableMountModelCallback>);
 
     // REQ_SET_SLEW_SPEED.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_SLEW_SPEED,
