@@ -110,6 +110,14 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_CALIBRATION_POS,
                                   &AmelasControllerServer::processGetPositionOrSpeed<controller::GetCalibrationPositionCallback>);
 
+    // REQ_SET_WAIT_ALT.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_WAIT_ALT,
+                                  &AmelasControllerServer::processSetDouble<controller::SetWaitAltCallback>);
+
+    // REQ_GET_WAIT_ALT.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_WAIT_ALT,
+                                  &AmelasControllerServer::processGetDouble<controller::GetWaitAltCallback>);
+
     // REQ_SET_HOMING_OFFSETS.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_HOMING_OFFSETS,
                                   &AmelasControllerServer::processSetPositionOrSpeed<controller::SetHomingOffsetsCallback>);
@@ -137,6 +145,14 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // REQ_GET_TRACK_POS_OFFSET.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET,
                                   &AmelasControllerServer::processGetPositionOrSpeed<controller::GetTrackPosOffsetCallback>);
+
+    // REQ_SET_TRACK_TIME_BIAS.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS,
+                                  &AmelasControllerServer::processSetDouble<controller::SetTrackTimeBiasCallback>);
+
+    // REQ_GET_TRACK_TIME_BIAS.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS,
+                                  &AmelasControllerServer::processGetDouble<controller::GetTrackTimeBiasCallback>);
 
     // REQ_SET_ABS_ALTAZ_MOTION.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION,

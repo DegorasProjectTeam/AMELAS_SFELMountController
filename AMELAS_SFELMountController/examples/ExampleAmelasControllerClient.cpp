@@ -782,7 +782,12 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                 }
 
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION)
-                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_CALIBRATION_POS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOMING_OFFSETS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED))
                 {
                     try
                     {
@@ -794,8 +799,50 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, az, el);
 
                         // Generate the struct.
-                        std::cout<<"Az: "<<az<<std::endl;
-                        std::cout<<"El: "<<el<<std::endl;
+                        std::cout << "Az: " << az << std::endl;
+                        std::cout << "El: " << el << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double waitAlt;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, waitAlt);
+
+                        // Generate the struct.
+                        std::cout << "Wait alt: " << waitAlt << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double timeBias;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, timeBias);
+
+                        // Generate the struct.
+                        std::cout << "Track time bias: " << timeBias << " ms" << std::endl;
                     }
                     catch(...)
                     {
