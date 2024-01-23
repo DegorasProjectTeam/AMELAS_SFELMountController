@@ -135,8 +135,8 @@ public:
     // TODO: LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs);
     // TODO: LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs);
 
-    // TODO: LIBAMELAS_EXPORT AmelasError setLocation(const MountLocation& location);
-    // TODO: LIBAMELAS_EXPORT AmelasError getLocation(MountLocation& location);
+    LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location);
+    // TODO: LIBAMELAS_EXPORT AmelasError getLocation(StationLocation& location);
 
     LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo);
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);

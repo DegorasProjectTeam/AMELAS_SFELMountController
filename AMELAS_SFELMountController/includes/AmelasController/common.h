@@ -303,6 +303,8 @@ using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
 
 using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
 
+using SetLocationCallback = std::function<AmelasError(const StationLocation&)>;
+
 using SetMeteoData = std::function<AmelasError(const MeteoData&)>;
 using GetMeteoData = std::function<AmelasError(MeteoData&)>;
 

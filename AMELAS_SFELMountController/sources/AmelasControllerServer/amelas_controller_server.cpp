@@ -126,6 +126,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
                                   &AmelasControllerServer::processGetPositionOrSpeed<controller::GetHomingOffsetsCallback>);
 
+    // REQ_SET_HOMING_OFFSETS.
+    /*this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_LOCATION,
+                                  &AmelasControllerServer::processSetLocation<controller::SetLocationCallback>);*/
+
     // REQ_DO_START_MOTION.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_START_MOTION,
                                   &AmelasControllerServer::processEmptyArguments<controller::SetDoStartMotionCallback>);

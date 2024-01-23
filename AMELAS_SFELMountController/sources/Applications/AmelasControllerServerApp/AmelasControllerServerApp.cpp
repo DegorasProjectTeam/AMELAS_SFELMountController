@@ -254,6 +254,10 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::enableMountModel);
 
+    /*amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_LOCATION,
+                                             &amelas_controller,
+                                             &AmelasController::setLocation);*/
+
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_METEO_DATA,
                                              &amelas_controller,
                                              &AmelasController::setMeteoData);

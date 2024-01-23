@@ -388,8 +388,37 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
 
 // TODO: AmelasError AmelasController::setMountModelCoefs(const MountModelCoefs &coefs)
 // TODO: AmelasError AmelasController::getMountModelCoefs(MountModelCoefs &coefs)
-// TODO: AmelasError AmelasController::setLocation(const MountLocation &location)
-// TODO: AmelasError AmelasController::getLocation(MountLocation &location)
+
+AmelasError AmelasController::setLocation(const StationLocation &location)
+{
+    const std::string symbol = "MAIN.commander.StationLocation";
+    const std::string command = "SET_LOCATION";
+
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol + ".wgs84.lat", location.wgs84.lat);
+    _plc->write(symbol + ".wgs84.lon", location.wgs84.lon);
+    _plc->write(symbol + ".wgs84.alt", location.wgs84.alt);
+    _plc->write(symbol + ".ecef.x", location.ecef.x);
+    _plc->write(symbol + ".ecef.y", location.ecef.y);
+    _plc->write(symbol + ".ecef.z", location.ecef.z);
+
+    // Log.
+    std::ostringstream oss;
+    oss << "Lat: " << location.wgs84.lat << '\n'
+    << "Lon: " << location.wgs84.lon << '\n'
+    << "Alt: " << location.wgs84.alt << '\n'
+    << "X: " << location.ecef.x << '\n'
+    << "Y: " << location.ecef.y << '\n'
+    << "Z: " << location.ecef.z << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+// TODO: AmelasError AmelasController::getLocation(StationLocation &location)
 
 AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
 {

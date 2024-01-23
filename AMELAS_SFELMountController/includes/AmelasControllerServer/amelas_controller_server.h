@@ -112,6 +112,9 @@ private:
     template <typename ClbkT>
     void processGetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);
     
+    /*template <typename ClbkT>
+    void processSetLocation(const CommandRequest &request, CommandReply &reply);*/
+    
     template <typename ClbkT>
     void processEmptyArguments(const CommandRequest &request, CommandReply &reply);
     
