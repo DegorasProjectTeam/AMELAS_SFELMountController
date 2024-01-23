@@ -626,18 +626,32 @@ AmelasError AmelasController::setContAltAzMotion(const AltAzVel &vel)
 
 AmelasError AmelasController::setIdleMotion()
 {
+
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
     const std::string symbol = "MAIN.commander.moveToIdleCmd";
     const std::string command = "SET_IDLE_MOTION";
 
-    // Do things in the hardware (PLC).
-    // _plc->executeCommand(symbol);
-    _plc->write(symbol + ".cmd", true);
+    if (_plc->read<double>("MAIN.commander.SlewSpeed.Azimuth") == 0.0
+    || _plc->read<double>("MAIN.commander.SlewSpeed.Elevation") == 0.0)
+    {
+        AmelasError error = AmelasError::INVALID_SPEED;
 
-    // Log.
-    setLog(command, "", error);
+        // Log.
+        std::ostringstream oss;
+        oss << "There is no speed defined in SlewSpeed." << '\n';
+        setLog(command, oss.str(), error);
+    }
+    else
+    {
+        // Do things in the hardware (PLC).
+        // _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
+
+        // Log.
+        setLog(command, "", error);
+    }
     
     return error;
 }
@@ -650,12 +664,25 @@ AmelasError AmelasController::setParkMotion()
     const std::string symbol = "MAIN.commander.moveToParkCmd";
     const std::string command = "SET_Park_MOTION";
 
-    // Do things in the hardware (PLC).
-    // _plc->executeCommand(symbol);
-    _plc->write(symbol + ".cmd", true);
+    if (_plc->read<double>("MAIN.commander.SlewSpeed.Azimuth") == 0.0
+    || _plc->read<double>("MAIN.commander.SlewSpeed.Elevation") == 0.0)
+    {
+        AmelasError error = AmelasError::INVALID_SPEED;
 
-    // Log.
-    setLog(command, "", error);
+        // Log.
+        std::ostringstream oss;
+        oss << "There is no speed defined in SlewSpeed." << '\n';
+        setLog(command, oss.str(), error);
+    }
+    else
+    {
+        // Do things in the hardware (PLC).
+        // _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
+
+        // Log.
+        setLog(command, "", error);
+    }
     
     return error;
 }
@@ -668,12 +695,25 @@ AmelasError AmelasController::setCalibrationMotion()
     const std::string symbol = "MAIN.commander.moveToCalibrationCmd";
     const std::string command = "SET_Calibration_MOTION";
 
-    // Do things in the hardware (PLC).
-    // _plc->executeCommand(symbol);
-    _plc->write(symbol + ".cmd", true);
+    if (_plc->read<double>("MAIN.commander.SlewSpeed.Azimuth") == 0.0
+    || _plc->read<double>("MAIN.commander.SlewSpeed.Elevation") == 0.0)
+    {
+        AmelasError error = AmelasError::INVALID_SPEED;
 
-    // Log.
-    setLog(command, "", error);
+        // Log.
+        std::ostringstream oss;
+        oss << "There is no speed defined in SlewSpeed." << '\n';
+        setLog(command, oss.str(), error);
+    }
+    else
+    {
+        // Do things in the hardware (PLC).
+        // _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
+
+        // Log.
+        setLog(command, "", error);
+    }
     
     return error;
 }
