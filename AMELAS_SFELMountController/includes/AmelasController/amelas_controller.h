@@ -77,7 +77,7 @@ public:
 
     // SAFETY RELATED FUNCTIONS
     //=====================================================================================================================
-    // TODO: LIBAMELAS_EXPORT AmelasError doResetState();
+    LIBAMELAS_EXPORT AmelasError doResetState();
     // TODO: LIBAMELAS_EXPORT AmelasError enableAvoidSun(const bool& enabled);
     //=====================================================================================================================
 

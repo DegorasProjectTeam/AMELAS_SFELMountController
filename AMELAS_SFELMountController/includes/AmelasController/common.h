@@ -273,6 +273,8 @@ using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Ar
 // Callback function type aliases
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
 
+using DoResetStateCallback = std::function<AmelasError()>;
+
 using EnableTrackingAdjustsCallback = std::function<AmelasError(const bool&)>;
 using EnableMountPowerCallback = std::function<AmelasError(const bool&)>;
 

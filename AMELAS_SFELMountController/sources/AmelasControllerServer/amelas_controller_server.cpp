@@ -45,6 +45,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     _logger(logger)
 {
     // Register each internal specific process function in the base server.
+
+    // REQ_DO_RESET_STATE.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_RESET_STATE,
+                                  &AmelasControllerServer::processEmptyArguments<controller::DoResetStateCallback>);
     
     // REQ_EN_TRACK_ADJ.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_TRACK_ADJ,

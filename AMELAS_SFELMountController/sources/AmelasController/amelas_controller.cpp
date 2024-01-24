@@ -42,7 +42,13 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
 
 // SAFETY RELATED FUNCTIONS
 //=====================================================================================================================
-// TODO: AmelasError AmelasController::doResetState()
+AmelasError AmelasController::doResetState()
+{
+    _plc->write("MAIN.commander.doResetState", true);
+
+    return AmelasError::SUCCESS;
+}
+
 // TODO: AmelasError AmelasController::enableAvoidSun(const bool &enabled)
 //=====================================================================================================================
 
