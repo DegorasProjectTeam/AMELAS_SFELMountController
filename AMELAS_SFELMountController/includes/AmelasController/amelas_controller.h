@@ -74,10 +74,37 @@ public:
     LIBAMELAS_EXPORT AmelasController(const AmelasControllerConfig &config, 
                                         const std::shared_ptr<spdlog::logger> logger);
 
+
+    // SAFETY RELATED FUNCTIONS
+    //=====================================================================================================================
+    LIBAMELAS_EXPORT AmelasError doResetState();
+    // TODO: LIBAMELAS_EXPORT AmelasError enableAvoidSun(const bool& enabled);
+    //=====================================================================================================================
+
+
+    // LOW LEVEL PLC REGISTERS RELATED FUNCTIONS
+    //=====================================================================================================================
+    LIBAMELAS_EXPORT AmelasError doConnectPLC();
+    LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
+
+    // TODO: LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& value);
+    //=====================================================================================================================
+
+
+    // STATUS AND CONFIGURATION RELATED FUNCTIONS
+    //=====================================================================================================================
+    // TODO: LIBAMELAS_EXPORT AmelasError getMountLog(const std::string& start, const std::string& end);
+
+    // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
+    // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
+
+    // TODO: LIBAMELAS_EXPORT AmelasError getMountStatus();
+    // TODO: LIBAMELAS_EXPORT AmelasError getDeviceInfo();
+
     LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
 
-    LIBAMELAS_EXPORT AmelasError enableTrackingAdjusts(const bool& enable);
-    LIBAMELAS_EXPORT AmelasError enableMountPower(const bool& enable);
+    LIBAMELAS_EXPORT AmelasError enableTrackingAdjusts(const bool& enabled);
+    LIBAMELAS_EXPORT AmelasError enableMountPower(const bool& enabled);
 
     LIBAMELAS_EXPORT AmelasError setSlewSpeed(const AltAzVel& vel);
     LIBAMELAS_EXPORT AmelasError getSlewSpeed(AltAzVel& vel);
@@ -97,40 +124,68 @@ public:
     LIBAMELAS_EXPORT AmelasError setIdlePositionHere();
     LIBAMELAS_EXPORT AmelasError setParkPositionHere();
     LIBAMELAS_EXPORT AmelasError setCalibrationPositionHere();
-
-    LIBAMELAS_EXPORT AmelasError setHomingOffsets(const AltAzAdj& pos);
-    LIBAMELAS_EXPORT AmelasError getHomingOffsets(AltAzAdj& pos);
     
     LIBAMELAS_EXPORT AmelasError setWaitAlt(const double& alt);
     LIBAMELAS_EXPORT AmelasError getWaitAlt(double& alt);
 
-    LIBAMELAS_EXPORT AmelasError enableMountModel(const bool& enable);
+    LIBAMELAS_EXPORT AmelasError setHomingOffsets(const AltAzAdj& pos);
+    LIBAMELAS_EXPORT AmelasError getHomingOffsets(AltAzAdj& pos);
+
+    LIBAMELAS_EXPORT AmelasError enableMountModel(const bool& enabled);
+    // TODO: LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs);
+    // TODO: LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs);
+
+    LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location);
+    // TODO: LIBAMELAS_EXPORT AmelasError getLocation(StationLocation& location);
 
     LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo);
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
+    
+    // TODO: LIBAMELAS_EXPORT AmelasError enableSimulationMode(const bool& enabled);
+    // TODO: LIBAMELAS_EXPORT AmelasError getSimulationState(bool& enabled);
+    // TODO: LIBAMELAS_EXPORT AmelasError setSimulationTime(const std::string& datetime);
+    // =====================================================================================================================
+
+
+    // MOTION RELATED FUNCTIONS
+    //=====================================================================================================================
+    // TODO: LIBAMELAS_EXPORT AmelasError getMotionMode(AmelasMotionMode &motion_mode);
+    // TODO: LIBAMELAS_EXPORT AmelasError getMotionState(AmelasMotionState &motion_state);
+
+    LIBAMELAS_EXPORT AmelasError doStartMotion();
+    LIBAMELAS_EXPORT AmelasError doPauseMotion();
+    LIBAMELAS_EXPORT AmelasError doStopMotion();
+
+    LIBAMELAS_EXPORT AmelasError setTrackPosOffset(const AltAzAdj& pos);
+    LIBAMELAS_EXPORT AmelasError getTrackPosOffset(AltAzAdj& pos);
+    
+    LIBAMELAS_EXPORT AmelasError setTrackTimeBias(const double& time);
+    LIBAMELAS_EXPORT AmelasError getTrackTimeBias(double& time);
+
+    LIBAMELAS_EXPORT AmelasError setAbsoluteAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
+    LIBAMELAS_EXPORT AmelasError setRelativeAltAzMotion(const AltAzPos& pos, const AltAzVel& vel);
+    LIBAMELAS_EXPORT AmelasError setContAltAzMotion(const AltAzVel &vel);
+
+    // TODO: LIBAMELAS_EXPORT AmelasError setHomingMotion();
+    LIBAMELAS_EXPORT AmelasError setIdleMotion();
+    LIBAMELAS_EXPORT AmelasError setParkMotion();
+    LIBAMELAS_EXPORT AmelasError setCalibrationMotion();
+    // TODO: LIBAMELAS_EXPORT AmelasError setCPFMotion(const file& cpf, AmelasTracking& tracking);
+    // TODO: LIBAMELAS_EXPORT AmelasError setStarMotion(const StarData& star_data);
+    //=====================================================================================================================
+
 
 private:
     AmelasError setEnable(const bool& enable, const std::string plcSymbol, const std::string command);
     AmelasError setPosition(const AltAzPos& pos, const std::string plcSymbol, const std::string command);
     AmelasError getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command);
+    AmelasError setSpeed(const AltAzVel& vel, const std::string plcSymbol, const std::string command);
+    AmelasError getSpeed(AltAzVel& vel, const std::string plcSymbol, const std::string command);
     void setLog(const std::string command, const std::string specific, const AmelasError error);
 
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
-
-    bool tracking_adjusts_;
-    bool mount_power_;
-    AltAzVel slew_speed_;
-    AltAzPos home_pos_;
-    AltAzPos idle_pos_;
-    AltAzPos park_pos_;
-    AltAzPos calibration_pos_;
-    AltAzAdj home_pos_offset_;
-    double wait_alt_;
-    double mount_model_;
-    MeteoData meteo_;
-
 };
 
 }} // END NAMESPACES.

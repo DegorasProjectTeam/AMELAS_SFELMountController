@@ -105,53 +105,20 @@ void AmelasAdsClient::disconnect()
     _isConnected = false;
 }
 
-template <typename T> 
-void AmelasAdsClient::write(const std::string &symbol, const T data)
+int AmelasAdsClient::executeCommand(const std::string &symbol)
 {
-    if (!_isConnected)
+    write(symbol + ".cmd", true);
+
+    if (read<bool>(symbol + ".ack"))
     {
-        std::ostringstream oss;
-        oss << "Tried to write ads symbol: " << symbol << " while client disconnected";
-        _logger->error(oss.str());
-        // TODO: Throw here
+        return 0;
     }
-
-    ULONG handle = getHandleFromSymbol(symbol);
-    long errorCode = AdsSyncWriteReqEx(_adsPort, &_adsAddress, ADSIGRP_SYM_VALBYHND,
-                                        handle, sizeof(T), (PVOID)&data);
-    if (errorCode) {
-        std::ostringstream oss;
-        oss << "Error: AdsSyncWriteReqEx writing symbol: " << symbol << " - Error code:" << errorCode << '\n';
-        _logger->error(oss.str());
-        // TODO: Throw here
-    }
-    
-}
-
-template <typename T>
-T AmelasAdsClient::read(const std::string &symbol)
-{
-    if (!_isConnected)
+    else if (read<bool>(symbol + ".nack"))
     {
-        std::ostringstream oss;
-        oss << "Tried to read ads symbol: " << symbol << " while client disconnected";
-        _logger->error(oss.str());
-        // TODO: Throw here
+        return read<int>(symbol + ".code");
     }
-
-    T readValue;
-    ULONG handle = getHandleFromSymbol(symbol);
-    ULONG pcbReturn;
-    long errorCode =
-        AdsSyncReadReqEx2(_adsPort, &_adsAddress, ADSIGRP_SYM_VALBYHND, handle,
-                            sizeof(T), (PVOID)&readValue, &pcbReturn);
-    if (errorCode) {
-        std::ostringstream oss;
-        oss << "Error: AdsSyncReadReqEx2 reading symbol: " << symbol << " - Error code:" << errorCode << '\n';
-        _logger->error(oss.str());
-        // TODO: Throw here
-    }
-    return readValue;
+    else
+        return 0;
 }
 
 void __stdcall AmelasAdsClient::BoolCallback(AmsAddr* pAddr, AdsNotificationHeader* pNotification, ULONG hUser)

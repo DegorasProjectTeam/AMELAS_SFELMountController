@@ -70,10 +70,76 @@ void MeteoData::deserialize(zmqutils::utils::BinarySerializer &serializer)
 
 size_t MeteoData::serializedSize() const
 {
-    return (2*sizeof(uint64_t) + sizeof(double)*3);
+    return (3*sizeof(uint64_t) + sizeof(double)*3);
 }
 
 MeteoData::~MeteoData(){}
+
+WGS84Coords::WGS84Coords(double lat, double lon, double alt):
+    lat(lat), lon(lon), alt(alt){}
+
+WGS84Coords::WGS84Coords(): lat(-1), lon(-1), alt(-1){}
+
+size_t WGS84Coords::serialize(zmqutils::utils::BinarySerializer &serializer) const
+{
+    return serializer.write(lat, lon, alt);
+}
+
+void WGS84Coords::deserialize(zmqutils::utils::BinarySerializer &serializer)
+{
+    serializer.read(lat, lon, alt);
+}
+
+size_t WGS84Coords::serializedSize() const
+{
+    return (3*sizeof(uint64_t) + sizeof(double)*3);
+}
+
+WGS84Coords::~WGS84Coords(){}
+
+ECEFCoords::ECEFCoords(double x, double y, double z):
+    x(x), y(y), z(z){}
+
+ECEFCoords::ECEFCoords(): x(-1), y(-1), z(-1){}
+
+size_t ECEFCoords::serialize(zmqutils::utils::BinarySerializer &serializer) const
+{
+    return serializer.write(x, y, z);
+}
+
+void ECEFCoords::deserialize(zmqutils::utils::BinarySerializer &serializer)
+{
+    serializer.read(x, y, z);
+}
+
+size_t ECEFCoords::serializedSize() const
+{
+    return (3*sizeof(uint64_t) + sizeof(double)*3);
+}
+
+ECEFCoords::~ECEFCoords(){}
+
+StationLocation::StationLocation(WGS84Coords wgs84, ECEFCoords ecef):
+    wgs84(wgs84), ecef(ecef){}
+
+StationLocation::StationLocation(): wgs84(-1,-1,-1), ecef(-1,-1,-1){}
+
+size_t StationLocation::serialize(zmqutils::utils::BinarySerializer &serializer) const
+{
+    return serializer.write(wgs84, ecef);
+}
+
+void StationLocation::deserialize(zmqutils::utils::BinarySerializer &serializer)
+{
+    serializer.read(wgs84, ecef);
+}
+
+size_t StationLocation::serializedSize() const
+{
+    return (2*sizeof(uint64_t) + sizeof(WGS84Coords)*2);
+}
+
+StationLocation::~StationLocation(){}
 
 // =====================================================================================================================
 
