@@ -933,6 +933,28 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                 }
 
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_MODE))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        AmelasMotionMode mode;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, mode);
+
+                        // Generate the struct.
+                        std::string motion_str = MotionModeStr[static_cast<size_t>(mode)];
+                        std::cout << "Motion mode: " << motion_str << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT))
                 {
                     try

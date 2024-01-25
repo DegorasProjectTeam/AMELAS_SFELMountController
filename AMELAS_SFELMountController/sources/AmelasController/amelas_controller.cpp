@@ -44,9 +44,18 @@ AmelasController::AmelasController(const AmelasControllerConfig &config,
 //=====================================================================================================================
 AmelasError AmelasController::doResetState()
 {
-    _plc->write("MAIN.commander.doResetState", true);
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
 
-    return AmelasError::SUCCESS;
+    const std::string symbol = "MAIN.commander.doResetState";
+    const std::string command = "DO_RESET_STATE";
+
+    _plc->write(symbol, true);
+
+    // Log.
+    setLog(command, "", error);
+
+    return error;
 }
 
 // TODO: AmelasError AmelasController::enableAvoidSun(const bool &enabled)
@@ -57,16 +66,32 @@ AmelasError AmelasController::doResetState()
 //=====================================================================================================================
 AmelasError AmelasController::doConnectPLC()
 {
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string command = "DO_CONNECT_PLC";
+
     _plc->connect();
 
-    return AmelasError::SUCCESS;
+    // Log.
+    setLog(command, "", error);
+
+    return error;
 }
 
 AmelasError AmelasController::doDisconnectPLC()
 {
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string command = "DO_DISCONNECT_PLC";
+
     _plc->disconnect();
 
-    return AmelasError::SUCCESS;
+    // Log.
+    setLog(command, "", error);
+
+    return error;
 }
 
 // TODO: AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &value)
@@ -397,7 +422,7 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
 
 AmelasError AmelasController::setLocation(const StationLocation &location)
 {
-    const std::string symbol = "MAIN.commander.StationLocation";
+    const std::string symbol = "GLOBALS.Parameters.Commander.StationLocation";
     const std::string command = "SET_LOCATION";
 
     // Auxiliar result.
@@ -472,8 +497,48 @@ AmelasError AmelasController::getMeteoData(MeteoData &meteo)
 
 // MOTION RELATED FUNCTIONS
 //=====================================================================================================================
-// TODO: AmelasError AmelasController::getMotionMode(AmelasMotionMode& motion_mode)
-// TODO: AmelasError AmelasController::getMotionState(AmelasMotionState& motion_state)
+AmelasError AmelasController::getMotionMode(AmelasMotionMode &motion_mode)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.commander._motionMode";
+    const std::string command = "GET_MOTION_MODE";
+
+    if (_plc->read<double>(symbol) == 0.0)
+        motion_mode = AmelasMotionMode::NO_MOTION;
+    else if (_plc->read<double>(symbol) == 1.0)
+        motion_mode = AmelasMotionMode::ABSOLUTE_MOTION;
+    else if (_plc->read<double>(symbol) == 2.0)
+        motion_mode = AmelasMotionMode::RELATIVE_MOTION;
+    else if (_plc->read<double>(symbol) == 3.0)
+        motion_mode = AmelasMotionMode::CONTINUOUS;
+    else if (_plc->read<double>(symbol) == 4.0)
+        motion_mode = AmelasMotionMode::HOMING_OP;
+    else if (_plc->read<double>(symbol) == 5.0)
+        motion_mode = AmelasMotionMode::TO_IDLE;
+    else if (_plc->read<double>(symbol) == 6.0)
+        motion_mode = AmelasMotionMode::TO_PARK;
+    else if (_plc->read<double>(symbol) == 7.0)
+        motion_mode = AmelasMotionMode::TO_CALIBRATION;
+    else if (_plc->read<double>(symbol) == 8.0)
+        motion_mode = AmelasMotionMode::CPF;
+    else if (_plc->read<double>(symbol) == 9.0)
+        motion_mode = AmelasMotionMode::STAR;
+    // else if (_plc->read<double>(symbol) == X.0)
+    //     motion_mode = AmelasMotionMode::TLE;
+
+    // Log.
+    std::string motion_str = MotionModeStr[static_cast<size_t>(motion_mode)];
+    std::ostringstream oss;
+    oss << "Motion mode: " << motion_str << '\n';
+    //oss << "Motion mode: " << _plc->read<double>(symbol) << '\n';
+    setLog(command, oss.str(), error);
+    
+    return error;
+}
+
+// TODO: AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
 
 AmelasError AmelasController::doStartMotion()
 {
