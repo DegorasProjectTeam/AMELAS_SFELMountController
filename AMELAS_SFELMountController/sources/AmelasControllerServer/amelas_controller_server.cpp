@@ -130,9 +130,21 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
                                   &AmelasControllerServer::processGetPositionOrSpeed<controller::GetHomingOffsetsCallback>);
 
-    // REQ_SET_HOMING_OFFSETS.
+    // REQ_SET_LOCATION.
     /*this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_LOCATION,
                                   &AmelasControllerServer::processSetLocation<controller::SetLocationCallback>);*/
+
+    // REQ_GET_LOCATION.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_LOCATION,
+                                  &AmelasControllerServer::processGetLocation<controller::GetLocationCallback>);
+
+    // REQ_SET_METEO_DATA.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_METEO_DATA,
+                                  &AmelasControllerServer::processSetMeteoData<controller::SetMeteoDataCallback>);
+
+    // REQ_GET_METEO_DATA.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_METEO_DATA,
+                                  &AmelasControllerServer::processGetMeteoData<controller::GetMeteoDataCallback>);
 
     // REQ_GET_MOTION_MODE.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOTION_MODE,

@@ -449,17 +449,39 @@ AmelasError AmelasController::setLocation(const StationLocation &location)
     return error;
 }
 
-// TODO: AmelasError AmelasController::getLocation(StationLocation &location)
-
-AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
+AmelasError AmelasController::getLocation(StationLocation &location)
 {
-    const std::string symbol = "MAIN.commander.MeteoData";
-    const std::string command = "SET_METEO_DATA";
-
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    // TODO
+    const std::string symbol = "GLOBALS.Parameters.Commander.StationLocation";
+    const std::string command = "GET_LOCATION";
+
+    location.wgs84.lat = _plc->read<double>(symbol + ".wgs84.lat");
+    location.wgs84.lon = _plc->read<double>(symbol + ".wgs84.lon");
+    location.wgs84.alt = _plc->read<double>(symbol + ".wgs84.alt");
+    location.ecef.x = _plc->read<double>(symbol + ".ecef.x");
+    location.ecef.y = _plc->read<double>(symbol + ".ecef.y");
+    location.ecef.z =_plc->read<double>(symbol + ".ecef.z");
+
+    // Log.
+    setLog(command, "", error);
+    
+    return error;
+}
+
+AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "GLOBALS.Parameters.Commander.MeteoData";
+    const std::string command = "SET_METEO_DATA";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbol + ".press", meteo.press);
+    _plc->write(symbol + ".temp", meteo.temp);
+    _plc->write(symbol + ".hr", meteo.hr);
 
     // Log.
     std::ostringstream oss;
@@ -476,8 +498,8 @@ AmelasError AmelasController::getMeteoData(MeteoData &meteo)
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.commander.MeteoData";
-    const std::string command = "SET_METEO_DATA";
+    const std::string symbol = "GLOBALS.Parameters.Commander.MeteoData";
+    const std::string command = "GET_METEO_DATA";
 
     meteo.press = _plc->read<double>(symbol + ".press");
     meteo.temp = _plc->read<double>(symbol + ".temp");
@@ -566,6 +588,12 @@ AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
         motion_state = AmelasMotionState::STOPPED;
     else if (_plc->read<double>(symbol) == 10.0)
         motion_state = AmelasMotionState::INVALID_ERROR;
+    else if (_plc->read<double>(symbol) == 0.0)
+        motion_state = AmelasMotionState::DISABLED;
+    else if (_plc->read<double>(symbol) == 11.0)
+        motion_state = AmelasMotionState::RESET;
+    else
+        motion_state = AmelasMotionState::UNKNOWN;
 
     // Log.
     std::string motion_str = MotionStateStr[static_cast<size_t>(motion_state)];

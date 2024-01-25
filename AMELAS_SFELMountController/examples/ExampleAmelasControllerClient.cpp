@@ -622,6 +622,80 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_LOCATION command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_METEO_DATA))
+        {
+            std::cout << "Sending REQ_SET_METEO_DATA command." << std::endl;
+
+            bool valid_params = true;
+            double press = 0., temp = 0., hr = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                press = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter press issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    temp = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter temp issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    hr = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter hr issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << press << " " << temp << " " << hr << std::endl;
+
+                MeteoData meteo(press, temp, hr);
+
+                BinarySerializer serializer;
+
+                serializer.write(meteo);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, meteo);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, press);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_METEO_DATA))
         {
             std::cout << "Sending REQ_GET_METEO_DATA command." << std::endl;
@@ -924,6 +998,62 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         // Generate the struct.
                         std::cout << "Az: " << az << std::endl;
                         std::cout << "El: " << el << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_METEO_DATA))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double press;
+                        double temp;
+                        double hr;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, press, temp, hr);
+
+                        // Generate the struct.
+                        std::cout << "Press: " << press << std::endl;
+                        std::cout << "Temp: " << temp << std::endl;
+                        std::cout << "Hr: " << hr << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_LOCATION))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double lat;
+                        double lon;
+                        double alt;
+                        double x;
+                        double y;
+                        double z;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, lat, lon, alt, x, y, z);
+
+                        // Generate the struct.
+                        std::cout << "Lat: " << lat << std::endl;
+                        std::cout << "Lon: " << lon << std::endl;
+                        std::cout << "Alt: " << alt << std::endl;
+                        std::cout << "X: " << x << std::endl;
+                        std::cout << "Y: " << y << std::endl;
+                        std::cout << "Z: " << z << std::endl;
                     }
                     catch(...)
                     {

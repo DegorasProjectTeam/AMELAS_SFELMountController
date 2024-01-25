@@ -249,4 +249,69 @@ void AmelasControllerServer::processGetDouble(const CommandRequest &request, Com
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, doubleValue);
 }
 
+template <typename ClbkT>
+void AmelasControllerServer::processSetMeteoData(const CommandRequest& request, CommandReply& reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    // Position struct.
+    controller::MeteoData meteo;
+
+    // Check the request parameters size.
+    if (request.params_size == 0 || !request.params)
+    {
+        reply.server_result = OperationResult::EMPTY_PARAMS;
+        return;
+    }
+
+    // Try to read the parameters data.
+    try
+    {
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, meteo);
+    }
+    catch(...)
+    {
+        reply.server_result = OperationResult::BAD_PARAMETERS;
+        return;
+    }
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, meteo);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+template <typename ClbkT>
+void AmelasControllerServer::processGetMeteoData(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+    controller::MeteoData meteo;
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, meteo);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, meteo.press, meteo.temp, meteo.hr);
+}
+
+template <typename ClbkT>
+void AmelasControllerServer::processGetLocation(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+    controller::StationLocation loc;
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, loc);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, loc.wgs84.lat, loc.wgs84.lon, loc.wgs84.alt, loc.ecef.x, loc.ecef.y, loc.ecef.z);
+}
+
 #endif

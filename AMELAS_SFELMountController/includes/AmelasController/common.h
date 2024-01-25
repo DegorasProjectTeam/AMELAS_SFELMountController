@@ -135,10 +135,13 @@ enum class AmelasMotionState : std::int32_t
     PAUSED        = 4,
     WAITING_START = 5,
     STOPPED       = 6,
-    INVALID_ERROR = 7
+    INVALID_ERROR = 7,
+    DISABLED      = 8,
+    RESET         = 9,
+    UNKNOWN       = 10
 };
 
-static constexpr std::array<const char*, 8> MotionStateStr
+static constexpr std::array<const char*, 11> MotionStateStr
 {
     "IDLE - The mount is currently stopped in the IDLE position.",
     "PARK - The mount is currently stopped in the PARK position.",
@@ -147,7 +150,10 @@ static constexpr std::array<const char*, 8> MotionStateStr
     "PAUSED - The mount is performing a movement operation but is paused.",
     "WAITING_START - The mount is waiting for the start of an automatic track at the initial coordinates of the object.",
     "STOPPED - The mount is currently stopped in an unknown position.",
-    "ERROR - The PLC state machine and the mount itself is currently stopped in error mode."
+    "ERROR - The PLC state machine and the mount itself is currently stopped in error mode.",
+    "DISABLED - The axes are disabled.",
+    "RESET - The PLC state machine is being reset.",
+    "UNKNOWN - Unrecognized state in application."
 };
 
 struct AltAzPos final : public zmqutils::utils::Serializable
@@ -306,9 +312,10 @@ using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
 using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
 
 using SetLocationCallback = std::function<AmelasError(const StationLocation&)>;
+using GetLocationCallback = std::function<AmelasError(StationLocation&)>;
 
-using SetMeteoData = std::function<AmelasError(const MeteoData&)>;
-using GetMeteoData = std::function<AmelasError(MeteoData&)>;
+using SetMeteoDataCallback = std::function<AmelasError(const MeteoData&)>;
+using GetMeteoDataCallback = std::function<AmelasError(MeteoData&)>;
 
 using GetMotionModeCallback = std::function<AmelasError(AmelasMotionMode&)>;
 using GetMotionStateCallback = std::function<AmelasError(AmelasMotionState&)>;
