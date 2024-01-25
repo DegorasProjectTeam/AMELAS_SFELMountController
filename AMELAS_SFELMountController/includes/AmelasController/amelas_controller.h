@@ -150,7 +150,7 @@ public:
     // MOTION RELATED FUNCTIONS
     //=====================================================================================================================
     LIBAMELAS_EXPORT AmelasError getMotionMode(AmelasMotionMode& motion_mode);
-    // TODO: LIBAMELAS_EXPORT AmelasError getMotionState(AmelasMotionState& motion_state);
+    LIBAMELAS_EXPORT AmelasError getMotionState(AmelasMotionState& motion_state);
 
     LIBAMELAS_EXPORT AmelasError doStartMotion();
     LIBAMELAS_EXPORT AmelasError doPauseMotion();

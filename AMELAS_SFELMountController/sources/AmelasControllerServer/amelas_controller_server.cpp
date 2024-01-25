@@ -138,6 +138,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOTION_MODE,
                                   &AmelasControllerServer::processGetMotionMode<controller::GetMotionModeCallback>);
 
+    // REQ_GET_MOTION_STATE.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOTION_STATE,
+                                  &AmelasControllerServer::processGetMotionState<controller::GetMotionStateCallback>);
+
     // REQ_DO_START_MOTION.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_START_MOTION,
                                   &AmelasControllerServer::processEmptyArguments<controller::SetDoStartMotionCallback>);

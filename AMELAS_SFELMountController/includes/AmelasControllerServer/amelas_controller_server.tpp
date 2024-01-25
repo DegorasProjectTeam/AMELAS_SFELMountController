@@ -17,6 +17,21 @@ void AmelasControllerServer::processGetMotionMode(const CommandRequest &request,
 }
 
 template <typename ClbkT>
+void AmelasControllerServer::processGetMotionState(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+    controller::AmelasMotionState state;
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, state);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, state);
+}
+
+template <typename ClbkT>
 void AmelasControllerServer::processGetPositionOrSpeed(const CommandRequest &request, CommandReply &reply)
 {
     // Auxiliar variables and containers.

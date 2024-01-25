@@ -532,13 +532,49 @@ AmelasError AmelasController::getMotionMode(AmelasMotionMode &motion_mode)
     std::string motion_str = MotionModeStr[static_cast<size_t>(motion_mode)];
     std::ostringstream oss;
     oss << "Motion mode: " << motion_str << '\n';
-    //oss << "Motion mode: " << _plc->read<double>(symbol) << '\n';
     setLog(command, oss.str(), error);
     
     return error;
 }
 
-// TODO: AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
+AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string symbol = "MAIN.axesController._motionState";
+    const std::string command = "GET_MOTION_STATE";
+
+    if (_plc->read<double>(symbol) == 4.0
+        || _plc->read<double>(symbol) == 6.0
+        || _plc->read<double>(symbol) == 7.0
+        || _plc->read<double>(symbol) == 13.0)
+        motion_state = AmelasMotionState::MOVING;
+    else if (_plc->read<double>(symbol) == 8.0)
+        motion_state = AmelasMotionState::PAUSED;
+    else if (_plc->read<double>("MAIN.commander._motionMode") == 1.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 2.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 3.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 4.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 5.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 6.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 7.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 8.0
+                || _plc->read<double>("MAIN.commander._motionMode") == 9.0)
+        motion_state = AmelasMotionState::WAITING_START;
+    else if (_plc->read<double>(symbol) == 3.0)
+        motion_state = AmelasMotionState::STOPPED;
+    else if (_plc->read<double>(symbol) == 10.0)
+        motion_state = AmelasMotionState::INVALID_ERROR;
+
+    // Log.
+    std::string motion_str = MotionStateStr[static_cast<size_t>(motion_state)];
+    std::ostringstream oss;
+    oss << "Motion state: " << motion_str << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
 
 AmelasError AmelasController::doStartMotion()
 {

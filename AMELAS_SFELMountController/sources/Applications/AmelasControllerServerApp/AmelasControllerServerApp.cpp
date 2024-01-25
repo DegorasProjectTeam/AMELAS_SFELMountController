@@ -273,6 +273,10 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::getMotionMode);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOTION_STATE,
+                                             &amelas_controller,
+                                             &AmelasController::getMotionState);
+
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_START_MOTION,
                                              &amelas_controller,
                                              &AmelasController::doStartMotion);
