@@ -176,6 +176,10 @@ int main(int, char**)
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_RESET_STATE,
                                              &amelas_controller,
                                              &AmelasController::doResetState);
+                                             
+    /*amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
+                                             &amelas_controller,
+                                             &AmelasController::getPLCregister);*/
 
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_TRACK_ADJ,
                                              &amelas_controller,

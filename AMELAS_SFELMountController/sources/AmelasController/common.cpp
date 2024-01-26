@@ -141,6 +141,50 @@ size_t StationLocation::serializedSize() const
 
 StationLocation::~StationLocation(){}
 
+PLCAddress::PLCAddress(std::string symbol, std::string type):
+    symbol(symbol), type(type){}
+
+PLCAddress::PLCAddress(): symbol(""), type(""){}
+
+size_t PLCAddress::serialize(zmqutils::utils::BinarySerializer &serializer) const
+{
+    return serializer.write(symbol, type);
+}
+
+void PLCAddress::deserialize(zmqutils::utils::BinarySerializer &serializer)
+{
+    serializer.read(symbol, type);
+}
+
+size_t PLCAddress::serializedSize() const
+{
+    return (2*sizeof(uint64_t) + sizeof(std::string)*2);
+}
+
+PLCAddress::~PLCAddress(){}
+
+PLCRegisterValue::PLCRegisterValue(std::string symbol, std::string type, std::string value):
+    symbol(symbol), type(type), value(value){}
+
+PLCRegisterValue::PLCRegisterValue(): symbol(""), type(""), value(""){}
+
+size_t PLCRegisterValue::serialize(zmqutils::utils::BinarySerializer &serializer) const
+{
+    return serializer.write(symbol, type, value);
+}
+
+void PLCRegisterValue::deserialize(zmqutils::utils::BinarySerializer &serializer)
+{
+    serializer.read(symbol, type, value);
+}
+
+size_t PLCRegisterValue::serializedSize() const
+{
+    return (2*sizeof(uint64_t) + sizeof(std::string)*3);
+}
+
+PLCRegisterValue::~PLCRegisterValue(){}
+
 // =====================================================================================================================
 
 

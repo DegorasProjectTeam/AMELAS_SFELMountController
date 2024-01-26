@@ -94,7 +94,30 @@ AmelasError AmelasController::doDisconnectPLC()
     return error;
 }
 
-// TODO: AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &value)
+AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &value)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string command = "GET_PLC_REGISTER";
+
+    if (address.type == "double")
+        value.value = std::to_string(_plc->read<double>(address.symbol));
+    else if (address.type == "int")
+        value.value = std::to_string(_plc->read<int>(address.symbol));
+    else if (address.type == "bool")
+        value.value = std::to_string(_plc->read<bool>(address.symbol));
+
+    value.symbol = address.symbol;
+    value.type = address.type;
+
+    // Log.
+    std::ostringstream oss;
+    oss << "Symbol: " << value.symbol << " <" << value.type << "> = " << value.value << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
 
 //=====================================================================================================================
 
@@ -549,6 +572,8 @@ AmelasError AmelasController::getMotionMode(AmelasMotionMode &motion_mode)
         motion_mode = AmelasMotionMode::STAR;
     // else if (_plc->read<double>(symbol) == X.0)
     //     motion_mode = AmelasMotionMode::TLE;
+    else
+        motion_mode = AmelasMotionMode::UNKNOWN;
 
     // Log.
     std::string motion_str = MotionModeStr[static_cast<size_t>(motion_mode)];

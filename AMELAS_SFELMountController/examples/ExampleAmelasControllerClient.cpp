@@ -161,6 +161,61 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
         {
             std::cout << "Sending REQ_GET_PLC_REGISTERS command." << std::endl;
+
+            /*bool valid_params = true;
+            std::string symbol = "", type = "";
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                symbol = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter symbol issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    type = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter type issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << symbol << " " << type << std::endl;
+
+                PLCAddress address(symbol, type);
+
+                BinarySerializer serializer;
+
+                serializer.write(address);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, address);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, symbol);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;*/
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_LOG))
         {
@@ -1006,6 +1061,27 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         //result = ClientResult::
                     }
                 }
+
+                /*if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        std::string symbol, type, value;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, symbol, type, value);
+
+                        // Generate the struct.
+                        std::cout << "Symbol: " << symbol << " <" << type << "> = " << value << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }*/
 
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_METEO_DATA))
                 {

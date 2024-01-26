@@ -87,7 +87,7 @@ public:
     LIBAMELAS_EXPORT AmelasError doConnectPLC();
     LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
 
-    // TODO: LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& value);
+    LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& value);
     //=====================================================================================================================
 
 
@@ -135,10 +135,10 @@ public:
     // TODO: LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs);
     // TODO: LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs);
 
-    LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location);
+    LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location); // TODO
     LIBAMELAS_EXPORT AmelasError getLocation(StationLocation& location);
 
-    LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo);
+    LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo); // TODO
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
     
     // TODO: LIBAMELAS_EXPORT AmelasError enableSimulationMode(const bool& enabled);

@@ -108,10 +108,11 @@ enum class AmelasMotionMode : std::int32_t
     TO_IDLE         = 7,
     TO_PARK         = 8,
     TO_CALIBRATION  = 9,
-    HOMING_OP       = 10
+    HOMING_OP       = 10,
+    UNKNOWN         = 11
 };
 
-static constexpr std::array<const char*, 11> MotionModeStr
+static constexpr std::array<const char*, 12> MotionModeStr
 {
     "NO_MOTION - The mount does not have any motion mode loaded.",
     "ABSOLUTE - The mount is moved to an absolute coordinate at a certain speed.",
@@ -123,7 +124,8 @@ static constexpr std::array<const char*, 11> MotionModeStr
     "TO_IDLE - The mount automatically goes to the IDLE position at a certain speed.",
     "TO_PARK - The mount automatically goes to the PARK position at a certain speed.",
     "TO_CALIBRATION - The mount automatically goes to the CALIBRATION position at a certain speed.",
-    "HOMING_OP - The mount automatically performs the homing operation."
+    "HOMING_OP - The mount automatically performs the homing operation.",
+    "UNKNOWN - Unrecognized state in application."
 };
 
 enum class AmelasMotionState : std::int32_t
@@ -272,6 +274,48 @@ struct StationLocation final : public zmqutils::utils::Serializable
     ECEFCoords ecef;
 };
 
+struct PLCAddress final : public zmqutils::utils::Serializable
+{
+    LIBAMELAS_EXPORT PLCAddress(std::string symbol, std::string type);
+
+    LIBAMELAS_EXPORT PLCAddress();
+
+    LIBAMELAS_EXPORT PLCAddress(const PLCAddress& plc) = default;
+
+    LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
+
+    LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;
+
+    LIBAMELAS_EXPORT size_t serializedSize() const final;
+
+    LIBAMELAS_EXPORT ~PLCAddress() final;
+
+    std::string symbol;
+    std::string type;
+};
+
+struct PLCRegisterValue final : public zmqutils::utils::Serializable
+{
+    LIBAMELAS_EXPORT PLCRegisterValue(std::string symbol, std::string type, std::string value);
+
+    LIBAMELAS_EXPORT PLCRegisterValue();
+
+    LIBAMELAS_EXPORT PLCRegisterValue(const PLCRegisterValue& plc) = default;
+
+    LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
+
+    LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;
+
+    LIBAMELAS_EXPORT size_t serializedSize() const final;
+
+    LIBAMELAS_EXPORT ~PLCRegisterValue() final;
+
+    std::string symbol;
+    std::string type;
+    std::string value;
+};
+
+
 // Generic callback.
 template<typename... Args>
 using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Args...);
@@ -280,6 +324,8 @@ using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Ar
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
 
 using DoResetStateCallback = std::function<AmelasError()>;
+
+using GetPLCRegisterCallback = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
 
 using EnableTrackingAdjustsCallback = std::function<AmelasError(const bool&)>;
 using EnableMountPowerCallback = std::function<AmelasError(const bool&)>;
