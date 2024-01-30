@@ -95,7 +95,7 @@ void AmelasControllerServer::processSetPositionOrSpeed(const CommandRequest& req
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
 }
 
-/*template <typename ClbkT>
+template <typename ClbkT>
 void AmelasControllerServer::processSetLocation(const CommandRequest& request, CommandReply& reply)
 {
     // Auxiliar variables and containers.
@@ -128,7 +128,7 @@ void AmelasControllerServer::processSetLocation(const CommandRequest& request, C
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
-}*/
+}
 
 template <typename ClbkT>
 void AmelasControllerServer::processSetAbsRelAltAzMotion(const CommandRequest &request, CommandReply &reply)

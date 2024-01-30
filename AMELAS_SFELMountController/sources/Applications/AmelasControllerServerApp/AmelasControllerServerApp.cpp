@@ -177,9 +177,9 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::doResetState);
                                              
-    /*amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
                                              &amelas_controller,
-                                             &AmelasController::getPLCregister);*/
+                                             &AmelasController::getPLCregister);
 
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_TRACK_ADJ,
                                              &amelas_controller,
@@ -261,9 +261,9 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::enableMountModel);
 
-    /*amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_LOCATION,
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_LOCATION,
                                              &amelas_controller,
-                                             &AmelasController::setLocation);*/
+                                             &AmelasController::setLocation);
 
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_LOCATION,
                                              &amelas_controller,

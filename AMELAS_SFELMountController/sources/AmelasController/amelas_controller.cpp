@@ -609,6 +609,18 @@ AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
                 || _plc->read<double>("MAIN.commander._motionMode") == 8.0
                 || _plc->read<double>("MAIN.commander._motionMode") == 9.0)
         motion_state = AmelasMotionState::WAITING_START;
+    else if (_plc->read<double>(symbol) == 3.0
+                && _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.IdlePosition.Azimuth")
+                && _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.IdlePosition.Elevation"))
+        motion_state = AmelasMotionState::IDLE;
+    else if (_plc->read<double>(symbol) == 3.0
+                && _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.ParkPosition.Azimuth")
+                && _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.ParkPosition.Elevation"))
+        motion_state = AmelasMotionState::PARK;
+    else if (_plc->read<double>(symbol) == 3.0
+                && _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.CalibrationPosition.Azimuth")
+                && _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.CalibrationPosition.Elevation"))
+        motion_state = AmelasMotionState::CALIBRATION;
     else if (_plc->read<double>(symbol) == 3.0)
         motion_state = AmelasMotionState::STOPPED;
     else if (_plc->read<double>(symbol) == 10.0)

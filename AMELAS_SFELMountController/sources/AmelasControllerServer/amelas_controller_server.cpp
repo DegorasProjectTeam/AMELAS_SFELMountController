@@ -131,8 +131,8 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processGetPositionOrSpeed<controller::GetHomingOffsetsCallback>);
 
     // REQ_SET_LOCATION.
-    /*this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_LOCATION,
-                                  &AmelasControllerServer::processSetLocation<controller::SetLocationCallback>);*/
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_LOCATION,
+                                  &AmelasControllerServer::processSetLocation<controller::SetLocationCallback>);
 
     // REQ_GET_LOCATION.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_LOCATION,
