@@ -163,12 +163,13 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_GET_PLC_REGISTERS command." << std::endl;
 
             /*bool valid_params = true;
-            std::string symbol = "", type = "";
+            std::string symbol = "";
+            std::string type = "";
             char *param_token = std::strtok(nullptr, " ");
 
             try
             {
-                symbol = std::stod(param_token);
+                symbol = param_token;
             }
             catch (...)
             {
@@ -182,7 +183,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 try
                 {
-                    type = std::stod(param_token);
+                    type = param_token;
                 }
                 catch (...)
                 {
@@ -195,7 +196,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             {
                 std::cout << "Sending: " << symbol << " " << type << std::endl;
 
-                PLCAddress address(symbol, type);
+                PLCRegisterValue address(symbol, type, "");
 
                 BinarySerializer serializer;
 
@@ -1062,12 +1063,14 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                 }
 
-                /*if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
                 {
                     try
                     {
                         AmelasError error;   // Trash. The controller error must be checked.
-                        std::string symbol, type, value;
+                        std::string symbol;
+                        std::string type;
+                        std::string value;
 
                         // Deserialize the parameters.
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, symbol, type, value);
@@ -1081,7 +1084,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
-                }*/
+                }
 
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_METEO_DATA))
                 {

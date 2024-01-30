@@ -87,7 +87,8 @@ public:
     LIBAMELAS_EXPORT AmelasError doConnectPLC();
     LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
 
-    LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& value);
+    // LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& value);
+    LIBAMELAS_EXPORT AmelasError getPLCregister(PLCRegisterValue& value);
     //=====================================================================================================================
 
 

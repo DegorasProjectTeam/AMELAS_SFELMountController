@@ -314,4 +314,39 @@ void AmelasControllerServer::processGetLocation(const CommandRequest &request, C
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, loc.wgs84.lat, loc.wgs84.lon, loc.wgs84.alt, loc.ecef.x, loc.ecef.y, loc.ecef.z);
 }
 
+template <typename ClbkT>
+void AmelasControllerServer::processGetPLCRegister(const CommandRequest& request, CommandReply& reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    // Position struct.
+    controller::PLCRegisterValue pos;
+
+    // Check the request parameters size.
+    if (request.params_size == 0 || !request.params)
+    {
+        reply.server_result = OperationResult::EMPTY_PARAMS;
+        return;
+    }
+
+    // Try to read the parameters data.
+    try
+    {
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, pos);
+    }
+    catch(...)
+    {
+        reply.server_result = OperationResult::BAD_PARAMETERS;
+        return;
+    }
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, pos);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, pos.symbol, pos.type, pos.value);
+}
+
 #endif

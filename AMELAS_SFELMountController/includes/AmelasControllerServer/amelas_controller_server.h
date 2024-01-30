@@ -111,12 +111,6 @@ private:
     
     template <typename ClbkT>
     void processGetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);
-
-    template <typename ClbkT>
-    void processSetMeteoData(const CommandRequest &request, CommandReply &reply);
-
-    template <typename ClbkT>
-    void processGetMeteoData(const CommandRequest &request, CommandReply &reply);
     
     template <typename ClbkT>
     void processGetMotionMode(const CommandRequest &request, CommandReply &reply);
@@ -129,12 +123,21 @@ private:
     
     template <typename ClbkT>
     void processGetLocation(const CommandRequest &request, CommandReply &reply);
+
+    template <typename ClbkT>
+    void processSetMeteoData(const CommandRequest &request, CommandReply &reply);
+
+    template <typename ClbkT>
+    void processGetMeteoData(const CommandRequest &request, CommandReply &reply);
     
     template <typename ClbkT>
     void processEmptyArguments(const CommandRequest &request, CommandReply &reply);
     
     template <typename ClbkT>
     void processSetAbsRelAltAzMotion(const CommandRequest &request, CommandReply &reply);
+
+    template <typename ClbkT>
+    void processGetPLCRegister(const CommandRequest &request, CommandReply &reply);
 
     // Subclass register process function helper.
     void registerRequestProcFunc(AmelasServerCommand command, AmelasRequestProcFunc func);

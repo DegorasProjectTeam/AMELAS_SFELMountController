@@ -213,6 +213,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // REQ_DO_DISCONNECT_PLC.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_DISCONNECT_PLC,
                                   &AmelasControllerServer::processEmptyArguments<controller::DoDisconnectPLC>);
+
+    // REQ_GET_PLC_REGISTERS.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
+                                  &AmelasControllerServer::processGetPLCRegister<controller::GetPLCRegisterCallback>);
 }
 
 AmelasControllerServer::~AmelasControllerServer() {}

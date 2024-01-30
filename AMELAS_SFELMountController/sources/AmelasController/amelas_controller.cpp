@@ -94,14 +94,15 @@ AmelasError AmelasController::doDisconnectPLC()
     return error;
 }
 
-AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &value)
+// AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &value)
+AmelasError AmelasController::getPLCregister(PLCRegisterValue &value)
 {
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
     const std::string command = "GET_PLC_REGISTER";
 
-    if (address.type == "double")
+    /*if (address.type == "double")
         value.value = std::to_string(_plc->read<double>(address.symbol));
     else if (address.type == "int")
         value.value = std::to_string(_plc->read<int>(address.symbol));
@@ -114,6 +115,18 @@ AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegis
     // Log.
     std::ostringstream oss;
     oss << "Symbol: " << value.symbol << " <" << value.type << "> = " << value.value << '\n';
+    setLog(command, oss.str(), error);*/
+
+    if (value.type == "double")
+        value.value = std::to_string(_plc->read<double>(value.symbol));
+    else if (value.type == "int")
+        value.value = std::to_string(_plc->read<int>(value.symbol));
+    else if (value.type == "bool")
+        value.value = std::to_string(_plc->read<bool>(value.symbol));
+
+    // Log.
+    std::ostringstream oss;
+    oss << "Symbol: " << value.symbol << " <" << value.type << ">" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
