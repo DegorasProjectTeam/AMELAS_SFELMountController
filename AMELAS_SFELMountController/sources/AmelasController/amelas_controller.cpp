@@ -94,8 +94,24 @@ AmelasError AmelasController::doDisconnectPLC()
     return error;
 }
 
-// AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &value)
-AmelasError AmelasController::getPLCregister(PLCRegisterValue &value)
+PLCRegisterValue AmelasController::getPLCregisterValue(const std::string symbol, const std::string type)
+{
+    PLCRegisterValue registerValue;
+
+    registerValue.symbol = symbol;
+    registerValue.type = type;
+
+    if (type == "double")
+        registerValue.value = std::to_string(_plc->read<double>(symbol));
+    else if (type == "int")
+        registerValue.value = std::to_string(_plc->read<int>(symbol));
+    else if (type == "bool")
+        registerValue.value = std::to_string(_plc->read<bool>(symbol));
+
+    return registerValue;
+}
+
+AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &registerValue)
 {
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
@@ -117,16 +133,18 @@ AmelasError AmelasController::getPLCregister(PLCRegisterValue &value)
     oss << "Symbol: " << value.symbol << " <" << value.type << "> = " << value.value << '\n';
     setLog(command, oss.str(), error);*/
 
-    if (value.type == "double")
-        value.value = std::to_string(_plc->read<double>(value.symbol));
-    else if (value.type == "int")
-        value.value = std::to_string(_plc->read<int>(value.symbol));
-    else if (value.type == "bool")
-        value.value = std::to_string(_plc->read<bool>(value.symbol));
+    // if (value.type == "double")
+    //     value.value = std::to_string(_plc->read<double>(value.symbol));
+    // else if (value.type == "int")
+    //     value.value = std::to_string(_plc->read<int>(value.symbol));
+    // else if (value.type == "bool")
+    //     value.value = std::to_string(_plc->read<bool>(value.symbol));
+
+    registerValue = getPLCregisterValue(address.symbol, address.type);
 
     // Log.
     std::ostringstream oss;
-    oss << "Symbol: " << value.symbol << " <" << value.type << ">" << '\n';
+    oss << "Symbol: " << registerValue.symbol << " <" << registerValue.type << "> = " << registerValue.value << '\n';
     setLog(command, oss.str(), error);
 
     return error;

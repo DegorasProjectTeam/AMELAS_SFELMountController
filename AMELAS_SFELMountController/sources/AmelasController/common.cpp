@@ -70,7 +70,7 @@ void MeteoData::deserialize(zmqutils::utils::BinarySerializer &serializer)
 
 size_t MeteoData::serializedSize() const
 {
-    return (3*sizeof(uint64_t) + sizeof(double)*3);
+    return (2*sizeof(uint64_t) + sizeof(double)*3);
 }
 
 MeteoData::~MeteoData(){}
@@ -136,7 +136,7 @@ void StationLocation::deserialize(zmqutils::utils::BinarySerializer &serializer)
 
 size_t StationLocation::serializedSize() const
 {
-    return (2*sizeof(uint64_t) + sizeof(WGS84Coords)*2);
+    return (2*sizeof(uint64_t) + sizeof(double)*6);
 }
 
 StationLocation::~StationLocation(){}
@@ -158,7 +158,7 @@ void PLCAddress::deserialize(zmqutils::utils::BinarySerializer &serializer)
 
 size_t PLCAddress::serializedSize() const
 {
-    return (2*sizeof(uint64_t) + sizeof(std::string)*2);
+    return (2*sizeof(uint64_t) + symbol.size() + type.size());
 }
 
 PLCAddress::~PLCAddress(){}
@@ -180,7 +180,7 @@ void PLCRegisterValue::deserialize(zmqutils::utils::BinarySerializer &serializer
 
 size_t PLCRegisterValue::serializedSize() const
 {
-    return (2*sizeof(uint64_t) + sizeof(std::string)*3);
+    return (2*sizeof(uint64_t) + symbol.size() + type.size() + value.size());
 }
 
 PLCRegisterValue::~PLCRegisterValue(){}

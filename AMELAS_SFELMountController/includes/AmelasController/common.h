@@ -282,6 +282,8 @@ struct PLCAddress final : public zmqutils::utils::Serializable
 
     LIBAMELAS_EXPORT PLCAddress(const PLCAddress& plc) = default;
 
+    LIBAMELAS_EXPORT PLCAddress& operator =(const PLCAddress& address) = default;
+
     LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
 
     LIBAMELAS_EXPORT void deserialize(zmqutils::utils::BinarySerializer& serializer) final;
@@ -301,6 +303,8 @@ struct PLCRegisterValue final : public zmqutils::utils::Serializable
     LIBAMELAS_EXPORT PLCRegisterValue();
 
     LIBAMELAS_EXPORT PLCRegisterValue(const PLCRegisterValue& plc) = default;
+
+    LIBAMELAS_EXPORT PLCRegisterValue& operator =(const PLCRegisterValue& registerValue) = default;
 
     LIBAMELAS_EXPORT size_t serialize(zmqutils::utils::BinarySerializer& serializer) const final;
 
@@ -325,8 +329,7 @@ using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
 
 using DoResetStateCallback = std::function<AmelasError()>;
 
-// using GetPLCRegisterCallback = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
-using GetPLCRegisterCallback = std::function<AmelasError(PLCRegisterValue&)>;
+using GetPLCRegisterCallback = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
 
 using EnableTrackingAdjustsCallback = std::function<AmelasError(const bool&)>;
 using EnableMountPowerCallback = std::function<AmelasError(const bool&)>;

@@ -162,7 +162,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_PLC_REGISTERS command." << std::endl;
 
-            /*bool valid_params = true;
+            bool valid_params = true;
             std::string symbol = "";
             std::string type = "";
             char *param_token = std::strtok(nullptr, " ");
@@ -196,7 +196,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             {
                 std::cout << "Sending: " << symbol << " " << type << std::endl;
 
-                PLCRegisterValue address(symbol, type, "");
+                /*PLCAddress address(symbol, type);
 
                 BinarySerializer serializer;
 
@@ -204,7 +204,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 std::cout<<serializer.toJsonString();
 
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, address);
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, address);*/
 
                 std::cout<<std::endl;
             }
@@ -216,7 +216,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                 valid_params = true;
             }
 
-            valid = valid_params;*/
+            valid = valid_params;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_LOG))
         {
@@ -683,7 +683,9 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_SET_METEO_DATA command." << std::endl;
 
             bool valid_params = true;
-            double press = 0., temp = 0., hr = 0.;
+            double press = 0.;
+            double temp = 0.;
+            double hr = 0.;
             char *param_token = std::strtok(nullptr, " ");
 
             try
@@ -1068,12 +1070,14 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     try
                     {
                         AmelasError error;   // Trash. The controller error must be checked.
+                        std::string address;
+                        std::string address_type;
                         std::string symbol;
                         std::string type;
                         std::string value;
 
                         // Deserialize the parameters.
-                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, symbol, type, value);
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, address, address_type, symbol, type, value);
 
                         // Generate the struct.
                         std::cout << "Symbol: " << symbol << " <" << type << "> = " << value << std::endl;

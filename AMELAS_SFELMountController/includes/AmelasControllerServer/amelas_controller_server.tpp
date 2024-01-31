@@ -321,6 +321,7 @@ void AmelasControllerServer::processGetPLCRegister(const CommandRequest& request
     controller::AmelasError ctrl_err;
 
     // Position struct.
+    controller::PLCAddress add;
     controller::PLCRegisterValue pos;
 
     // Check the request parameters size.
@@ -333,7 +334,7 @@ void AmelasControllerServer::processGetPLCRegister(const CommandRequest& request
     // Try to read the parameters data.
     try
     {
-        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, pos);
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, add, pos);
     }
     catch(...)
     {
@@ -342,11 +343,11 @@ void AmelasControllerServer::processGetPLCRegister(const CommandRequest& request
     }
 
     // Now we will process the command in the controller.
-    ctrl_err = this->invokeCallback<ClbkT>(request, reply, pos);
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, add, pos);
 
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)
-        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, pos.symbol, pos.type, pos.value);
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, add.symbol, add.type, pos.symbol, pos.type, pos.value);
 }
 
 #endif
