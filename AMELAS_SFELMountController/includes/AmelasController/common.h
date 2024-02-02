@@ -368,7 +368,7 @@ using SetMeteoDataCallback = std::function<AmelasError(const MeteoData&)>;
 using GetMeteoDataCallback = std::function<AmelasError(MeteoData&)>;
 
 using GetMotionModeCallback = std::function<AmelasError(AmelasMotionMode&)>;
-using GetMotionStateCallback = std::function<AmelasError(AmelasMotionState&)>;
+using GetMotionStateCallback = std::function<AmelasError(AmelasMotionState&, AltAzPos&)>;
 
 using SetDoStartMotionCallback = std::function<AmelasError()>;
 using SetDoPauseMotionCallback = std::function<AmelasError()>;

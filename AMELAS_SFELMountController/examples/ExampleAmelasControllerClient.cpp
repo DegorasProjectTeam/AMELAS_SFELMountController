@@ -1174,13 +1174,26 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     {
                         AmelasError error;   // Trash. The controller error must be checked.
                         AmelasMotionState state;
+                        double az;
+                        double el;
 
                         // Deserialize the parameters.
-                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, state);
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, state, az, el);
 
                         // Generate the struct.
                         std::string motion_str = MotionStateStr[static_cast<size_t>(state)];
-                        std::cout << "Motion state: " << motion_str << std::endl;
+
+                        if (state == AmelasMotionState::STOPPED
+                            || state == AmelasMotionState::IDLE
+                            || state == AmelasMotionState::PARK
+                            || state == AmelasMotionState::CALIBRATION)
+                        {
+                            std::cout << "Motion state: " << motion_str << std::endl;
+                            std::cout << "Az: "           << az         << std::endl;
+                            std::cout << "El: "           << el         << std::endl;
+                        }
+                        else
+                            std::cout << "Motion state: " << motion_str << std::endl;
                     }
                     catch(...)
                     {

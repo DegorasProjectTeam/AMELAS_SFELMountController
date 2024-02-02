@@ -175,12 +175,12 @@ void AmelasController::setLog(const std::string command, const std::string speci
 
     std::ostringstream oss;
     oss << oss_1.str()
-    << "<AMELAS CONTROLLER>" << '\n'
-    << "-> " << command << '\n'
-    << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-    << specific
-    << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
-    << std::string(100, '-') << '\n';
+        << "<AMELAS CONTROLLER>" << '\n'
+        << "-> " << command << '\n'
+        << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
+        << specific
+        << "Error: " << static_cast<int>(error) << " (" << cmd_str << ")" << '\n'
+        << std::string(100, '-') << '\n';
 
     if (error == AmelasError::SUCCESS)
         _logger->info(oss.str());
@@ -245,7 +245,7 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
     // Log.
     std::ostringstream oss;
     oss << "Az: " << pos.az << '\n'
-    << "El: " << pos.el << '\n';
+        << "El: " << pos.el << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -285,7 +285,7 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
     // Log.
     std::ostringstream oss;
     oss << "Az: " << vel.az << '\n'
-    << "El: " << vel.el << '\n';
+        << "El: " << vel.el << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -493,11 +493,11 @@ AmelasError AmelasController::setLocation(const StationLocation &location)
     // Log.
     std::ostringstream oss;
     oss << "Lat: " << location.wgs84.lat << '\n'
-    << "Lon: " << location.wgs84.lon << '\n'
-    << "Alt: " << location.wgs84.alt << '\n'
-    << "X: " << location.ecef.x << '\n'
-    << "Y: " << location.ecef.y << '\n'
-    << "Z: " << location.ecef.z << '\n';
+        << "Lon: " << location.wgs84.lon << '\n'
+        << "Alt: " << location.wgs84.alt << '\n'
+        << "X: "   << location.ecef.x    << '\n'
+        << "Y: "   << location.ecef.y    << '\n'
+        << "Z: "   << location.ecef.z    << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -540,8 +540,8 @@ AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
     // Log.
     std::ostringstream oss;
     oss << "Press: " << meteo.press << '\n'
-    << "Temp: " << meteo.temp << '\n'
-    << "HR: " << meteo.hr << '\n';
+        << "Temp: "  << meteo.temp  << '\n'
+        << "HR: "    << meteo.hr    << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -615,7 +615,7 @@ AmelasError AmelasController::getMotionMode(AmelasMotionMode &motion_mode)
     return error;
 }
 
-AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
+AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state, AltAzPos &pos)
 {
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
@@ -623,42 +623,45 @@ AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
     const std::string symbol = "MAIN.axesController._motionState";
     const std::string command = "GET_MOTION_STATE";
 
-    if (_plc->read<double>(symbol) == 4.0
-        || _plc->read<double>(symbol) == 6.0
-        || _plc->read<double>(symbol) == 7.0
-        || _plc->read<double>(symbol) == 13.0)
+    pos.az = _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos");
+    pos.el = _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos");
+
+    if (_plc->read<double>(symbol) == 4.0      // Homing
+        || _plc->read<double>(symbol) == 6.0   // MovingAbsolute
+        || _plc->read<double>(symbol) == 7.0   // MovingRelative
+        || _plc->read<double>(symbol) == 13.0) // MovingVelocity
         motion_state = AmelasMotionState::MOVING;
-    else if (_plc->read<double>(symbol) == 8.0)
+    else if (_plc->read<double>(symbol) == 8.0) // Halting
         motion_state = AmelasMotionState::PAUSED;
-    else if (_plc->read<double>("MAIN.commander._motionMode") == 1.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 2.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 3.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 4.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 5.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 6.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 7.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 8.0
-                || _plc->read<double>("MAIN.commander._motionMode") == 9.0)
+    else if (_plc->read<double>("MAIN.commander._motionMode") == 1.0        // LoadMoveAbsolute
+                || _plc->read<double>("MAIN.commander._motionMode") == 2.0  // LoadMoveRelative
+                || _plc->read<double>("MAIN.commander._motionMode") == 3.0  // LoadMoveVelocity
+                || _plc->read<double>("MAIN.commander._motionMode") == 4.0  // LoadMoveToHome
+                || _plc->read<double>("MAIN.commander._motionMode") == 5.0  // LoadMoveToIdle
+                || _plc->read<double>("MAIN.commander._motionMode") == 6.0  // LoadMoveToPark
+                || _plc->read<double>("MAIN.commander._motionMode") == 7.0  // LoadMoveToCalibration
+                || _plc->read<double>("MAIN.commander._motionMode") == 8.0  // LoadMoveCPFMotion
+                || _plc->read<double>("MAIN.commander._motionMode") == 9.0) // LoadMoveStarMotion
         motion_state = AmelasMotionState::WAITING_START;
-    else if (_plc->read<double>(symbol) == 3.0
+    else if (_plc->read<double>(symbol) == 3.0 // Standstill
                 && _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.IdlePosition.Azimuth")
                 && _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.IdlePosition.Elevation"))
         motion_state = AmelasMotionState::IDLE;
-    else if (_plc->read<double>(symbol) == 3.0
+    else if (_plc->read<double>(symbol) == 3.0 // Standstill
                 && _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.ParkPosition.Azimuth")
                 && _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.ParkPosition.Elevation"))
         motion_state = AmelasMotionState::PARK;
-    else if (_plc->read<double>(symbol) == 3.0
+    else if (_plc->read<double>(symbol) == 3.0 // Standstill
                 && _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.CalibrationPosition.Azimuth")
                 && _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos") == _plc->read<double>("MAIN.commander.CalibrationPosition.Elevation"))
         motion_state = AmelasMotionState::CALIBRATION;
-    else if (_plc->read<double>(symbol) == 3.0)
+    else if (_plc->read<double>(symbol) == 3.0) // Standstill
         motion_state = AmelasMotionState::STOPPED;
-    else if (_plc->read<double>(symbol) == 10.0)
+    else if (_plc->read<double>(symbol) == 10.0) // Error
         motion_state = AmelasMotionState::INVALID_ERROR;
-    else if (_plc->read<double>(symbol) == 0.0)
+    else if (_plc->read<double>(symbol) == 0.0) // Disabled
         motion_state = AmelasMotionState::DISABLED;
-    else if (_plc->read<double>(symbol) == 11.0)
+    else if (_plc->read<double>(symbol) == 11.0) // Reset
         motion_state = AmelasMotionState::RESET;
     else
         motion_state = AmelasMotionState::UNKNOWN;
@@ -666,7 +669,19 @@ AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state)
     // Log.
     std::string motion_str = MotionStateStr[static_cast<size_t>(motion_state)];
     std::ostringstream oss;
-    oss << "Motion state: " << motion_str << '\n';
+
+    if (motion_state == AmelasMotionState::STOPPED
+        || motion_state == AmelasMotionState::IDLE
+        || motion_state == AmelasMotionState::PARK
+        || motion_state == AmelasMotionState::CALIBRATION)
+    {
+        oss << "Motion state: " << motion_str   << '\n'
+            << "Az: " << std::to_string(pos.az) << '\n'
+            << "El: " << std::to_string(pos.el) << '\n';
+    }
+    else
+        oss << "Motion state: " << motion_str << '\n';
+
     setLog(command, oss.str(), error);
 
     return error;
@@ -826,7 +841,7 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
     // Log.
     std::ostringstream oss;
     oss << "Az (pos): " << pos.az << " - El (pos): " << pos.el << '\n'
-    << "Az (vel): " << vel.az << " - El (vel): " << vel.el << '\n';
+        << "Az (vel): " << vel.az << " - El (vel): " << vel.el << '\n';
     setLog(command, oss.str(), error);
     
     return error;
@@ -848,7 +863,7 @@ AmelasError AmelasController::setContAltAzMotion(const AltAzVel &vel)
     // Log.
     std::ostringstream oss;
     oss << "Az (vel): " << vel.az << '\n'
-    << "El (vel): " << vel.el << '\n';
+        << "El (vel): " << vel.el << '\n';
     setLog(command, oss.str(), error);
 
     return error;

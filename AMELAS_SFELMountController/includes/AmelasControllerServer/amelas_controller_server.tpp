@@ -22,13 +22,14 @@ void AmelasControllerServer::processGetMotionState(const CommandRequest &request
     // Auxiliar variables and containers.
     controller::AmelasError ctrl_err;
     controller::AmelasMotionState state;
+    controller::AltAzPos pos;
 
     // Now we will process the command in the controller.
-    ctrl_err = this->invokeCallback<ClbkT>(request, reply, state);
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, state, pos);
 
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)
-        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, state);
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, state, pos.az, pos.el);
 }
 
 template <typename ClbkT>
