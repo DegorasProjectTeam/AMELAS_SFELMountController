@@ -197,22 +197,35 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
 
     std::ostringstream oss;
 
-    // TODO: Check the provided values
-    if (command == "EN_TRACK_ADJ")
+    if (_plc->read<bool>(plcSymbol) == enabled)
     {
-        oss << "Track adj.: " << enabled << '\n';
-    }
-    else if (command == "EN_MOUNT_POWER")
-    {
-        oss << "Mount power: " << enabled << '\n';
-    }
-    else if (command == "EN_MOUNT_MODEL")
-    {
-        oss << "Mount model: " << enabled << '\n';
-    }
+        std::string result;
+        std::string prefix = "MAIN.commander.enable";
+        size_t pos = plcSymbol.find(prefix);
 
-    // Do things in the hardware (PLC).
-    _plc->write(plcSymbol, enabled);
+        if (pos != std::string::npos)
+            result = plcSymbol.substr(pos + prefix.length());
+
+        oss << result << " is already set to " << enabled << "." << '\n';
+    }
+    else
+    {
+        if (command == "EN_TRACK_ADJ")
+        {
+            oss << "Track adj.: " << enabled << '\n';
+        }
+        else if (command == "EN_MOUNT_POWER")
+        {
+            oss << "Mount power: " << enabled << '\n';
+        }
+        else if (command == "EN_MOUNT_MODEL")
+        {
+            oss << "Mount model: " << enabled << '\n';
+        }
+
+        // Do things in the hardware (PLC).
+        _plc->write(plcSymbol, enabled);
+    }
 
     // Log.
     setLog(command, oss.str(), error);
@@ -695,9 +708,19 @@ AmelasError AmelasController::doStartMotion()
     const std::string symbol = "MAIN.commander.StartMotion";
     const std::string command = "DO_START_MOTION";
 
-    // Do things in the hardware (PLC).
-    // _plc->executeCommand(symbol);
-    _plc->write(symbol + ".cmd", true);
+    if (_plc->read<double>(symbol) == 4.0      // Homing
+        || _plc->read<double>(symbol) == 6.0   // MovingAbsolute
+        || _plc->read<double>(symbol) == 7.0   // MovingRelative
+        || _plc->read<double>(symbol) == 13.0) // MovingVelocity
+    {
+        ; // Do nothing
+    }
+    else
+    {
+        // Do things in the hardware (PLC).
+        // _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
+    }
 
     // Log.
     setLog(command, "", error);
@@ -734,8 +757,6 @@ AmelasError AmelasController::doStopMotion()
     // Do things in the hardware (PLC).
     // _plc->executeCommand(symbol);
     _plc->write(symbol + ".cmd", true);
-
-    // TODO: borrar todo lo relativo al movimiento actual
 
     // Log.
     setLog(command, "", error);
