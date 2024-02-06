@@ -239,7 +239,7 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
     AmelasError error = AmelasError::SUCCESS;
 
     // Check the provided values.
-    if (pos.az >= 360.0 ||  pos.az < 0.0 || pos.el >= 90. || pos.el < 0.)
+    if (pos.az > 360.0 ||  pos.az < 0.0 || pos.el >= 90. || pos.el < 0.)
     {
         error = AmelasError::INVALID_POSITION;
     }
@@ -827,20 +827,21 @@ AmelasError AmelasController::setAbsoluteAltAzMotion(const AltAzPos &pos, const 
     error_pos = setPosition(pos, symbol + "Position", command + " (POS)");
     error_vel = setSpeed(vel, symbol + "Velocity", command + " (VEL)");
 
-    if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::SUCCESS)
-    {
+    //if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::SUCCESS)
+    //{
         // Do things in the hardware (PLC).
         // _plc->executeCommand(symbol);
         _plc->write(symbol + "Cmd.cmd", true);
 
-        return AmelasError::SUCCESS;
-    }
-    else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
-        return AmelasError::INVALID_POSITION;
-    else if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::INVALID_SPEED)
-        return AmelasError::INVALID_SPEED;
-    else
-        return AmelasError::INVALID_ERROR;
+     //   return AmelasError::SUCCESS;
+    //}
+    //else if (error_pos == AmelasError::INVALID_POSITION && error_vel == AmelasError::SUCCESS)
+    //    return AmelasError::INVALID_POSITION;
+    //else if (error_pos == AmelasError::SUCCESS && error_vel == AmelasError::INVALID_SPEED)
+    //    return AmelasError::INVALID_SPEED;
+    //else
+    //    return AmelasError::INVALID_ERROR;
+    return AmelasError::SUCCESS;
 }
 
 AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const AltAzVel &vel)

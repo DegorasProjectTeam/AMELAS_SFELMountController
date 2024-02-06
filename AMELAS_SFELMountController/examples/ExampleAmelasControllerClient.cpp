@@ -1273,6 +1273,7 @@ int main(int, char**)
     // Configuration variables.
     unsigned port = 9999;
     std::string ip = "127.0.0.1";
+    // std::string ip = "169.254.58.154"; // AVS
 
     std::string endpoint = "tcp://" + ip + ":" + std::to_string(port);
     
