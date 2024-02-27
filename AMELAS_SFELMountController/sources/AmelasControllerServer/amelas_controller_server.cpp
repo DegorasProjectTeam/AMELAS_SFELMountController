@@ -217,6 +217,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // REQ_GET_PLC_REGISTERS.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
                                   &AmelasControllerServer::processGetPLCRegister<controller::GetPLCRegisterCallback>);
+
+    // REQ_DO_SYNC_NTP.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_NTP,
+                                  &AmelasControllerServer::processSetNTPserver<controller::DoSyncTimeNTPCallback>);
 }
 
 AmelasControllerServer::~AmelasControllerServer() {}

@@ -99,7 +99,10 @@ private:
     // Process functions for all the specific commands.
     template <typename ClbkT>
     void processSetBool(const CommandRequest &request, CommandReply &reply);
-    
+
+    template <typename ClbkT>
+    void processSetNTPserver(const CommandRequest &request, CommandReply &reply);
+
     template <typename ClbkT>
     void processSetDouble(const CommandRequest &request, CommandReply &reply);
     

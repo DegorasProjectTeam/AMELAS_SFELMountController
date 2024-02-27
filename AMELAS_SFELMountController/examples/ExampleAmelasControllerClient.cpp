@@ -104,6 +104,48 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_DO_RESET_STATE command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_NTP))
+        {
+            std::cout << "Sending REQ_DO_SYNC_NTP command." << std::endl;
+
+            bool valid_params = true;
+            unsigned port = 0;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                port = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << port << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(port);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, port);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, port);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_AVOID_SUN)
         || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ)
         || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER)
@@ -156,7 +198,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_DISCONNECT_PLC))
         {
-            std::cout << "Sending REQ_DO_CONNECT_PLC command." << std::endl;
+            std::cout << "Sending REQ_DO_DISCONNECT_PLC command." << std::endl;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
         {
@@ -1274,6 +1316,7 @@ int main(int, char**)
     unsigned port = 9999;
     std::string ip = "127.0.0.1";
     // std::string ip = "169.254.58.154"; // AVS
+    // std::string ip = "10.50.3.1"; // PLC prueba
 
     std::string endpoint = "tcp://" + ip + ":" + std::to_string(port);
     

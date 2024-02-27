@@ -180,6 +180,10 @@ int main(int, char**)
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
                                              &amelas_controller,
                                              &AmelasController::getPLCregister);
+                                             
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_SYNC_NTP,
+                                             &amelas_controller,
+                                             &AmelasController::doSyncTimeNTP);
 
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_TRACK_ADJ,
                                              &amelas_controller,

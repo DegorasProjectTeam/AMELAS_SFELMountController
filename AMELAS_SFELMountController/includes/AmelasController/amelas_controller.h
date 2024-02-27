@@ -97,6 +97,7 @@ public:
     // TODO: LIBAMELAS_EXPORT AmelasError getMountLog(const std::string& start, const std::string& end);
 
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
+    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const unsigned& port);
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
 
     // TODO: LIBAMELAS_EXPORT AmelasError getMountStatus();

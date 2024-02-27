@@ -320,13 +320,37 @@ AmelasError AmelasController::getSpeed(AltAzVel &vel, const std::string plcSymbo
 
 // TODO: AmelasError AmelasController::getMountLog(const std::string &start, const std::string &end)
 // TODO: AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port, const unsigned &timeout)
+
+AmelasError AmelasController::doSyncTimeNTP(const unsigned &port = 123)
+{
+    // Auxiliar result.
+    AmelasError error = AmelasError::SUCCESS;
+
+    const std::string command = "DO_SYNC_NTP";
+
+    const std::string symbolEnable = "Object1.ClientPara.bEnable";
+    const std::string symbolHost = "Object1.ClientPara.sServerName";
+    const std::string symbolPort = "Object1.ClientPara.nServerPort";
+
+    // Do things in the hardware (PLC).
+    _plc->write(symbolEnable, 1);
+    _plc->write(symbolPort, port);
+
+    // Log.
+    std::ostringstream oss;
+    oss << "Server port: " << port << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
 // TODO: AmelasError AmelasController::doSyncTimeManual(const std::string &datetime)
 // TODO: AmelasError AmelasController::getMountStatus()
 // TODO: AmelasError AmelasController::getDeviceInfo()
 
 AmelasError AmelasController::enableTrackingAdjusts(const bool &enabled)
 {
-    const std::string symbol = "MAIN.commander.enableTrackingAdjuts";
+    const std::string symbol = "MAIN.timeManager._bEnableTrackingAdjuts";
     const std::string command = "EN_TRACK_ADJ";
     return setEnable(enabled, symbol, command);
 }
@@ -780,7 +804,7 @@ AmelasError AmelasController::getTrackPosOffset(AltAzAdj &pos)
 
 AmelasError AmelasController::setTrackTimeBias(const double &time)
 {
-    const std::string symbol = "MAIN.commander.TrackTimeBias";
+    const std::string symbol = "MAIN.timeManager._rTrackTimeBias";
     const std::string command = "SET_TRACK_TIME_BIAS";
 
     // Auxiliar result.
@@ -804,7 +828,7 @@ AmelasError AmelasController::getTrackTimeBias(double &time)
     // Auxiliar result.
     AmelasError error = AmelasError::SUCCESS;
 
-    const std::string symbol = "MAIN.commander.TrackTimeBias";
+    const std::string symbol = "MAIN.timeManager._rTrackTimeBias";
     const std::string command = "GET_TRACK_TIME_BIAS";
 
     time = _plc->read<double>(symbol);

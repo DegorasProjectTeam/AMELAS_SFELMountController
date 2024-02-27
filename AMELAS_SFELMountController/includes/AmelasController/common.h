@@ -331,6 +331,8 @@ using DoResetStateCallback = std::function<AmelasError()>;
 
 using GetPLCRegisterCallback = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
 
+using DoSyncTimeNTPCallback = std::function<AmelasError(const unsigned&)>;
+
 using EnableTrackingAdjustsCallback = std::function<AmelasError(const bool&)>;
 using EnableMountPowerCallback = std::function<AmelasError(const bool&)>;
 
