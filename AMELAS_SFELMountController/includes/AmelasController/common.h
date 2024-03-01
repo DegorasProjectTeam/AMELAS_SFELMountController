@@ -393,6 +393,8 @@ using SetCalibrationMotionCallback = std::function<AmelasError()>;
 using DoConnectPLC = std::function<AmelasError()>;
 using DoDisconnectPLC = std::function<AmelasError()>;
 
+using DoPruebaBucles = std::function<AmelasError()>;
+
 // =====================================================================================================================
 
 }} // END NAMESPACES.

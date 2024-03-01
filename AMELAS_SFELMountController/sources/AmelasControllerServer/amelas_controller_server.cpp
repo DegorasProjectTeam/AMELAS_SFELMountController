@@ -221,6 +221,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // REQ_DO_SYNC_NTP.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_NTP,
                                   &AmelasControllerServer::processSetNTPserver<controller::DoSyncTimeNTPCallback>);
+
+    // REQ_DO_PRUEBA_BUCLES.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
+                                  &AmelasControllerServer::processEmptyArguments<controller::DoPruebaBucles>);
 }
 
 AmelasControllerServer::~AmelasControllerServer() {}

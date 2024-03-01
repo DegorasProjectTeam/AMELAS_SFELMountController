@@ -1000,6 +1000,10 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_SET_CALIBRATION_MOTION command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES))
+        {
+            std::cout << "Sending REQ_DO_PRUEBA_BUCLES command." << std::endl;
+        }
         else
         {
             valid = false;
@@ -1356,6 +1360,19 @@ int main(int, char**)
         std::cout<<"- REQ_ALIVE:            2"<<std::endl;
         std::cout<<"- REQ_GET_SERVER_TIME:  3"<<std::endl;
         std::cout<<"- CUSTOM:         cmd param1 param2 ..."<<std::endl;
+        std::cout<<""<<std::endl;
+        std::cout<<"- REQ_DO_CONNECT_PLC:       88"<<std::endl;
+        std::cout<<"- REQ_DO_DISCONNECT_PLC:    89"<<std::endl;
+        std::cout<<"- REQ_GET_MOTION_MODE:      70"<<std::endl;
+        std::cout<<"- REQ_GET_MOTION_STATE:     71"<<std::endl;
+        std::cout<<"- REQ_EN_MOUNT_POWER:       42 bool (0/1)"<<std::endl;
+        std::cout<<"- REQ_SET_ABS_ALTAZ_MOTION: 79 pos.az pos.el vel.az vel.el"<<std::endl;
+        std::cout<<"- REQ_SET_REL_ALTAZ_MOTION: 80 pos.az pos.el vel.az vel.el"<<std::endl;
+        std::cout<<"- REQ_SET_CON_ALTAZ_MOTION: 81 vel.az vel.el"<<std::endl;
+        std::cout<<"- REQ_DO_START_MOTION:      72"<<std::endl;
+        std::cout<<"- REQ_DO_PAUSE_MOTION:      73"<<std::endl;
+        std::cout<<"- REQ_DO_STOP_MOTION:       74"<<std::endl;
+        std::cout<<""<<std::endl;
         std::cout<<"-- Other --"<<std::endl;
         std::cout<<"- Client exit:             exit"<<std::endl;
         std::cout<<"- Enable auto-alive:       auto_alive_en"<<std::endl;

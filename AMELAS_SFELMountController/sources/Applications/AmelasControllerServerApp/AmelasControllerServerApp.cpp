@@ -349,6 +349,10 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::doDisconnectPLC);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
+                                            &amelas_controller,
+                                            &AmelasController::pruebaBucles);
+
     // ---------------------------------------
 
     // Start the server.

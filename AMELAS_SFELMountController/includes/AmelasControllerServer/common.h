@@ -98,6 +98,7 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_SET_STAR_MOTION          = 87,
     REQ_DO_CONNECT_PLC           = 88,
     REQ_DO_DISCONNECT_PLC        = 89,
+    REQ_DO_PRUEBA_BUCLES         = 100,
     END_IMPL_COMMANDS            = 90,
     END_AMELAS_COMMANDS          = 91
 };
