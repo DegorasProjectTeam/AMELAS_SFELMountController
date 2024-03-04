@@ -147,12 +147,21 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             valid = valid_params;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_AVOID_SUN)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_SIMULATION_MODE))
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_SIMULATION_MODE))
         {
-            std::cout << "Sending REQ_ENABLE_X command." << std::endl;
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_AVOID_SUN))
+                std::cout << "Sending REQ_EN_AVOID_SUN command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ))
+                std::cout << "Sending REQ_EN_TRACK_ADJ command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER))
+                std::cout << "Sending REQ_EN_MOUNT_POWER command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL))
+                std::cout << "Sending REQ_EN_MOUNT_MODEL command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_SIMULATION_MODE))
+                std::cout << "Sending REQ_EN_SIMULATION_MODE command." << std::endl;
 
             bool valid_params = true;
             bool enable = false;
@@ -391,9 +400,12 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             valid = valid_params;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_MANUAL)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SIMULATION_TIME))
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SIMULATION_TIME))
         {
-            std::cout << "Sending REQ_DO_SYNC_MANUAL or REQ_SET_SIMULATION_TIME command." << std::endl;
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_MANUAL))
+                std::cout << "Sending REQ_DO_SYNC_MANUAL command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SIMULATION_TIME))
+                std::cout << "Sending REQ_SET_SIMULATION_TIME command." << std::endl;
 
             bool valid_params = true;
             std::string datetime = "";
@@ -442,14 +454,27 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_GET_MOUNT_INFO command." << std::endl;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
         {
-            std::cout << "Sending REQ_SET_X command." << std::endl;
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION))
+                std::cout << "Sending REQ_SET_HOME_POSITION command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS))
+                std::cout << "Sending REQ_SET_IDLE_POS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS))
+                std::cout << "Sending REQ_SET_PARK_POS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS))
+                std::cout << "Sending REQ_SET_CALIBRATION_POS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS))
+                std::cout << "Sending REQ_SET_HOMING_OFFSETS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED))
+                std::cout << "Sending REQ_SET_SLEW_SPEED command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
+                std::cout << "Sending REQ_SET_TRACK_POS_OFFSET command." << std::endl;
 
             bool valid_params = true;
             double az = 0., el = 0.;
@@ -539,9 +564,12 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_SET_CALIBRATION_POS_HERE command." << std::endl;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_WAIT_ALT)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS))
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS))
         {
-            std::cout << "Sending REQ_SET_WAIT_ALT or REQ_SET_TRACK_TIME_BIAS command." << std::endl;
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_WAIT_ALT))
+                std::cout << "Sending REQ_SET_WAIT_ALT command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS))
+                std::cout << "Sending REQ_SET_TRACK_TIME_BIAS command." << std::endl;
 
             bool valid_params = true;
             double alt = 0.;
@@ -833,9 +861,12 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_GET_TRACK_TIME_BIAS command." << std::endl;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION)
-        || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION))
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION))
         {
-            std::cout << "Sending set pos-vel command." << std::endl;
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION))
+                std::cout << "Sending REQ_SET_ABS_ALTAZ_MOTION command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION))
+                std::cout << "Sending REQ_SET_REL_ALTAZ_MOTION command." << std::endl;
 
             bool valid_params = true;
             double az = 0., el = 0.;
@@ -1004,6 +1035,64 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_DO_PRUEBA_BUCLES command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_PRUEBA))
+        {
+            std::cout << "Sending REQ_GET_PLC_PRUEBA command." << std::endl;
+
+            bool valid_params = true;
+            std::string name, type;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                name = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter name issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    type = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter type issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << name << " " << type << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(name, type);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, type);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
         else
         {
             valid = false;
@@ -1099,9 +1188,31 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         // Deserialize the parameters.
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, az, el);
 
-                        // Generate the struct.
-                        std::cout << "Az: " << az << std::endl;
-                        std::cout << "El: " << el << std::endl;
+                        std::cout << "" << std::endl;
+
+                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION))
+                            std::cout << "Home position:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
+                            std::cout << "Idle position:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS))
+                            std::cout << "Parking position:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_CALIBRATION_POS))
+                            std::cout << "Calibration position:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET))
+                            std::cout << "Tracking position offsets:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOMING_OFFSETS))
+                            std::cout << "Homing offsets:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED))
+                            std::cout << "Slew speed:" << std::endl;
+
+                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED)) {
+                            std::cout << "  Az: " << az << " \370/s" << std::endl;
+                            std::cout << "  El: " << el << " \370/s" << std::endl;
+                        }
+                        else {
+                            std::cout << "  Az: " << az << " \370" << std::endl;
+                            std::cout << "  El: " << el << " \370" << std::endl;
+                        }
                     }
                     catch(...)
                     {
@@ -1148,10 +1259,11 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         // Deserialize the parameters.
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, press, temp, hr);
 
-                        // Generate the struct.
-                        std::cout << "Press: " << press << std::endl;
-                        std::cout << "Temp: " << temp << std::endl;
-                        std::cout << "Hr: " << hr << std::endl;
+                        std::cout << "" << std::endl;
+                        std::cout << "Meteo data: " << std::endl;
+                        std::cout << "  Press: " << press << " mbar" << std::endl;
+                        std::cout << "  Temp:  "  << temp << " \370C" << std::endl;
+                        std::cout << "  Hr:    "    << hr << " %" << std::endl;
                     }
                     catch(...)
                     {
@@ -1176,13 +1288,16 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         // Deserialize the parameters.
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, lat, lon, alt, x, y, z);
 
-                        // Generate the struct.
-                        std::cout << "Lat: " << lat << std::endl;
-                        std::cout << "Lon: " << lon << std::endl;
-                        std::cout << "Alt: " << alt << std::endl;
-                        std::cout << "X: " << x << std::endl;
-                        std::cout << "Y: " << y << std::endl;
-                        std::cout << "Z: " << z << std::endl;
+                        std::cout << "" << std::endl;
+                        std::cout << "Station location: " << std::endl;
+                        std::cout << "  Geodetic coordinates: " << std::endl;
+                        std::cout << "    Lat: " << lat << std::endl;
+                        std::cout << "    Lon: " << lon << std::endl;
+                        std::cout << "    Alt: " << alt << std::endl;
+                        std::cout << "  Geocentric coordinates: " << std::endl;
+                        std::cout << "    x:   " << x << std::endl;
+                        std::cout << "    y:   " << y << std::endl;
+                        std::cout << "    z:   " << z << std::endl;
                     }
                     catch(...)
                     {
@@ -1204,6 +1319,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                         // Generate the struct.
                         std::string motion_str = MotionModeStr[static_cast<size_t>(mode)];
+                        std::cout << "" << std::endl;
                         std::cout << "Motion mode: " << motion_str << std::endl;
                     }
                     catch(...)
@@ -1228,6 +1344,8 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                         // Generate the struct.
                         std::string motion_str = MotionStateStr[static_cast<size_t>(state)];
+                        
+                        std::cout << "" << std::endl;
 
                         if (state == AmelasMotionState::STOPPED
                             || state == AmelasMotionState::IDLE
@@ -1235,8 +1353,9 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                             || state == AmelasMotionState::CALIBRATION)
                         {
                             std::cout << "Motion state: " << motion_str << std::endl;
-                            std::cout << "Az: "           << az         << std::endl;
-                            std::cout << "El: "           << el         << std::endl;
+                            std::cout << "  Position: "   << std::endl;
+                            std::cout << "    Az: "       << az         << std::endl;
+                            std::cout << "    El: "       << el         << std::endl;
                         }
                         else
                             std::cout << "Motion state: " << motion_str << std::endl;
@@ -1353,32 +1472,22 @@ int main(int, char**)
     while(!console_cfg.closeStatus())
     {
         // Get the command and parameters.
+        std::cout<<""<<std::endl;
         std::cout<<"------------------------------------------------------"<<std::endl;
         std::cout<<"-- Commands --"<<std::endl;
-        std::cout<<"- REQ_CONNECT:          0"<<std::endl;
-        std::cout<<"- REQ_DISCONNECT:       1"<<std::endl;
-        std::cout<<"- REQ_ALIVE:            2"<<std::endl;
-        std::cout<<"- REQ_GET_SERVER_TIME:  3"<<std::endl;
-        std::cout<<"- CUSTOM:         cmd param1 param2 ..."<<std::endl;
-        std::cout<<""<<std::endl;
-        std::cout<<"- REQ_DO_CONNECT_PLC:       88"<<std::endl;
-        std::cout<<"- REQ_DO_DISCONNECT_PLC:    89"<<std::endl;
-        std::cout<<"- REQ_GET_MOTION_MODE:      70"<<std::endl;
-        std::cout<<"- REQ_GET_MOTION_STATE:     71"<<std::endl;
-        std::cout<<"- REQ_EN_MOUNT_POWER:       42 bool (0/1)"<<std::endl;
-        std::cout<<"- REQ_SET_ABS_ALTAZ_MOTION: 79 pos.az pos.el vel.az vel.el"<<std::endl;
-        std::cout<<"- REQ_SET_REL_ALTAZ_MOTION: 80 pos.az pos.el vel.az vel.el"<<std::endl;
-        std::cout<<"- REQ_SET_CON_ALTAZ_MOTION: 81 vel.az vel.el"<<std::endl;
-        std::cout<<"- REQ_DO_START_MOTION:      72"<<std::endl;
-        std::cout<<"- REQ_DO_PAUSE_MOTION:      73"<<std::endl;
-        std::cout<<"- REQ_DO_STOP_MOTION:       74"<<std::endl;
+        std::cout<<"- REQ_CONNECT:                   0"<<std::endl;
+        std::cout<<"- REQ_DISCONNECT:                1"<<std::endl;
+        std::cout<<"- REQ_ALIVE:                     2"<<std::endl;
+        std::cout<<"- REQ_GET_SERVER_TIME:           3"<<std::endl;
+        std::cout<<"- CUSTOM:                        cmd param1 param2 ..."<<std::endl;
         std::cout<<""<<std::endl;
         std::cout<<"-- Other --"<<std::endl;
-        std::cout<<"- Client exit:             exit"<<std::endl;
-        std::cout<<"- Enable auto-alive:       auto_alive_en"<<std::endl;
-        std::cout<<"- Disable auto-alive:      auto_alive_ds"<<std::endl;
-        std::cout<<"- Enable auto-alive clbk:  auto_alive_clbk_en"<<std::endl;
-        std::cout<<"- Disable auto-alive clbk: auto_alive_clbk_ds"<<std::endl;
+        std::cout<<"- Client exit:                   exit"<<std::endl;
+        std::cout<<"- Enable auto-alive:             auto_alive_en"<<std::endl;
+        std::cout<<"- Disable auto-alive:            auto_alive_ds"<<std::endl;
+        std::cout<<"- Enable auto-alive clbk:        auto_alive_clbk_en"<<std::endl;
+        std::cout<<"- Disable auto-alive clbk:       auto_alive_clbk_ds"<<std::endl;
+        std::cout<<"- Shows all the custom commands: commands"<<std::endl;
         std::cout<<"------------------------------------------------------"<<std::endl;
         std::cout<<"Write a command: ";
         std::getline(std::cin, command);
@@ -1413,6 +1522,85 @@ int main(int, char**)
         {
             std::cout << "Disabling auto-alive clbk..." << std::endl;
             client.setAliveCallbacksEnabled(false);
+            continue;
+        }
+        else if(command == "commands")
+        {
+            std::cout << "Showing all custom commands:" << std::endl;
+            std::cout << "" << std::endl;
+            std::cout << "\t- REQ_DO_CONNECT_PLC:           88" << std::endl;
+            std::cout << "\t- REQ_DO_DISCONNECT_PLC:        89" << std::endl;
+            std::cout << "" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "    SAFETY RELATED FUNCTIONS" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "\t- REQ_DO_RESET_STATE:           33" << std::endl;
+            std::cout << "\t- REQ_EN_AVOID_SUN:             34 (TODO)" << std::endl;
+            std::cout << "" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "    LOW LEVEL PLC REGISTERS RELATED FUNCTIONS" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "\t- REQ_GET_PLC_REGISTERS:        35 (TODO)" << std::endl;
+            std::cout << "" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "    STATUS & CONFIGURATION RELATED FUNCTIONS" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "\t- REQ_GET_MOUNT_LOG:            36 (TODO)" << std::endl;
+            std::cout << "\t- REQ_DO_SYNC_NTP:              37 (TODO)" << std::endl;
+            std::cout << "\t- REQ_DO_SYNC_MANUAL:           38 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_STATUS:         39 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_INFO:           40 (TODO)" << std::endl;
+            std::cout << "\t- REQ_EN_TRACK_ADJ:             41 bool" << std::endl;
+            std::cout << "\t- REQ_EN_MOUNT_POWER:           42 bool" << std::endl;
+            std::cout << "\t- REQ_SET_SLEW_SPEED:           43 double double" << std::endl;
+            std::cout << "\t- REQ_GET_SLEW_SPEED:           44" << std::endl;
+            std::cout << "\t- REQ_SET_HOME_POSITION:        45 double double" << std::endl;
+            std::cout << "\t- REQ_GET_HOME_POSITION:        46" << std::endl;
+            std::cout << "\t- REQ_SET_IDLE_POS:             47 double double" << std::endl;
+            std::cout << "\t- REQ_GET_IDLE_POS:             48" << std::endl;
+            std::cout << "\t- REQ_SET_PARK_POS:             49 double double" << std::endl;
+            std::cout << "\t- REQ_GET_PARK_POS:             50" << std::endl;
+            std::cout << "\t- REQ_SET_CALIBRATION_POS:      51 double double" << std::endl;
+            std::cout << "\t- REQ_GET_CALIBRATION_POS:      52" << std::endl;
+            std::cout << "\t- REQ_SET_IDLE_POS_HERE:        53" << std::endl;
+            std::cout << "\t- REQ_SET_PARK_POS_HERE:        54" << std::endl;
+            std::cout << "\t- REQ_SET_CALIBRATION_POS_HERE: 55" << std::endl;
+            std::cout << "\t- REQ_SET_WAIT_ALT:             56 double" << std::endl;
+            std::cout << "\t- REQ_GET_WAIT_ALT:             57" << std::endl;
+            std::cout << "\t- REQ_SET_HOMING_OFFSETS:       58 double double" << std::endl;
+            std::cout << "\t- REQ_GET_HOMING_OFFSETS:       59" << std::endl;
+            std::cout << "\t- REQ_EN_MOUNT_MODEL:           60 bool" << std::endl;
+            std::cout << "\t- REQ_SET_MOUNT_MODEL_COEFS:    61 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_MODEL_COEFS:    62 (TODO)" << std::endl;
+            std::cout << "\t- REQ_SET_LOCATION:             63 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_LOCATION:             64" << std::endl;
+            std::cout << "\t- REQ_SET_METEO_DATA:           65 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_METEO_DATA:           66" << std::endl;
+            std::cout << "\t- REQ_EN_SIMULATION_MODE:       67 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_SIMULATION_STATE:     68 (TODO)" << std::endl;
+            std::cout << "\t- REQ_SET_SIMULATION_TIME:      69 (TODO)" << std::endl;
+            std::cout << "" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "    MOTION RELATED FUNCTIONS" << std::endl;
+            std::cout << "    " << std::string(70, '-') << '\n';
+            std::cout << "\t- REQ_GET_MOTION_MODE:          70" << std::endl;
+            std::cout << "\t- REQ_GET_MOTION_STATE:         71" << std::endl;
+            std::cout << "\t- REQ_DO_START_MOTION:          72" << std::endl;
+            std::cout << "\t- REQ_DO_PAUSE_MOTION:          73" << std::endl;
+            std::cout << "\t- REQ_DO_STOP_MOTION:           74" << std::endl;
+            std::cout << "\t- REQ_SET_TRACK_POS_OFFSET:     75 double double" << std::endl;
+            std::cout << "\t- REQ_GET_TRACK_POS_OFFSET:     76" << std::endl;
+            std::cout << "\t- REQ_SET_TRACK_TIME_BIAS:      77 double" << std::endl;
+            std::cout << "\t- REQ_GET_TRACK_TIME_BIAS:      78" << std::endl;
+            std::cout << "\t- REQ_SET_ABS_ALTAZ_MOTION:     79 double double double double" << std::endl;
+            std::cout << "\t- REQ_SET_REL_ALTAZ_MOTION:     80 double double double double" << std::endl;
+            std::cout << "\t- REQ_SET_CON_ALTAZ_MOTION:     81 double double" << std::endl;
+            std::cout << "\t- REQ_SET_HOMING_MOTION:        82 (TODO)" << std::endl;
+            std::cout << "\t- REQ_SET_IDLE_MOTION:          83" << std::endl;
+            std::cout << "\t- REQ_SET_PARK_MOTION:          84" << std::endl;
+            std::cout << "\t- REQ_SET_CALIBRATION_MOTION:   85" << std::endl;
+            std::cout << "\t- REQ_SET_CPF_MOTION:           86 (TODO)" << std::endl;
+            std::cout << "\t- REQ_SET_STAR_MOTION:          87 (TODO)" << std::endl;
             continue;
         }
 

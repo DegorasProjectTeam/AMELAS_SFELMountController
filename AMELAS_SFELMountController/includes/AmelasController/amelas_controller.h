@@ -89,6 +89,7 @@ public:
 
     LIBAMELAS_EXPORT PLCRegisterValue getPLCregisterValue(const std::string symbol, const std::string type);
     LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& registerValue);
+    LIBAMELAS_EXPORT AmelasError getPLCprueba(const std::string& symbol, const std::string& type);
     //=====================================================================================================================
 
 

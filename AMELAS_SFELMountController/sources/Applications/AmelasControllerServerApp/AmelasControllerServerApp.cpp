@@ -353,6 +353,10 @@ int main(int, char**)
                                             &amelas_controller,
                                             &AmelasController::pruebaBucles);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_PRUEBA,
+                                             &amelas_controller,
+                                             &AmelasController::getPLCprueba);
+
     // ---------------------------------------
 
     // Start the server.

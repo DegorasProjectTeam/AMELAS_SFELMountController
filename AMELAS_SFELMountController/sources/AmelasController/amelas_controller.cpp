@@ -159,6 +159,30 @@ AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegis
     return error;
 }
 
+
+AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std::string &type)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "GET_PLC_REGISTER";
+
+    // Variable used for this function
+    double value;
+
+    // Functionality
+    if (type == "double")
+        value = _plc->read<double>(symbol);
+
+    // Log
+    std::ostringstream oss;
+    oss << "Symbol: " << symbol << " <" << type << "> = " << value << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
 //=====================================================================================================================
 
 

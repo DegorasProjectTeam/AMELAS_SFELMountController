@@ -142,6 +142,9 @@ private:
     template <typename ClbkT>
     void processGetPLCRegister(const CommandRequest &request, CommandReply &reply);
 
+    template <typename ClbkT>
+    void processGetPLCprueba(const CommandRequest &request, CommandReply &reply);
+
     // Subclass register process function helper.
     void registerRequestProcFunc(AmelasServerCommand command, AmelasRequestProcFunc func);
 

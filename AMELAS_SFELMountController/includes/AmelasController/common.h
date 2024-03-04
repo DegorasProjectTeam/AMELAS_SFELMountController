@@ -394,6 +394,7 @@ using DoConnectPLC = std::function<AmelasError()>;
 using DoDisconnectPLC = std::function<AmelasError()>;
 
 using DoPruebaBucles = std::function<AmelasError()>;
+using GetPLCpruebaCallback = std::function<AmelasError(const std::string&, const std::string&)>;
 
 // =====================================================================================================================
 

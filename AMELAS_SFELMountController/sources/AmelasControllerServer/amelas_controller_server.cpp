@@ -225,6 +225,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // REQ_DO_PRUEBA_BUCLES.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
                                   &AmelasControllerServer::processEmptyArguments<controller::DoPruebaBucles>);
+
+    // REQ_GET_PLC_PRUEBA.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_PLC_PRUEBA,
+                                  &AmelasControllerServer::processGetPLCprueba<controller::GetPLCpruebaCallback>);
 }
 
 AmelasControllerServer::~AmelasControllerServer() {}
