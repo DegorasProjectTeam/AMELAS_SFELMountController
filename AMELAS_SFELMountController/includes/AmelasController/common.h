@@ -75,10 +75,14 @@ enum class AmelasError : std::int32_t
     CPF_NO_PASSES      = 10,
     STAR_NOT_VISIBLE   = 11,
     STAR_UNSAFE        = 12,
-    STAR_INVALID       = 13
+    STAR_INVALID       = 13,
+    ENABLE_WARN        = 14,
+    START_WARN         = 15,
+    STOP_WARN          = 16
+
 };
 
-static constexpr std::array<const char*, 14> ControllerErrorStr
+static constexpr std::array<const char*, 17> ControllerErrorStr
 {
     "SUCCESS - Controller process success.",
     "MOUNT_UNSAFE_STATE - The mount is in an unsafe state, so the operation cannot be done.",
@@ -94,6 +98,9 @@ static constexpr std::array<const char*, 14> ControllerErrorStr
     "STAR_NOT_VISIBLE - The provided star is not currently visible in your local sky.",
     "STAR_UNSAFE - The position of the provided star is unsafe (for example 90 deg altitude or Sun colision).",
     "STAR_INVALID - The provided star parameters are invalid (for example due to an unsoported standard equinox).",
+    "It is already at the desired value.",
+    "There is no move loaded, so the operation cannot be carried out.",
+    "The mount is already stopped, so the operation cannot be carried out."
 };
 
 enum class AmelasMotionMode : std::int32_t
@@ -363,10 +370,12 @@ using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
 
 using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
 
-using SetLocationCallback = std::function<AmelasError(const StationLocation&)>;
+using SetLocationCallback = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>;
+//using SetLocationCallback = std::function<AmelasError(const StationLocation&)>;
 using GetLocationCallback = std::function<AmelasError(StationLocation&)>;
 
-using SetMeteoDataCallback = std::function<AmelasError(const MeteoData&)>;
+using SetMeteoDataCallback = std::function<AmelasError(const double&, const double&, const double&)>;
+//using SetMeteoDataCallback = std::function<AmelasError(const MeteoData&)>;
 using GetMeteoDataCallback = std::function<AmelasError(MeteoData&)>;
 
 using GetMotionModeCallback = std::function<AmelasError(AmelasMotionMode&)>;

@@ -199,7 +199,7 @@ void AmelasController::setLog(const std::string command, const std::string speci
     std::ostringstream oss_1;
     if (error == AmelasError::SUCCESS)
         oss_1 << std::string(93, '-') << '\n';
-    else if (error == AmelasError::UNSAFE_POSITION || error == AmelasError::UNSAFE_SPEED)
+    else if (error == AmelasError::MOUNT_UNSAFE_STATE || error == AmelasError::UNSAFE_POSITION || error == AmelasError::UNSAFE_SPEED || error == AmelasError::STAR_UNSAFE || error == AmelasError::ENABLE_WARN || error == AmelasError::START_WARN || error == AmelasError::STOP_WARN)
         oss_1 << std::string(90, '-') << '\n';
     else
         oss_1 << std::string(92, '-') << '\n';
@@ -210,17 +210,113 @@ void AmelasController::setLog(const std::string command, const std::string speci
         << "<AMELAS CONTROLLER>" << '\n'
         << "-> " << command << '\n'
         << "Time: " << zmqutils::utils::currentISO8601Date() << '\n'
-        << specific
-        << "Error: " << static_cast<int>(error) << " (" << ControllerErrorStr[static_cast<size_t>(error)] << ")" << '\n'
-        << std::string(100, '-') << '\n';
+        << specific;
+
+    std::ostringstream oss_2;
+    oss_2 << "Error: " << static_cast<int>(error) << " (" << ControllerErrorStr[static_cast<size_t>(error)] << ")" << '\n'
+          << std::string(100, '-') << '\n';
 
     // Log output
     if (error == AmelasError::SUCCESS)
-        _logger->info(oss.str());
+        _logger->info(oss.str() + oss_2.str());
     else if (error == AmelasError::MOUNT_UNSAFE_STATE || error == AmelasError::UNSAFE_POSITION || error == AmelasError::UNSAFE_SPEED || error == AmelasError::STAR_UNSAFE)
-        _logger->warn(oss.str());
+        _logger->warn(oss.str() + oss_2.str());
+    else if (error == AmelasError::ENABLE_WARN || error == AmelasError::START_WARN || error == AmelasError::STOP_WARN)
+        _logger->warn(oss.str() + std::string(100, '-') + '\n');
     else
-        _logger->error(oss.str());
+        _logger->error(oss.str() + oss_2.str());
+}
+
+AmelasMotionMode AmelasController::motionModes()
+{
+    // Symbol used for PLC
+    const std::string symbol = "MAIN.commander._motionMode";
+
+    // Variables used for this function
+    AmelasMotionMode motion_mode;
+
+    // Functionality
+    if (_plc->read<double>(symbol) == 0.0)
+        motion_mode = AmelasMotionMode::NO_MOTION;
+    else if (_plc->read<double>(symbol) == 1.0)
+        motion_mode = AmelasMotionMode::ABSOLUTE_MOTION;
+    else if (_plc->read<double>(symbol) == 2.0)
+        motion_mode = AmelasMotionMode::RELATIVE_MOTION;
+    else if (_plc->read<double>(symbol) == 3.0)
+        motion_mode = AmelasMotionMode::CONTINUOUS;
+    else if (_plc->read<double>(symbol) == 4.0)
+        motion_mode = AmelasMotionMode::HOMING_OP;
+    else if (_plc->read<double>(symbol) == 5.0)
+        motion_mode = AmelasMotionMode::TO_IDLE;
+    else if (_plc->read<double>(symbol) == 6.0)
+        motion_mode = AmelasMotionMode::TO_PARK;
+    else if (_plc->read<double>(symbol) == 7.0)
+        motion_mode = AmelasMotionMode::TO_CALIBRATION;
+    else if (_plc->read<double>(symbol) == 8.0)
+        motion_mode = AmelasMotionMode::CPF;
+    else if (_plc->read<double>(symbol) == 9.0)
+        motion_mode = AmelasMotionMode::STAR;
+    // TODO
+    // else if (_plc->read<double>(symbol) == X.0)
+    //     motion_mode = AmelasMotionMode::TLE;
+    else
+        motion_mode = AmelasMotionMode::UNKNOWN;
+
+    return motion_mode;
+}
+
+AmelasMotionState AmelasController::motionStates()
+{
+    // Symbols used for PLC
+    const std::string sState     = "MAIN.axesController._motionState";
+    const std::string sActPosAz  = "MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos";
+    const std::string sActPosEl  = "MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos";
+
+    // Variables used for this function
+    AmelasMotionState motion_state;
+
+    // Functionality
+    if (_plc->read<double>(sState) == 4.0      // Homing
+        || _plc->read<double>(sState) == 6.0   // MovingAbsolute
+        || _plc->read<double>(sState) == 7.0   // MovingRelative
+        || _plc->read<double>(sState) == 13.0) // MovingVelocity
+        motion_state = AmelasMotionState::MOVING;
+    else if (_plc->read<double>(sState) == 8.0) // Halting
+        motion_state = AmelasMotionState::PAUSED;
+    else if (motionModes() == AmelasMotionMode::ABSOLUTE_MOTION   // LoadMoveAbsolute
+            || motionModes() == AmelasMotionMode::RELATIVE_MOTION // LoadMoveRelative
+            || motionModes() == AmelasMotionMode::CONTINUOUS      // LoadMoveVelocity
+            || motionModes() == AmelasMotionMode::HOMING_OP       // LoadMoveToHome
+            || motionModes() == AmelasMotionMode::TO_IDLE         // LoadMoveToIdle
+            || motionModes() == AmelasMotionMode::TO_PARK         // LoadMoveToPark
+            || motionModes() == AmelasMotionMode::TO_CALIBRATION  // LoadMoveToCalibration
+            || motionModes() == AmelasMotionMode::CPF             // LoadMoveCPFMotion
+            || motionModes() == AmelasMotionMode::STAR)           // LoadMoveStarMotion
+        motion_state = AmelasMotionState::WAITING_START;
+    else if (_plc->read<double>(sState) == 3.0 // Standstill
+            && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.IdlePosition.Azimuth")
+            && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.IdlePosition.Elevation"))
+        motion_state = AmelasMotionState::IDLE;
+    else if (_plc->read<double>(sState) == 3.0 // Standstill
+            && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.ParkPosition.Azimuth")
+            && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.ParkPosition.Elevation"))
+        motion_state = AmelasMotionState::PARK;
+    else if (_plc->read<double>(sState) == 3.0 // Standstill
+            && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.CalibrationPosition.Azimuth")
+            && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.CalibrationPosition.Elevation"))
+        motion_state = AmelasMotionState::CALIBRATION;
+    else if (_plc->read<double>(sState) == 3.0) // Standstill
+        motion_state = AmelasMotionState::STOPPED;
+    else if (_plc->read<double>(sState) == 10.0) // Error
+        motion_state = AmelasMotionState::INVALID_ERROR;
+    else if (_plc->read<double>(sState) == 0.0) // Disabled
+        motion_state = AmelasMotionState::DISABLED;
+    else if (_plc->read<double>(sState) == 11.0) // Reset
+        motion_state = AmelasMotionState::RESET;
+    else
+        motion_state = AmelasMotionState::UNKNOWN;
+
+    return motion_state;
 }
 
 AmelasError AmelasController::setEnable(const bool &enabled, const std::string plcSymbol, const std::string command)
@@ -242,6 +338,8 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
             result = plcSymbol.substr(pos + prefix.length());
 
         oss << result << " is already set to " << enabled << "." << '\n';
+
+        error = AmelasError::ENABLE_WARN;
     }
     else
     {
@@ -286,14 +384,22 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
         }
 
         // Functionality
-        _plc->write(plcSymbol + ".Azimuth", pos.az);
-        _plc->write(plcSymbol + ".Elevation", pos.el);
+        /*_plc->write(plcSymbol + ".Azimuth", pos.az);
+        _plc->write(plcSymbol + ".Elevation", pos.el);*/
     }
+
+    if (motionStates() == AmelasMotionState::MOVING)
+    {
+        error = AmelasError::MOUNT_UNSAFE_STATE;
+    }
+
+    _plc->write(plcSymbol + ".Azimuth", pos.az);
+    _plc->write(plcSymbol + ".Elevation", pos.el);
 
     // Log
     std::ostringstream oss;
-    oss << "Az: " << pos.az << '\n'
-        << "El: " << pos.el << '\n';
+    oss << "  Az: " << pos.az << " \370" << '\n'
+        << "  El: " << pos.el << " \370" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -309,7 +415,10 @@ AmelasError AmelasController::getPosition(AltAzPos &pos, const std::string plcSy
     pos.el = _plc->read<double>(plcSymbol + ".Elevation");
 
     // Log
-    setLog(command, "", error);
+    std::ostringstream oss;
+    oss << "  Az: " << pos.az << " \370" << '\n'
+        << "  El: " << pos.el << " \370" << '\n';
+    setLog(command, oss.str(), error);
     
     return error;
 }
@@ -331,10 +440,15 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
         _plc->write(plcSymbol + ".Elevation", vel.el);
     }
 
+    if (motionStates() == AmelasMotionState::MOVING)
+    {
+        error = AmelasError::MOUNT_UNSAFE_STATE;
+    }
+
     // Log
     std::ostringstream oss;
-    oss << "Az: " << vel.az << '\n'
-        << "El: " << vel.el << '\n';
+    oss << "  Az: " << vel.az << " \370/s" << '\n'
+        << "  El: " << vel.el << " \370/s" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -350,7 +464,10 @@ AmelasError AmelasController::getSpeed(AltAzVel &vel, const std::string plcSymbo
     vel.el = _plc->read<double>(plcSymbol + ".Elevation");
 
     // Log
-    setLog(command, "", error);
+    std::ostringstream oss;
+    oss << "  Az: " << vel.az << " \370/s" << '\n'
+        << "  El: " << vel.el << " \370/s" << '\n';
+    setLog(command, oss.str(), error);
     
     return error;
 }
@@ -571,7 +688,7 @@ AmelasError AmelasController::setWaitAlt(const double &alt)
 
     // Log
     std::ostringstream oss;
-    oss << "Alt: " << alt << '\n';
+    oss << "  Alt: " << alt << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -637,7 +754,42 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
 // TODO: AmelasError AmelasController::getMountModelCoefs(MountModelCoefs &coefs)
 
 // TODO
-AmelasError AmelasController::setLocation(const StationLocation &location)
+AmelasError AmelasController::setLocation(const double &lat, const double &lon, const double &alt, const double &x, const double &y, const double &z)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "SET_LOCATION";
+
+    // Symbol used for PLC
+    const std::string symbol = "GLOBALS.Parameters.Commander.StationLocation";
+
+    // Functionality
+    _plc->write(symbol + ".wgs84.lat", lat);
+    _plc->write(symbol + ".wgs84.lon", lon);
+    _plc->write(symbol + ".wgs84.alt", alt);
+    _plc->write(symbol + ".ecef.x", x);
+    _plc->write(symbol + ".ecef.y", y);
+    _plc->write(symbol + ".ecef.z", z);
+
+    // Log
+    std::ostringstream oss;
+    oss << "  Station location: " << '\n'
+        << "    Geodetic coordinates: " << '\n'
+        << "      Lat: " << lat << '\n'
+        << "      Lon: " << lon << '\n'
+        << "      Alt: " << alt << '\n'
+        << "    Geocentric coordinates: " << '\n'
+        << "      x:   " << x << '\n'
+        << "      y:   " << y << '\n'
+        << "      z:   " << z << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+/*AmelasError AmelasController::setLocation(const StationLocation &location)
 {
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
@@ -667,7 +819,7 @@ AmelasError AmelasController::setLocation(const StationLocation &location)
     setLog(command, oss.str(), error);
 
     return error;
-}
+}*/
 
 AmelasError AmelasController::getLocation(StationLocation &location)
 {
@@ -689,13 +841,51 @@ AmelasError AmelasController::getLocation(StationLocation &location)
     location.ecef.z    = _plc->read<double>(symbol + ".ecef.z");
 
     // Log
-    setLog(command, "", error);
+    std::ostringstream oss;
+    oss << "  Station location: " << '\n'
+        << "    Geodetic coordinates: " << '\n'
+        << "      Lat: " << location.wgs84.lat << '\n'
+        << "      Lon: " << location.wgs84.lon << '\n'
+        << "      Alt: " << location.wgs84.alt << '\n'
+        << "    Geocentric coordinates: " << '\n'
+        << "      x:   " << location.ecef.x << '\n'
+        << "      y:   " << location.ecef.y << '\n'
+        << "      z:   " << location.ecef.z << '\n';
+    setLog(command, oss.str(), error);
     
     return error;
 }
 
 // TODO
-AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
+AmelasError AmelasController::setMeteoData(const double &press, const double &temp, const double &hr)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "SET_METEO_DATA";
+
+    // Symbol used for PLC
+    const std::string symbol = "GLOBALS.Parameters.Commander.MeteoData";
+
+    // Functionality
+    _plc->write(symbol + ".press", press);
+    _plc->write(symbol + ".temp", temp);
+    _plc->write(symbol + ".hr", hr);
+
+    // Log
+    std::ostringstream oss;
+    oss << "  Meteo data: "                   << '\n'
+        << "    Press: " << press << " mbar"  << '\n'
+        << "    Temp:  " << temp  << " \370C" << '\n'
+        << "    Hr:    " << hr    << " %"     << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+
+/*AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
 {
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
@@ -719,7 +909,7 @@ AmelasError AmelasController::setMeteoData(const MeteoData &meteo)
     setLog(command, oss.str(), error);
 
     return error;
-}
+}*/
 
 AmelasError AmelasController::getMeteoData(MeteoData &meteo)
 {
@@ -738,7 +928,12 @@ AmelasError AmelasController::getMeteoData(MeteoData &meteo)
     meteo.hr    = _plc->read<double>(symbol + ".hr");
 
     // Log
-    setLog(command, "", error);
+    std::ostringstream oss;
+    oss << "  Meteo data: "                   << '\n'
+        << "    Press: " << meteo.press << " mbar"  << '\n'
+        << "    Temp:  " << meteo.temp  << " \370C" << '\n'
+        << "    Hr:    " << meteo.hr    << " %"     << '\n';
+    setLog(command, oss.str(), error);
     
     return error;
 }
@@ -759,35 +954,8 @@ AmelasError AmelasController::getMotionMode(AmelasMotionMode &motion_mode)
     // Command used for log
     const std::string command = "GET_MOTION_MODE";
 
-    // Symbol used for PLC
-    const std::string symbol = "MAIN.commander._motionMode";
-
     // Functionality
-    if (_plc->read<double>(symbol) == 0.0)
-        motion_mode = AmelasMotionMode::NO_MOTION;
-    else if (_plc->read<double>(symbol) == 1.0)
-        motion_mode = AmelasMotionMode::ABSOLUTE_MOTION;
-    else if (_plc->read<double>(symbol) == 2.0)
-        motion_mode = AmelasMotionMode::RELATIVE_MOTION;
-    else if (_plc->read<double>(symbol) == 3.0)
-        motion_mode = AmelasMotionMode::CONTINUOUS;
-    else if (_plc->read<double>(symbol) == 4.0)
-        motion_mode = AmelasMotionMode::HOMING_OP;
-    else if (_plc->read<double>(symbol) == 5.0)
-        motion_mode = AmelasMotionMode::TO_IDLE;
-    else if (_plc->read<double>(symbol) == 6.0)
-        motion_mode = AmelasMotionMode::TO_PARK;
-    else if (_plc->read<double>(symbol) == 7.0)
-        motion_mode = AmelasMotionMode::TO_CALIBRATION;
-    else if (_plc->read<double>(symbol) == 8.0)
-        motion_mode = AmelasMotionMode::CPF;
-    else if (_plc->read<double>(symbol) == 9.0)
-        motion_mode = AmelasMotionMode::STAR;
-    // TODO
-    // else if (_plc->read<double>(symbol) == X.0)
-    //     motion_mode = AmelasMotionMode::TLE;
-    else
-        motion_mode = AmelasMotionMode::UNKNOWN;
+    motion_mode = motionModes();
 
     // Log
     std::string motion_str = MotionModeStr[static_cast<size_t>(motion_mode)];
@@ -806,56 +974,12 @@ AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state, Al
     // Command used for log
     const std::string command = "GET_MOTION_STATE";
 
-    // Symbols used for PLC
-    const std::string sState     = "MAIN.axesController._motionState";
-    const std::string sMode      = "MAIN.commander._motionMode";
-    const std::string sActPosAz  = "MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos";
-    const std::string sActPosEl  = "MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos";
-
     // Variables used for this function
-    pos.az = _plc->read<double>(sActPosAz);
-    pos.el = _plc->read<double>(sActPosEl);
+    pos.az = _plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos");
+    pos.el = _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos");
 
     // Functionality
-    if (_plc->read<double>(sState) == 4.0      // Homing
-        || _plc->read<double>(sState) == 6.0   // MovingAbsolute
-        || _plc->read<double>(sState) == 7.0   // MovingRelative
-        || _plc->read<double>(sState) == 13.0) // MovingVelocity
-        motion_state = AmelasMotionState::MOVING;
-    else if (_plc->read<double>(sState) == 8.0) // Halting
-        motion_state = AmelasMotionState::PAUSED;
-    else if (_plc->read<double>(sMode) == 1.0    // LoadMoveAbsolute
-            || _plc->read<double>(sMode) == 2.0  // LoadMoveRelative
-            || _plc->read<double>(sMode) == 3.0  // LoadMoveVelocity
-            || _plc->read<double>(sMode) == 4.0  // LoadMoveToHome
-            || _plc->read<double>(sMode) == 5.0  // LoadMoveToIdle
-            || _plc->read<double>(sMode) == 6.0  // LoadMoveToPark
-            || _plc->read<double>(sMode) == 7.0  // LoadMoveToCalibration
-            || _plc->read<double>(sMode) == 8.0  // LoadMoveCPFMotion
-            || _plc->read<double>(sMode) == 9.0) // LoadMoveStarMotion
-        motion_state = AmelasMotionState::WAITING_START;
-    else if (_plc->read<double>(sState) == 3.0 // Standstill
-            && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.IdlePosition.Azimuth")
-            && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.IdlePosition.Elevation"))
-        motion_state = AmelasMotionState::IDLE;
-    else if (_plc->read<double>(sState) == 3.0 // Standstill
-            && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.ParkPosition.Azimuth")
-            && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.ParkPosition.Elevation"))
-        motion_state = AmelasMotionState::PARK;
-    else if (_plc->read<double>(sState) == 3.0 // Standstill
-            && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.CalibrationPosition.Azimuth")
-            && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.CalibrationPosition.Elevation"))
-        motion_state = AmelasMotionState::CALIBRATION;
-    else if (_plc->read<double>(sState) == 3.0) // Standstill
-        motion_state = AmelasMotionState::STOPPED;
-    else if (_plc->read<double>(sState) == 10.0) // Error
-        motion_state = AmelasMotionState::INVALID_ERROR;
-    else if (_plc->read<double>(sState) == 0.0) // Disabled
-        motion_state = AmelasMotionState::DISABLED;
-    else if (_plc->read<double>(sState) == 11.0) // Reset
-        motion_state = AmelasMotionState::RESET;
-    else
-        motion_state = AmelasMotionState::UNKNOWN;
+    motion_state = motionStates();
 
     // Log
     std::ostringstream oss;
@@ -863,11 +987,12 @@ AmelasError AmelasController::getMotionState(AmelasMotionState &motion_state, Al
     if (motion_state == AmelasMotionState::STOPPED
         || motion_state == AmelasMotionState::IDLE
         || motion_state == AmelasMotionState::PARK
-        || motion_state == AmelasMotionState::CALIBRATION)
+        || motion_state == AmelasMotionState::CALIBRATION
+        || motion_state == AmelasMotionState::MOVING)
     {
         oss << "Motion state: " << MotionStateStr[static_cast<size_t>(motion_state)]   << '\n'
-            << "Az: " << std::to_string(pos.az) << '\n'
-            << "El: " << std::to_string(pos.el) << '\n';
+            << "  Az: " << std::to_string(pos.az) << " \370" << '\n'
+            << "  El: " << std::to_string(pos.el) << " \370" << '\n';
     }
     else
         oss << "Motion state: " << MotionStateStr[static_cast<size_t>(motion_state)] << '\n';
@@ -888,23 +1013,25 @@ AmelasError AmelasController::doStartMotion()
     // Symbol used for PLC
     const std::string symbol = "MAIN.commander.StartMotion";
 
-    // Check conditions
-    if (_plc->read<double>(symbol) == 4.0      // Homing
-        || _plc->read<double>(symbol) == 6.0   // MovingAbsolute
-        || _plc->read<double>(symbol) == 7.0   // MovingRelative
-        || _plc->read<double>(symbol) == 13.0) // MovingVelocity
+    // Variable used for this function
+    std::ostringstream oss;
+
+    // Functionality
+    if (motionModes() == AmelasMotionMode::NO_MOTION)
     {
-        ; // Do nothing
+        //error = AmelasError::MOUNT_UNSAFE_STATE;
+        error = AmelasError::START_WARN;
+        oss << "There is no move loaded, so the operation cannot be carried out." << '\n';
     }
     else
     {
-        // Functionality
         // CHECK: _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
+        oss << "";
     }
 
     // Log
-    setLog(command, "", error);
+    setLog(command, oss.str(), error);
 
     return error;
 }
@@ -920,12 +1047,25 @@ AmelasError AmelasController::doPauseMotion()
     // Symbol used for PLC
     const std::string symbol = "MAIN.commander.PauseMotion";
 
+    // Variable used for this function
+    std::ostringstream oss;
+
     // Functionality
-    // CHECK: _plc->executeCommand(symbol);
-    _plc->write(symbol + ".cmd", true);
+    if (motionStates() != AmelasMotionState::MOVING)
+    {
+        //error = AmelasError::MOUNT_UNSAFE_STATE;
+        error = AmelasError::STOP_WARN;
+        oss << "The mount is already stopped, so the operation cannot be carried out." << '\n';
+    }
+    else
+    {
+        // CHECK: _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
+        oss << "";
+    }
 
     // Log
-    setLog(command, "", error);
+    setLog(command, oss.str(), error);
     
     return error;
 }
@@ -941,12 +1081,25 @@ AmelasError AmelasController::doStopMotion()
     // Symbol used for PLC
     const std::string symbol = "MAIN.commander.StopMotion";
 
+    // Variable used for this function
+    std::ostringstream oss;
+
     // Functionality
-    // CHECK: _plc->executeCommand(symbol);
-    _plc->write(symbol + ".cmd", true);
+    if (motionStates() != AmelasMotionState::MOVING)
+    {
+        //error = AmelasError::MOUNT_UNSAFE_STATE;
+        error = AmelasError::STOP_WARN;
+        oss << "The mount is already stopped, so the operation cannot be carried out." << '\n';
+    }
+    else
+    {
+        // CHECK: _plc->executeCommand(symbol);
+        _plc->write(symbol + ".cmd", true);
+        oss << "";
+    }
 
     // Log
-    setLog(command, "", error);
+    setLog(command, oss.str(), error);
     
     return error;
 }
@@ -993,7 +1146,7 @@ AmelasError AmelasController::setTrackTimeBias(const double &time)
 
     // Log
     std::ostringstream oss;
-    oss << "Track time bias: " << time << '\n';
+    oss << "  Track time bias: " << time << " ms" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -1014,7 +1167,9 @@ AmelasError AmelasController::getTrackTimeBias(double &time)
     time = _plc->read<double>(symbol);
 
     // Log
-    setLog(command, "", error);
+    std::ostringstream oss;
+    oss << "  Track time bias: " << time << " ms" << '\n';
+    setLog(command, oss.str(), error);
     
     return error;
 }
@@ -1073,8 +1228,8 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
 
     // Log
     std::ostringstream oss;
-    oss << "Az (pos): " << pos.az << " - El (pos): " << pos.el << '\n'
-        << "Az (vel): " << vel.az << " - El (vel): " << vel.el << '\n';
+    oss << "  Az (pos): " << pos.az << " \370"   << " - El (pos): " << pos.el << " \370" << '\n'
+        << "  Az (vel): " << vel.az << " \370/s" << " - El (vel): " << vel.el << " \370/s" << '\n';
     setLog(command, oss.str(), error);
     
     return error;
@@ -1099,8 +1254,8 @@ AmelasError AmelasController::setContAltAzMotion(const AltAzVel &vel)
 
     // Log
     std::ostringstream oss;
-    oss << "Az (vel): " << vel.az << '\n'
-        << "El (vel): " << vel.el << '\n';
+    oss << "  Az (vel): " << vel.az << " \370/s" << '\n'
+        << "  El (vel): " << vel.el << " \370/s" << '\n';
     setLog(command, oss.str(), error);
 
     return error;

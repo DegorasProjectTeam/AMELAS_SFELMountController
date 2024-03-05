@@ -138,10 +138,12 @@ public:
     // TODO: LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs);
     // TODO: LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs);
 
-    LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location); // TODO
+    //LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location); // TODO
+    LIBAMELAS_EXPORT AmelasError setLocation(const double& lat, const double& lon, const double& alt, const double& x, const double& y, const double& z);
     LIBAMELAS_EXPORT AmelasError getLocation(StationLocation& location);
 
-    LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo); // TODO
+    //LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo); // TODO
+    LIBAMELAS_EXPORT AmelasError setMeteoData(const double& press, const double& temp, const double& hr);
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
     
     // TODO: LIBAMELAS_EXPORT AmelasError enableSimulationMode(const bool& enabled);
@@ -155,8 +157,23 @@ public:
     LIBAMELAS_EXPORT AmelasError getMotionMode(AmelasMotionMode& motion_mode);
     LIBAMELAS_EXPORT AmelasError getMotionState(AmelasMotionState& motion_state, AltAzPos &pos);
 
+    /**
+     * @brief   Starts the motion.
+     * @return  AmelasError
+     * @warning If the mount does not have any movement loaded, the function will do nothing and a warning will occur.
+     */
     LIBAMELAS_EXPORT AmelasError doStartMotion();
+    /**
+     * @brief   Pauses the motion.
+     * @return  AmelasError
+     * @warning If the mount is not moving, the function will do nothing and a warning will occur.
+     */
     LIBAMELAS_EXPORT AmelasError doPauseMotion();
+    /**
+     * @brief   Stops the motion.
+     * @return  AmelasError
+     * @warning If the mount is not moving, the function will do nothing and a warning will occur.
+     */
     LIBAMELAS_EXPORT AmelasError doStopMotion();
 
     LIBAMELAS_EXPORT AmelasError setTrackPosOffset(const AltAzAdj& pos);
@@ -187,6 +204,8 @@ private:
     AmelasError getPosition(AltAzPos& pos, const std::string plcSymbol, const std::string command);
     AmelasError setSpeed(const AltAzVel& vel, const std::string plcSymbol, const std::string command);
     AmelasError getSpeed(AltAzVel& vel, const std::string plcSymbol, const std::string command);
+    AmelasMotionMode motionModes();
+    AmelasMotionState motionStates();
     void setLog(const std::string command, const std::string specific, const AmelasError error);
 
     const AmelasControllerConfig _config;

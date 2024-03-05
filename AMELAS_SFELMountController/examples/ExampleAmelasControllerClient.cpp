@@ -621,7 +621,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_MOUNT_MODEL_COEFS command." << std::endl;
         }
-        /*else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_LOCATION))
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_LOCATION))
         {
             std::cout << "Sending set REQ_SET_LOCATION command." << std::endl;
 
@@ -719,17 +719,17 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             {
                 std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
 
-                WGS84Coords wgs84(lat, lon, alt);
+                /*WGS84Coords wgs84(lat, lon, alt);
                 ECEFCoords ecef(x, y, z);
-                StationLocation loc(wgs84, ecef);
+                StationLocation loc(wgs84, ecef);*/
 
                 BinarySerializer serializer;
 
-                serializer.write(loc);
+                serializer.write(lat, lon, alt, x, y, z);
 
                 std::cout<<serializer.toJsonString();
 
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, loc);
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
 
                 std::cout<<std::endl;
             }
@@ -743,7 +743,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             valid = valid_params;
 
-        }*/
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_LOCATION))
         {
             std::cout << "Sending REQ_GET_LOCATION command." << std::endl;
@@ -802,15 +802,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             {
                 std::cout << "Sending: " << press << " " << temp << " " << hr << std::endl;
 
-                MeteoData meteo(press, temp, hr);
+                //MeteoData meteo(press, temp, hr);
 
                 BinarySerializer serializer;
 
-                serializer.write(meteo);
+                serializer.write(press, temp, hr);
 
                 std::cout<<serializer.toJsonString();
 
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, meteo);
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, press, temp, hr);
 
                 std::cout<<std::endl;
             }
@@ -1260,10 +1260,10 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, press, temp, hr);
 
                         std::cout << "" << std::endl;
-                        std::cout << "Meteo data: " << std::endl;
-                        std::cout << "  Press: " << press << " mbar" << std::endl;
-                        std::cout << "  Temp:  "  << temp << " \370C" << std::endl;
-                        std::cout << "  Hr:    "    << hr << " %" << std::endl;
+                        std::cout << "Meteo data: "                   << std::endl;
+                        std::cout << "  Press: " << press << " mbar"  << std::endl;
+                        std::cout << "  Temp:  " << temp  << " \370C" << std::endl;
+                        std::cout << "  Hr:    " << hr    << " %"     << std::endl;
                     }
                     catch(...)
                     {
@@ -1350,12 +1350,13 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         if (state == AmelasMotionState::STOPPED
                             || state == AmelasMotionState::IDLE
                             || state == AmelasMotionState::PARK
-                            || state == AmelasMotionState::CALIBRATION)
+                            || state == AmelasMotionState::CALIBRATION
+                            || state == AmelasMotionState::MOVING)
                         {
-                            std::cout << "Motion state: " << motion_str << std::endl;
-                            std::cout << "  Position: "   << std::endl;
-                            std::cout << "    Az: "       << az         << std::endl;
-                            std::cout << "    El: "       << el         << std::endl;
+                            std::cout << "Motion state: " << motion_str    << std::endl;
+                            std::cout << "  Position: "                    << std::endl;
+                            std::cout << "    Az: "       << az << " \370" << std::endl;
+                            std::cout << "    El: "       << el << " \370" << std::endl;
                         }
                         else
                             std::cout << "Motion state: " << motion_str << std::endl;

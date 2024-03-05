@@ -96,7 +96,7 @@ void AmelasControllerServer::processSetPositionOrSpeed(const CommandRequest& req
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
 }
 
-template <typename ClbkT>
+/*template <typename ClbkT>
 void AmelasControllerServer::processSetLocation(const CommandRequest& request, CommandReply& reply)
 {
     // Auxiliar variables and containers.
@@ -129,7 +129,7 @@ void AmelasControllerServer::processSetLocation(const CommandRequest& request, C
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
-}
+}*/
 
 template <typename ClbkT>
 void AmelasControllerServer::processSetAbsRelAltAzMotion(const CommandRequest &request, CommandReply &reply)
@@ -250,7 +250,7 @@ void AmelasControllerServer::processGetDouble(const CommandRequest &request, Com
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, doubleValue);
 }
 
-template <typename ClbkT>
+/*template <typename ClbkT>
 void AmelasControllerServer::processSetMeteoData(const CommandRequest& request, CommandReply& reply)
 {
     // Auxiliar variables and containers.
@@ -283,7 +283,7 @@ void AmelasControllerServer::processSetMeteoData(const CommandRequest& request, 
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
-}
+}*/
 
 template <typename ClbkT>
 void AmelasControllerServer::processGetMeteoData(const CommandRequest &request, CommandReply &reply)
@@ -414,6 +414,74 @@ void AmelasControllerServer::processGetPLCprueba(const CommandRequest &request, 
 
     // Now we will process the command in the controller.
     ctrl_err = this->invokeCallback<ClbkT>(request, reply, name, type);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+template <typename ClbkT>
+void AmelasControllerServer::processSetLocation(const CommandRequest& request, CommandReply& reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    double lat, lon, alt, x, y, z;
+
+    // Check the request parameters size.
+    if (request.params_size == 0 || !request.params)
+    {
+        reply.server_result = OperationResult::EMPTY_PARAMS;
+        return;
+    }
+
+    // Try to read the parameters data.
+    try
+    {
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, lat, lon, alt, x, y, z);
+    }
+    catch(...)
+    {
+        reply.server_result = OperationResult::BAD_PARAMETERS;
+        return;
+    }
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, lat, lon, alt, x, y, z);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+template <typename ClbkT>
+void AmelasControllerServer::processSetMeteoData(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    double press, temp, hr;
+
+    // Check the request parameters size.
+    if (request.params_size == 0 || !request.params)
+    {
+        reply.server_result = OperationResult::EMPTY_PARAMS;
+        return;
+    }
+
+    // Try to read the parameters data.
+    try
+    {
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, press, temp, hr);
+    }
+    catch(...)
+    {
+        reply.server_result = OperationResult::BAD_PARAMETERS;
+        return;
+    }
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, press, temp, hr);
 
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)
