@@ -534,7 +534,43 @@ AmelasError AmelasController::getSpeed(AltAzVel &vel, const std::string plcSymbo
     return error;
 }
 
-// TODO: AmelasError AmelasController::getMountLog(const std::string &start, const std::string &end)
+AmelasError AmelasController::getMountLog(const std::string &day)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "GET_MOUNT_LOG";
+
+    // Variables used for this function
+    std::string file = "./logs/daily_" + day + ".txt";
+    std::ifstream logFile;
+    std::string logRead;
+
+    // Functionality
+    logFile.open(file);
+
+    if (logFile.is_open())
+    {
+        while (logFile)
+        {
+            std::getline (logFile, logRead);
+            std::cout << logRead << '\n';
+        }
+        std::cout << '\n';
+    }
+    else
+    {
+        error = AmelasError::FILE_ERROR;
+    }
+
+    // Log
+    std::ostringstream oss;
+    oss << "File: " << day << ".txt" << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
 // TODO: AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port, const unsigned &timeout)
 
 // TODO

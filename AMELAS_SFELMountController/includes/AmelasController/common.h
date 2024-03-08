@@ -78,11 +78,12 @@ enum class AmelasError : std::int32_t
     STAR_INVALID       = 13,
     ENABLE_WARN        = 14,
     START_WARN         = 15,
-    STOP_WARN          = 16
+    STOP_WARN          = 16,
+    FILE_ERROR         = 17
 
 };
 
-static constexpr std::array<const char*, 17> ControllerErrorStr
+static constexpr std::array<const char*, 18> ControllerErrorStr
 {
     "SUCCESS - Controller process success.",
     "MOUNT_UNSAFE_STATE - The mount is in an unsafe state, so the operation cannot be done.",
@@ -100,7 +101,8 @@ static constexpr std::array<const char*, 17> ControllerErrorStr
     "STAR_INVALID - The provided star parameters are invalid (for example due to an unsoported standard equinox).",
     "It is already at the desired value.",
     "There is no move loaded, so the operation cannot be carried out.",
-    "The mount is already stopped, so the operation cannot be carried out."
+    "The mount is already stopped, so the operation cannot be carried out.",
+    "FILE_ERROR - Can't open file. Is it possible it was moved, renamed or deleted?"
 };
 
 enum class AmelasMotionMode : std::int32_t
@@ -334,6 +336,8 @@ using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Ar
 // Callback function type aliases
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
 
+
+using GetMountLogCallback = std::function<AmelasError(const std::string&)>;
 using DoResetStateCallback = std::function<AmelasError()>;
 using EnableAvoidSunCallback = std::function<AmelasError(const bool&)>;
 

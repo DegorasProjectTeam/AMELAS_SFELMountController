@@ -111,7 +111,7 @@ private:
 
     template <typename ClbkT>
     void processSetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);
-    
+
     template <typename ClbkT>
     void processGetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);
     
@@ -144,6 +144,9 @@ private:
 
     template <typename ClbkT>
     void processGetPLCprueba(const CommandRequest &request, CommandReply &reply);
+
+    template <typename ClbkT>
+    void processSetString(const CommandRequest &request, CommandReply &reply);
 
     // Subclass register process function helper.
     void registerRequestProcFunc(AmelasServerCommand command, AmelasRequestProcFunc func);

@@ -95,7 +95,7 @@ public:
 
     // STATUS AND CONFIGURATION RELATED FUNCTIONS
     //=====================================================================================================================
-    // TODO: LIBAMELAS_EXPORT AmelasError getMountLog(const std::string& start, const std::string& end);
+    LIBAMELAS_EXPORT AmelasError getMountLog(const std::string &day);
 
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
     LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const unsigned& port);

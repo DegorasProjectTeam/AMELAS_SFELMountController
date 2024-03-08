@@ -274,52 +274,37 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_GET_MOUNT_LOG command." << std::endl;
 
             bool valid_params = true;
-            std::string start = "", end = "";
+            std::string day;
             char *param_token = std::strtok(nullptr, " ");
 
             try
             {
-                start = std::stod(param_token);
+                day = std::string(param_token);
             }
             catch (...)
             {
-                std::cerr << "Bad parameter start issued.";
+                std::cerr << "Bad parameter day issued.";
                 valid_params = false;
             }
 
             if (valid_params)
             {
-                param_token = std::strtok(nullptr, " ");
-
-                try
-                {
-                    end = std::stod(param_token);
-                }
-                catch (...)
-                {
-                    std::cerr << "Bad parameter end issued.";
-                    valid_params = false;
-                }
-            }
-
-            if (valid_params)
-            {
-                std::cout << "Sending: " << start << " " << end << std::endl;
+                std::cout << "Sending: " << day << std::endl;
 
                 BinarySerializer serializer;
 
-                serializer.write(start, end);
+                serializer.write(day);
 
                 std::cout<<serializer.toJsonString();
 
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, start, end);
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
 
                 std::cout<<std::endl;
             }
             else
             {
                 std::cout<<"Sending invalid command: "<<std::endl;
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, start, end);
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
 
                 valid_params = true;
             }
@@ -1546,7 +1531,7 @@ int main(int, char**)
             std::cout << "    " << std::string(70, '-') << '\n';
             std::cout << "    STATUS & CONFIGURATION RELATED FUNCTIONS" << std::endl;
             std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "\t- REQ_GET_MOUNT_LOG:            36 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_LOG:            36 YYYY-MM-DD" << std::endl;
             std::cout << "\t- REQ_DO_SYNC_NTP:              37 (TODO)" << std::endl;
             std::cout << "\t- REQ_DO_SYNC_MANUAL:           38 (TODO)" << std::endl;
             std::cout << "\t- REQ_GET_MOUNT_STATUS:         39 (TODO)" << std::endl;

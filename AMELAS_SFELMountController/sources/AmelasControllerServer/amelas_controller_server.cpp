@@ -46,6 +46,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
 {
     // Register each internal specific process function in the base server.
 
+    // REQ_GET_MOUNT_LOG.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_LOG,
+                                  &AmelasControllerServer::processSetString<controller::GetMountLogCallback>);
+
     // REQ_DO_RESET_STATE.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_RESET_STATE,
                                   &AmelasControllerServer::processEmptyArguments<controller::DoResetStateCallback>);

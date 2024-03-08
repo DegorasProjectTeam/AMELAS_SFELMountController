@@ -173,6 +173,10 @@ int main(int, char**)
     // ---------------------------------------
 
     // Set the controller callbacks in the server.
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOUNT_LOG,
+                                             &amelas_controller,
+                                             &AmelasController::getMountLog);
+
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_RESET_STATE,
                                              &amelas_controller,
                                              &AmelasController::doResetState);
