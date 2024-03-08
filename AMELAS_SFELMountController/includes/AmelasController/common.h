@@ -335,6 +335,7 @@ using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Ar
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
 
 using DoResetStateCallback = std::function<AmelasError()>;
+using EnableAvoidSunCallback = std::function<AmelasError(const bool&)>;
 
 using GetPLCRegisterCallback = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
 

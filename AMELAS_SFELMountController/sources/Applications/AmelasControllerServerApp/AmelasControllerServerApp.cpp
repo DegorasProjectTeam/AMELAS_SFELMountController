@@ -177,6 +177,10 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::doResetState);
                                              
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_AVOID_SUN,
+                                             &amelas_controller,
+                                             &AmelasController::enableAvoidSun);
+                                             
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
                                              &amelas_controller,
                                              &AmelasController::getPLCregister);

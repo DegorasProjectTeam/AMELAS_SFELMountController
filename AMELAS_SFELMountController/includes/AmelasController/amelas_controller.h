@@ -78,7 +78,7 @@ public:
     // SAFETY RELATED FUNCTIONS
     //=====================================================================================================================
     LIBAMELAS_EXPORT AmelasError doResetState();
-    // TODO: LIBAMELAS_EXPORT AmelasError enableAvoidSun(const bool& enabled);
+    LIBAMELAS_EXPORT AmelasError enableAvoidSun(const bool& enabled);
     //=====================================================================================================================
 
 
@@ -211,6 +211,7 @@ private:
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
+    bool _avoid_sun = false;
 };
 
 }} // END NAMESPACES.

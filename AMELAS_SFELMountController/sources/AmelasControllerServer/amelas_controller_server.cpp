@@ -50,6 +50,10 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_RESET_STATE,
                                   &AmelasControllerServer::processEmptyArguments<controller::DoResetStateCallback>);
     
+    // REQ_EN_AVOID_SUN.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_AVOID_SUN,
+                                  &AmelasControllerServer::processSetBool<controller::EnableAvoidSunCallback>);
+    
     // REQ_EN_TRACK_ADJ.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_TRACK_ADJ,
                                   &AmelasControllerServer::processSetBool<controller::EnableTrackingAdjustsCallback>);

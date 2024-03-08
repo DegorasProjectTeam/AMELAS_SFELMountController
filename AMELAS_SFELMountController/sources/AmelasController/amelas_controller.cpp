@@ -62,7 +62,38 @@ AmelasError AmelasController::doResetState()
     return error;
 }
 
-// TODO: AmelasError AmelasController::enableAvoidSun(const bool &enabled)
+AmelasError AmelasController::enableAvoidSun(const bool &enabled)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "EN_AVOID_SUN";
+
+    // Variable used for this function
+    std::ostringstream oss;
+
+    // Functionality
+    if (_avoid_sun == enabled)
+    {
+        oss << "Avoid Sun is already set to " << enabled << "." << '\n';
+
+        error = AmelasError::ENABLE_WARN;
+    }
+    else
+    {
+        oss << "Avoid Sun" << '\n'
+            << "  Old: " << _avoid_sun << '\n'
+            << "  New: " << enabled    << '\n';
+
+        _avoid_sun = enabled;
+    }
+
+    // Log
+    setLog(command, oss.str(), error);
+
+    return error;
+}
 //=====================================================================================================================
 
 
@@ -326,6 +357,7 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
 
     // Variable used for this function
     std::ostringstream oss;
+    bool oldEn;
 
     // Modifying log message
     if (_plc->read<bool>(plcSymbol) == enabled)
@@ -343,17 +375,25 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
     }
     else
     {
+        oldEn = _plc->read<bool>(plcSymbol);
+
         if (command == "EN_TRACK_ADJ")
         {
-            oss << "Track adj.: " << enabled << '\n';
+            oss << "Track adj" << '\n'
+                << "  Old: " << oldEn   << '\n'
+                << "  New: " << enabled << '\n';
         }
         else if (command == "EN_MOUNT_POWER")
         {
-            oss << "Mount power: " << enabled << '\n';
+            oss << "Mount power" << '\n'
+                << "  Old: " << oldEn   << '\n'
+                << "  New: " << enabled << '\n';
         }
         else if (command == "EN_MOUNT_MODEL")
         {
-            oss << "Mount model: " << enabled << '\n';
+            oss << "Mount model" << '\n'
+                << "  Old: " << oldEn   << '\n'
+                << "  New: " << enabled << '\n';
         }
 
         // Functionality
@@ -371,6 +411,9 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
 
+    // Variables used for this function
+    AltAzPos oldPos;
+
     // Check the provided values
     if (pos.az > 360.0 ||  pos.az < 0.0 || pos.el >= 90. || pos.el < 0.)
     {
@@ -384,7 +427,9 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
         }
 
         // Functionality
-        /*_plc->write(plcSymbol + ".Azimuth", pos.az);
+        /*oldPos.az = _plc->read<double>(plcSymbol + ".Azimuth");
+        oldPos.el = _plc->read<double>(plcSymbol + ".Elevation");
+        _plc->write(plcSymbol + ".Azimuth", pos.az);
         _plc->write(plcSymbol + ".Elevation", pos.el);*/
     }
 
@@ -393,12 +438,19 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
         error = AmelasError::MOUNT_UNSAFE_STATE;
     }
 
+    oldPos.az = _plc->read<double>(plcSymbol + ".Azimuth");
+    oldPos.el = _plc->read<double>(plcSymbol + ".Elevation");
+
     _plc->write(plcSymbol + ".Azimuth", pos.az);
     _plc->write(plcSymbol + ".Elevation", pos.el);
 
     // Log
-    std::ostringstream oss;
-    oss << "  Az: " << pos.az << " \370" << '\n'
+    std::ostringstream oss;    
+    oss << "Old:" << '\n'
+        << "  Az: " << oldPos.az << " \370" << '\n'
+        << "  El: " << oldPos.el << " \370" << '\n'
+        << "New:" << '\n'
+        << "  Az: " << pos.az << " \370" << '\n'
         << "  El: " << pos.el << " \370" << '\n';
     setLog(command, oss.str(), error);
 
@@ -428,6 +480,9 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
 
+    // Variables used for this function
+    AltAzVel oldSpeed;
+
     // Check the provided values
     if (vel.az < 0.0 ||  vel.el < 0.0)
     {
@@ -436,6 +491,9 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
     else
     {
         // Functionality
+        oldSpeed.az = _plc->read<double>(plcSymbol + ".Azimuth");
+        oldSpeed.el = _plc->read<double>(plcSymbol + ".Elevation");
+
         _plc->write(plcSymbol + ".Azimuth", vel.az);
         _plc->write(plcSymbol + ".Elevation", vel.el);
     }
@@ -447,7 +505,11 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
 
     // Log
     std::ostringstream oss;
-    oss << "  Az: " << vel.az << " \370/s" << '\n'
+    oss << "Old:" << '\n'
+        << "  Az: " << oldSpeed.az << " \370/s" << '\n'
+        << "  El: " << oldSpeed.el << " \370/s" << '\n'
+        << "New:" << '\n'
+        << "  Az: " << vel.az << " \370/s" << '\n'
         << "  El: " << vel.el << " \370/s" << '\n';
     setLog(command, oss.str(), error);
 

@@ -1536,7 +1536,7 @@ int main(int, char**)
             std::cout << "    SAFETY RELATED FUNCTIONS" << std::endl;
             std::cout << "    " << std::string(70, '-') << '\n';
             std::cout << "\t- REQ_DO_RESET_STATE:           33" << std::endl;
-            std::cout << "\t- REQ_EN_AVOID_SUN:             34 (TODO)" << std::endl;
+            std::cout << "\t- REQ_EN_AVOID_SUN:             34 bool" << std::endl;
             std::cout << "" << std::endl;
             std::cout << "    " << std::string(70, '-') << '\n';
             std::cout << "    LOW LEVEL PLC REGISTERS RELATED FUNCTIONS" << std::endl;
