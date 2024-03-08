@@ -205,6 +205,10 @@ AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std:
     // Functionality
     if (type == "double")
         value = _plc->read<double>(symbol);
+    else if (type == "int")
+        value = _plc->read<short int>(symbol);
+    else if (type == "bool")
+        value = _plc->read<bool>(symbol);
 
     // Log
     std::ostringstream oss;
@@ -571,6 +575,7 @@ AmelasError AmelasController::getMountLog(const std::string &day)
 
     return error;
 }
+
 // TODO: AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port, const unsigned &timeout)
 
 // TODO

@@ -1030,7 +1030,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             try
             {
-                name = std::stod(param_token);
+                name = std::string(param_token);
             }
             catch (...)
             {
@@ -1044,7 +1044,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 try
                 {
-                    type = std::stod(param_token);
+                    type = std::string(param_token);
                 }
                 catch (...)
                 {
