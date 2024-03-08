@@ -109,37 +109,54 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_DO_SYNC_NTP command." << std::endl;
 
             bool valid_params = true;
+            std::string name = "";
             unsigned port = 0;
             char *param_token = std::strtok(nullptr, " ");
 
             try
             {
-                port = std::stod(param_token);
+                name = std::string(param_token);
             }
             catch (...)
             {
-                std::cerr << "Bad parameter.";
+                std::cerr << "Bad parameter name.";
                 valid_params = false;
             }
 
             if (valid_params)
             {
-                std::cout << "Sending: " << port << std::endl;
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    port = std::stoi(param_token);
+                }
+                catch(...)
+                {
+                    std::cerr << "Bad parameter port.";
+                    valid_params = false;
+                }
+                
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << name << " " << port << std::endl;
 
                 BinarySerializer serializer;
 
-                serializer.write(port);
+                serializer.write(name, port);
 
                 std::cout<<serializer.toJsonString();
 
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, port);
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, port);
 
                 std::cout<<std::endl;
             }
             else
             {
                 std::cout<<"Sending invalid command: "<<std::endl;
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, port);
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
 
                 valid_params = true;
             }

@@ -579,7 +579,7 @@ AmelasError AmelasController::getMountLog(const std::string &day)
 // TODO: AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port, const unsigned &timeout)
 
 // TODO
-AmelasError AmelasController::doSyncTimeNTP(const unsigned &port = 123)
+AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port)
 {
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
@@ -594,11 +594,12 @@ AmelasError AmelasController::doSyncTimeNTP(const unsigned &port = 123)
 
     // Functionality
     _plc->write(symbolEnable, true);
-    _plc->write(symbolPort, port);
+    _plc->write<unsigned short int>(symbolPort, port);
 
     // Log
     std::ostringstream oss;
-    oss << "Server port: " << port << '\n';
+    oss << "Server name: " << host << '\n'
+        << "Server port: " << port << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -843,14 +844,44 @@ AmelasError AmelasController::getHomingOffsets(AltAzAdj &pos)
 
 AmelasError AmelasController::enableMountModel(const bool &enabled)
 {
-    // Command used for log
+    /*// Command used for log
     const std::string command = "EN_MOUNT_MODEL";
 
     // Symbol used for PLC
     const std::string symbol = "MAIN.commander.enableMountModel";
 
     // Functionality
-    return setEnable(enabled, symbol, command);
+    return setEnable(enabled, symbol, command)*/
+    
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "EN_MOUNT_MODEL";
+
+    // Variable used for this function
+    std::ostringstream oss;
+
+    // Functionality
+    if (_enable_mount_model == enabled)
+    {
+        oss << "Mount model is already set to " << enabled << "." << '\n';
+
+        error = AmelasError::ENABLE_WARN;
+    }
+    else
+    {
+        oss << "Mount model" << '\n'
+            << "  Old: " << _enable_mount_model << '\n'
+            << "  New: " << enabled << '\n';
+
+        _enable_mount_model = enabled;
+    }
+
+    // Log
+    setLog(command, oss.str(), error);
+
+    return error;
 }
 
 // TODO: AmelasError AmelasController::setMountModelCoefs(const MountModelCoefs &coefs)

@@ -98,7 +98,7 @@ public:
     LIBAMELAS_EXPORT AmelasError getMountLog(const std::string &day);
 
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
-    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const unsigned& port);
+    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123);
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
 
     // TODO: LIBAMELAS_EXPORT AmelasError getMountStatus();
@@ -212,6 +212,7 @@ private:
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
     bool _avoid_sun = false;
+    bool _enable_mount_model = false;
 };
 
 }} // END NAMESPACES.

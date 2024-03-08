@@ -357,6 +357,7 @@ void AmelasControllerServer::processSetNTPserver(const CommandRequest& request, 
     // Auxiliar variables and containers.
     controller::AmelasError ctrl_err;
 
+    std::string server;
     unsigned port;
 
     // Check the request parameters size.
@@ -369,7 +370,7 @@ void AmelasControllerServer::processSetNTPserver(const CommandRequest& request, 
     // Try to read the parameters data.
     try
     {
-        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, port);
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, server, port);
     }
     catch(...)
     {
@@ -378,7 +379,7 @@ void AmelasControllerServer::processSetNTPserver(const CommandRequest& request, 
     }
 
     // Now we will process the command in the controller.
-    ctrl_err = this->invokeCallback<ClbkT>(request, reply, port);
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, server, port);
 
     // Serialize parameters if all ok.
     if(reply.server_result == OperationResult::COMMAND_OK)
