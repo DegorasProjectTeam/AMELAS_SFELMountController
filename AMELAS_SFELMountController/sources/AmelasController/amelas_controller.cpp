@@ -134,53 +134,24 @@ AmelasError AmelasController::doDisconnectPLC()
 }
 
 // TODO
-PLCRegisterValue AmelasController::getPLCregisterValue(const std::string symbol, const std::string type)
-{
-    PLCRegisterValue registerValue;
-
-    registerValue.symbol = symbol;
-    registerValue.type = type;
-
-    if (type == "double")
-        registerValue.value = std::to_string(_plc->read<double>(symbol));
-    else if (type == "int")
-        registerValue.value = std::to_string(_plc->read<short int>(symbol));
-    else if (type == "bool")
-        registerValue.value = std::to_string(_plc->read<bool>(symbol));
-
-    return registerValue;
-}
-
 AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &registerValue)
 {
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
 
+    // Command used for log
     const std::string command = "GET_PLC_REGISTER";
 
-    /*if (address.type == "double")
-        value.value = std::to_string(_plc->read<double>(address.symbol));
+    // Functionality
+    registerValue.symbol = address.symbol;
+    registerValue.type = address.type;
+
+    if (address.type == "double")
+        registerValue.value = std::to_string(_plc->read<double>(address.symbol));
     else if (address.type == "int")
-        value.value = std::to_string(_plc->read<short int>(address.symbol));
+        registerValue.value = std::to_string(_plc->read<short int>(address.symbol));
     else if (address.type == "bool")
-        value.value = std::to_string(_plc->read<bool>(address.symbol));
-
-    value.symbol = address.symbol;
-    value.type = address.type;
-
-    // Log
-    std::ostringstream oss;
-    oss << "Symbol: " << value.symbol << " <" << value.type << "> = " << value.value << '\n';
-    setLog(command, oss.str(), error);*/
-
-    // if (value.type == "double")
-    //     value.value = std::to_string(_plc->read<double>(value.symbol));
-    // else if (value.type == "int")
-    //     value.value = std::to_string(_plc->read<short int>(value.symbol));
-    // else if (value.type == "bool")
-    //     value.value = std::to_string(_plc->read<bool>(value.symbol));
-
-    registerValue = getPLCregisterValue(address.symbol, address.type);
+        registerValue.value = std::to_string(_plc->read<bool>(address.symbol));
 
     // Log
     std::ostringstream oss;
@@ -189,7 +160,6 @@ AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegis
 
     return error;
 }
-
 
 AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std::string &type)
 {
@@ -200,15 +170,15 @@ AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std:
     const std::string command = "GET_PLC_REGISTER";
 
     // Variable used for this function
-    double value;
+    std::string value;
 
     // Functionality
     if (type == "double")
-        value = _plc->read<double>(symbol);
+        value = std::to_string(_plc->read<double>(symbol));
     else if (type == "int")
-        value = _plc->read<short int>(symbol);
+        value = std::to_string(_plc->read<short int>(symbol));
     else if (type == "bool")
-        value = _plc->read<bool>(symbol);
+        value = std::to_string(_plc->read<bool>(symbol));
 
     // Log
     std::ostringstream oss;
@@ -217,7 +187,6 @@ AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std:
 
     return error;
 }
-
 //=====================================================================================================================
 
 
@@ -538,6 +507,21 @@ AmelasError AmelasController::getSpeed(AltAzVel &vel, const std::string plcSymbo
     return error;
 }
 
+double AmelasController::deg_to_radians(const double &degrees)
+{
+    return degrees * (M_PI / 180.0);
+}
+
+double AmelasController::arcsec_to_radians(const double &arcsec)
+{
+    return arcsec * (M_PI / 648000.0);
+}
+
+double AmelasController::arcsec_to_deg(const double &arcsec)
+{
+    return arcsec * (1 / 3600.0);
+}
+
 AmelasError AmelasController::getMountLog(const std::string &day)
 {
     // Auxiliar result
@@ -570,7 +554,7 @@ AmelasError AmelasController::getMountLog(const std::string &day)
 
     // Log
     std::ostringstream oss;
-    oss << "File: " << day << ".txt" << '\n';
+    oss << "File: daily_" << day << ".txt" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -885,7 +869,105 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
 }
 
 // TODO: AmelasError AmelasController::setMountModelCoefs(const MountModelCoefs &coefs)
+AmelasError AmelasController::setMountModelCoefs(double &an, double &aw, double &ca, double &npae, double &ie, double &ia)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "SET_MOUNT_MODEL_COEFS";
+
+    // Variable used for this function
+    AltAzPos actPosRadians(deg_to_radians(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos")), deg_to_radians(_plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos")));
+    double old_an = _an_tpoint;
+    double old_aw = _aw_tpoint;
+    double old_ca = _ca_tpoint;
+    double old_npae = _npae_tpoint;
+    double old_ie = _ie_tpoint;
+    double old_ia = _ia_tpoint;
+
+    // Functionality
+    _an_tpoint = an;
+    _aw_tpoint = aw;
+    _ca_tpoint = ca;
+    _npae_tpoint = npae;
+    _ie_tpoint = ie;
+    _ia_tpoint = ia;
+
+    ie = arcsec_to_deg(ie);
+    ia = arcsec_to_deg(ia);
+    ca = arcsec_to_deg(ca);
+    an = arcsec_to_deg(an);
+    aw = arcsec_to_deg(aw);
+    npae = arcsec_to_deg(npae);
+
+    //--> IE
+    _elOffset = ie;
+
+    //--> IA
+    _azOffset = -ia;
+
+    //--> CA
+    if (cos(actPosRadians.el) != 0.0)
+        _azOffset = -ca * 1 / cos(actPosRadians.el);
+
+    //--> AN
+    _azOffset = -an * sin(actPosRadians.az) * tan(actPosRadians.el);
+    _elOffset = -an * cos(actPosRadians.az);
+
+    //--> AW
+    _azOffset = -aw * cos(actPosRadians.az) * tan(actPosRadians.el);
+    _elOffset = aw * sin(actPosRadians.az);
+
+    //--> NPAE
+    _azOffset = -npae * tan(actPosRadians.el);
+
+    // Log
+    std::ostringstream oss;
+    oss << "Old:" << '\n'
+        << "  AN:   " << old_an   << " \"" << '\n'
+        << "  AW:   " << old_aw   << " \"" << '\n'
+        << "  CA:   " << old_ca   << " \"" << '\n'
+        << "  NPAE: " << old_npae << " \"" << '\n'
+        << "  IE:   " << old_ie   << " \"" << '\n'
+        << "  IA:   " << old_ia   << " \"" << '\n'
+        << "New:" << '\n'
+        << "  AN:   " << _an_tpoint   << " \"" << '\n'
+        << "  AW:   " << _aw_tpoint   << " \"" << '\n'
+        << "  CA:   " << _ca_tpoint   << " \"" << '\n'
+        << "  NPAE: " << _npae_tpoint << " \"" << '\n'
+        << "  IE:   " << _ie_tpoint   << " \"" << '\n'
+        << "  IA:   " << _ia_tpoint   << " \"" << '\n'
+        << "" << '\n'
+        << "  _azOffset: " << _azOffset << " \370" << '\n'
+        << "  _elOffset: " << _elOffset << " \370" << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
 // TODO: AmelasError AmelasController::getMountModelCoefs(MountModelCoefs &coefs)
+AmelasError AmelasController::getMountModelCoefs(double &an, double &aw, double &ca, double &npae, double &ie, double &ia)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "GET_MOUNT_MODEL_COEFS";
+
+    // Functionality
+    an = _an_tpoint;
+    aw = _aw_tpoint;
+    ca = _ca_tpoint;
+    npae = _npae_tpoint;
+    ie = _ie_tpoint;
+    ia = _ia_tpoint;
+
+    // Log
+    setLog(command, "", error);
+
+    return error;
+}
 
 // TODO
 AmelasError AmelasController::setLocation(const double &lat, const double &lon, const double &alt, const double &x, const double &y, const double &z)

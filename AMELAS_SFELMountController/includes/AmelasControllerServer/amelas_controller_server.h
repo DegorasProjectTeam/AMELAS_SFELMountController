@@ -147,6 +147,9 @@ private:
 
     template <typename ClbkT>
     void processSetString(const CommandRequest &request, CommandReply &reply);
+    
+    template <typename ClbkT>
+    void processGetSixDoubles(const CommandRequest &request, CommandReply &reply);
 
     // Subclass register process function helper.
     void registerRequestProcFunc(AmelasServerCommand command, AmelasRequestProcFunc func);

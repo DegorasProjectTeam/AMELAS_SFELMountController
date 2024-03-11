@@ -87,9 +87,8 @@ public:
     LIBAMELAS_EXPORT AmelasError doConnectPLC();
     LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
 
-    LIBAMELAS_EXPORT PLCRegisterValue getPLCregisterValue(const std::string symbol, const std::string type);
     LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& registerValue);
-    LIBAMELAS_EXPORT AmelasError getPLCprueba(const std::string& symbol, const std::string& type);
+    LIBAMELAS_EXPORT AmelasError getPLCprueba(const std::string& symbol, const std::string& type); // Prueba
     //=====================================================================================================================
 
 
@@ -98,7 +97,7 @@ public:
     LIBAMELAS_EXPORT AmelasError getMountLog(const std::string &day);
 
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
-    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123);
+    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123); // Prueba
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
 
     // TODO: LIBAMELAS_EXPORT AmelasError getMountStatus();
@@ -136,14 +135,16 @@ public:
 
     LIBAMELAS_EXPORT AmelasError enableMountModel(const bool& enabled);
     // TODO: LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs);
+    LIBAMELAS_EXPORT AmelasError setMountModelCoefs(double& an, double& aw, double& ca, double& npae, double& ie, double& ia); // Prueba
     // TODO: LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs);
+    LIBAMELAS_EXPORT AmelasError getMountModelCoefs(double& an, double& aw, double& ca, double& npae, double& ie, double& ia); // Prueba
 
     //LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location); // TODO
-    LIBAMELAS_EXPORT AmelasError setLocation(const double& lat, const double& lon, const double& alt, const double& x, const double& y, const double& z);
+    LIBAMELAS_EXPORT AmelasError setLocation(const double& lat, const double& lon, const double& alt, const double& x, const double& y, const double& z); // Prueba
     LIBAMELAS_EXPORT AmelasError getLocation(StationLocation& location);
 
     //LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo); // TODO
-    LIBAMELAS_EXPORT AmelasError setMeteoData(const double& press, const double& temp, const double& hr);
+    LIBAMELAS_EXPORT AmelasError setMeteoData(const double& press, const double& temp, const double& hr); // Prueba
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
     
     // TODO: LIBAMELAS_EXPORT AmelasError enableSimulationMode(const bool& enabled);
@@ -157,23 +158,8 @@ public:
     LIBAMELAS_EXPORT AmelasError getMotionMode(AmelasMotionMode& motion_mode);
     LIBAMELAS_EXPORT AmelasError getMotionState(AmelasMotionState& motion_state, AltAzPos &pos);
 
-    /**
-     * @brief   Starts the motion.
-     * @return  AmelasError
-     * @warning If the mount does not have any movement loaded, the function will do nothing and a warning will occur.
-     */
     LIBAMELAS_EXPORT AmelasError doStartMotion();
-    /**
-     * @brief   Pauses the motion.
-     * @return  AmelasError
-     * @warning If the mount is not moving, the function will do nothing and a warning will occur.
-     */
     LIBAMELAS_EXPORT AmelasError doPauseMotion();
-    /**
-     * @brief   Stops the motion.
-     * @return  AmelasError
-     * @warning If the mount is not moving, the function will do nothing and a warning will occur.
-     */
     LIBAMELAS_EXPORT AmelasError doStopMotion();
 
     LIBAMELAS_EXPORT AmelasError setTrackPosOffset(const AltAzAdj& pos);
@@ -191,7 +177,7 @@ public:
     LIBAMELAS_EXPORT AmelasError setParkMotion();
     LIBAMELAS_EXPORT AmelasError setCalibrationMotion();
 
-    LIBAMELAS_EXPORT AmelasError pruebaBucles();
+    LIBAMELAS_EXPORT AmelasError pruebaBucles(); // Prueba
 
     // TODO: LIBAMELAS_EXPORT AmelasError setCPFMotion(const file& cpf, AmelasTracking& tracking);
     // TODO: LIBAMELAS_EXPORT AmelasError setStarMotion(const StarData& star_data);
@@ -207,12 +193,24 @@ private:
     AmelasMotionMode motionModes();
     AmelasMotionState motionStates();
     void setLog(const std::string command, const std::string specific, const AmelasError error);
+    double deg_to_radians(const double& degrees);
+    double arcsec_to_radians(const double& arcsec);
+    double arcsec_to_deg(const double& arcsec);
 
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
+
     bool _avoid_sun = false;
     bool _enable_mount_model = false;
+    double _ie_tpoint = 0.0;
+    double _ia_tpoint = 0.0;
+    double _ca_tpoint = 0.0;
+    double _an_tpoint = 0.0;
+    double _aw_tpoint = 0.0;
+    double _npae_tpoint = 0.0;
+    double _elOffset = 0.0;
+    double _azOffset = 0.0;
 };
 
 }} // END NAMESPACES.

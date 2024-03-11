@@ -623,6 +623,125 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_MOUNT_MODEL_COEFS command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS))
+        {
+            std::cout << "Sending set REQ_SET_MOUNT_MODEL_COEFS command." << std::endl;
+
+            bool valid_params = true;
+            double lat = 0., lon = 0., alt = 0.;
+            double x = 0., y = 0., z = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                lat = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter latitude issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    lon = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter longitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    alt = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter altitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    x = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter x issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    y = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter y issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    z = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter z issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(lat, lon, alt, x, y, z);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_LOCATION))
         {
             std::cout << "Sending set REQ_SET_LOCATION command." << std::endl;
@@ -1275,6 +1394,33 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                 }
 
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double an, aw, ca, npae, ie, ia;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, an, aw, ca, npae, ie, ia);
+
+                        std::cout << "" << std::endl;
+                        std::cout << "Mount model coefs: " << std::endl;
+                        std::cout << "  AN:   " << an   << " \"" << std::endl;
+                        std::cout << "  AW:   " << aw   << " \"" << std::endl;
+                        std::cout << "  CA:   " << ca   << " \"" << std::endl;
+                        std::cout << "  NPAE: " << npae << " \"" << std::endl;
+                        std::cout << "  IE:   " << ie   << " \"" << std::endl;
+                        std::cout << "  IA:   " << ia   << " \"" << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_LOCATION))
                 {
                     try
@@ -1573,8 +1719,8 @@ int main(int, char**)
             std::cout << "\t- REQ_SET_HOMING_OFFSETS:       58 double double" << std::endl;
             std::cout << "\t- REQ_GET_HOMING_OFFSETS:       59" << std::endl;
             std::cout << "\t- REQ_EN_MOUNT_MODEL:           60 bool" << std::endl;
-            std::cout << "\t- REQ_SET_MOUNT_MODEL_COEFS:    61 (TODO)" << std::endl;
-            std::cout << "\t- REQ_GET_MOUNT_MODEL_COEFS:    62 (TODO)" << std::endl;
+            std::cout << "\t- REQ_SET_MOUNT_MODEL_COEFS:    61 double double double double double double" << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_MODEL_COEFS:    62" << std::endl;
             std::cout << "\t- REQ_SET_LOCATION:             63 (TODO)" << std::endl;
             std::cout << "\t- REQ_GET_LOCATION:             64" << std::endl;
             std::cout << "\t- REQ_SET_METEO_DATA:           65 (TODO)" << std::endl;

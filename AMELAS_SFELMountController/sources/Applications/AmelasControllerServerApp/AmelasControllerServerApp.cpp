@@ -273,6 +273,14 @@ int main(int, char**)
                                              &amelas_controller,
                                              &AmelasController::enableMountModel);
 
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS,
+                                             &amelas_controller,
+                                             &AmelasController::setMountModelCoefs);
+
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS,
+                                             &amelas_controller,
+                                             &AmelasController::getMountModelCoefs);
+
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_LOCATION,
                                              &amelas_controller,
                                              &AmelasController::setLocation);
