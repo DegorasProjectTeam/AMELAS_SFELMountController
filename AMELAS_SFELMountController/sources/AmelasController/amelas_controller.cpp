@@ -600,8 +600,6 @@ AmelasError AmelasController::getMountStatus(std::string &mountStatus)
     // Command used for log
     const std::string command = "GET_MOUNT_STATUS";
 
-    // Symbols used for PLC
-
     // Variables used for this function
     std::ostringstream oss;
     AltAzPos actPos(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos"), _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos"));
@@ -652,7 +650,7 @@ AmelasError AmelasController::getMountStatus(std::string &mountStatus)
 }
 
 // TODO
-AmelasError AmelasController::getDeviceInfo()
+AmelasError AmelasController::getDeviceInfo(std::string &deviceInfo)
 {
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
@@ -660,14 +658,18 @@ AmelasError AmelasController::getDeviceInfo()
     // Command used for log
     const std::string command = "GET_MOUNT_INFO";
 
-    // Symbols used for PLC
-
     // Variables used for this function
+    std::ostringstream oss;
 
     // Functionality
+    oss << "MOUNT INFO"                    << '\n'
+        << "  C++ software version:     1.9.4" << '\n'
+        << "  TwinCAT software version: 1.4.0" << '\n';
+
+    deviceInfo = oss.str();
 
     // Log
-    setLog(command, "", error);
+    setLog(command, oss.str(), error);
 
     return error;
 }

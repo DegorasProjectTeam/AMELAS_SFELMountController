@@ -101,7 +101,7 @@ public:
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
 
     LIBAMELAS_EXPORT AmelasError getMountStatus(std::string& mountStatus); // PRUEBA (en pruebas)
-    LIBAMELAS_EXPORT AmelasError getDeviceInfo(); // PRUEBA (en pruebas)
+    LIBAMELAS_EXPORT AmelasError getDeviceInfo(std::string& deviceInfo); // PRUEBA (en pruebas)
 
     LIBAMELAS_EXPORT AmelasError enableTrackingAdjusts(const bool& enabled);
     LIBAMELAS_EXPORT AmelasError enableMountPower(const bool& enabled);

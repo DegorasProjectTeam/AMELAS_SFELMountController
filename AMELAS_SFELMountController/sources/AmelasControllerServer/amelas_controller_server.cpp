@@ -69,7 +69,7 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_STATUS,
                                   &AmelasControllerServer::processGetString<controller::GetMountStatusCallback>); // PRUEBA
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_INFO,
-                                  &AmelasControllerServer::processEmptyArguments<controller::GetDeviceInfoCallback>); // PRUEBA
+                                  &AmelasControllerServer::processGetString<controller::GetDeviceInfoCallback>); // PRUEBA
     this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_TRACK_ADJ,
                                   &AmelasControllerServer::processSetBool<controller::EnableTrackingAdjustsCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_MOUNT_POWER,
