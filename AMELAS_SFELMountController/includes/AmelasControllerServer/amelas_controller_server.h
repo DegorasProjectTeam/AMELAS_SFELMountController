@@ -137,6 +137,8 @@ private:
     void processGetPLCRegister(const CommandRequest &request, CommandReply &reply);
     template <typename ClbkT>
     void processGetPLCprueba(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetString(const CommandRequest &request, CommandReply &reply);
 
 
     // Subclass register process function helper.

@@ -1114,6 +1114,14 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_SIMULATION_STATE command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_STATUS))
+        {
+            std::cout << "Sending REQ_GET_MOUNT_STATUS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_INFO))
+        {
+            std::cout << "Sending REQ_GET_MOUNT_INFO command." << std::endl;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_MODE))
         {
             std::cout << "Sending REQ_GET_MOTION_MODE command." << std::endl;
@@ -1616,6 +1624,28 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                 }
 
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_STATUS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        std::string strVal;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, strVal);
+
+                        // Generate the struct.
+                        std::cout << "" << std::endl;
+                        std::cout << strVal;
+                    }
+                    catch(...)
+                    {
+                        std::cout<<"BAD PARAMS"<<std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_MODE))
                 {
                     try
@@ -1858,8 +1888,8 @@ int main(int, char**)
             std::cout << "\t- REQ_GET_MOUNT_LOG:            36 YYYY-MM-DD" << std::endl;
             std::cout << "\t- REQ_DO_SYNC_NTP:              37 (TODO)" << std::endl;
             std::cout << "\t- REQ_DO_SYNC_MANUAL:           38 (TODO)" << std::endl;
-            std::cout << "\t- REQ_GET_MOUNT_STATUS:         39 (TODO)" << std::endl;
-            std::cout << "\t- REQ_GET_MOUNT_INFO:           40 (TODO)" << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_STATUS:         39" << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_INFO:           40" << std::endl;
             std::cout << "\t- REQ_EN_TRACK_ADJ:             41 bool" << std::endl;
             std::cout << "\t- REQ_EN_MOUNT_POWER:           42 bool" << std::endl;
             std::cout << "\t- REQ_SET_SLEW_SPEED:           43 double double" << std::endl;

@@ -334,85 +334,72 @@ template<typename... Args>
 using AmelasControllerCallback = controller::AmelasError(AmelasController::*)(Args...);
 
 // Callback function type aliases
-using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
-
-
-using GetMountLogCallback = std::function<AmelasError(const std::string&)>;
-using DoResetStateCallback = std::function<AmelasError()>;
+// -- SAFETY RELATED FUNCTIONS
+using DoResetStateCallback   = std::function<AmelasError()>;
 using EnableAvoidSunCallback = std::function<AmelasError(const bool&)>;
 
-using GetPLCRegisterCallback = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
+// -- LOW LEVEL PLC REGISTERS RELATED FUNCTIONS
+using DoConnectPLCCallback    = std::function<AmelasError()>;
+using DoDisconnectPLCCallback = std::function<AmelasError()>;
+using GetPLCRegisterCallback  = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
+using GetPLCpruebaCallback    = std::function<AmelasError(const std::string&, const std::string&)>; // PRUEBA
 
-using DoSyncTimeNTPCallback = std::function<AmelasError(const std::string&, const unsigned&)>;
-
-using EnableTrackingAdjustsCallback = std::function<AmelasError(const bool&)>;
-using EnableMountPowerCallback = std::function<AmelasError(const bool&)>;
-
-using SetSlewSpeedCallback = std::function<AmelasError(const AltAzVel&)>;
-using GetSlewSpeedCallback = std::function<AmelasError(AltAzVel&)>;
-
-using SetHomePositionCallback = std::function<AmelasError(const AltAzPos&)>;
-using GetHomePositionCallback = std::function<AmelasError(AltAzPos&)>;
-
-using SetIdlePositionCallback = std::function<AmelasError(const AltAzPos&)>;
-using GetIdlePositionCallback = std::function<AmelasError(AltAzPos&)>;
-
-using SetParkPositionCallback = std::function<AmelasError(const AltAzPos&)>;
-using GetParkPositionCallback = std::function<AmelasError(AltAzPos&)>;
-
-using SetCalibrationPositionCallback = std::function<AmelasError(const AltAzPos&)>;
-using GetCalibrationPositionCallback = std::function<AmelasError(AltAzPos&)>;
-
-using SetIdlePositionHereCallback = std::function<AmelasError()>;
-using SetParkPositionHereCallback = std::function<AmelasError()>;
+// -- STATUS AND CONFIGURATION RELATED FUNCTIONS
+using GetMountLogCallback                = std::function<AmelasError(const std::string&)>;
+using DoSyncTimeNTPCallback              = std::function<AmelasError(const std::string&, const unsigned&)>; // PRUEBA
+using GetMountStatusCallback             = std::function<AmelasError(std::string&)>; // PRUEBA
+using GetDeviceInfoCallback              = std::function<AmelasError()>; // PRUEBA
+using EnableTrackingAdjustsCallback      = std::function<AmelasError(const bool&)>;
+using EnableMountPowerCallback           = std::function<AmelasError(const bool&)>;
+using SetSlewSpeedCallback               = std::function<AmelasError(const AltAzVel&)>;
+using GetSlewSpeedCallback               = std::function<AmelasError(AltAzVel&)>;
+using SetHomePositionCallback            = std::function<AmelasError(const AltAzPos&)>;
+using GetHomePositionCallback            = std::function<AmelasError(AltAzPos&)>;
+using SetIdlePositionCallback            = std::function<AmelasError(const AltAzPos&)>;
+using GetIdlePositionCallback            = std::function<AmelasError(AltAzPos&)>;
+using SetParkPositionCallback            = std::function<AmelasError(const AltAzPos&)>;
+using GetParkPositionCallback            = std::function<AmelasError(AltAzPos&)>;
+using SetCalibrationPositionCallback     = std::function<AmelasError(const AltAzPos&)>;
+using GetCalibrationPositionCallback     = std::function<AmelasError(AltAzPos&)>;
+using SetIdlePositionHereCallback        = std::function<AmelasError()>;
+using SetParkPositionHereCallback        = std::function<AmelasError()>;
 using SetCalibrationPositionHereCallback = std::function<AmelasError()>;
+using SetWaitAltCallback                 = std::function<AmelasError(const double&)>;
+using GetWaitAltCallback                 = std::function<AmelasError(double&)>;
+using SetHomingOffsetsCallback           = std::function<AmelasError(const AltAzAdj&)>;
+using GetHomingOffsetsCallback           = std::function<AmelasError(AltAzAdj&)>;
+using EnableMountModelCallback           = std::function<AmelasError(const bool&)>;
+using SetMountModelCoefsCallback         = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>; // PRUEBA
+using SetMountModelCoefsFileCallback     = std::function<AmelasError(const std::string&)>; // PRUEBA
+using GetMountModelCoefsCallback         = std::function<AmelasError(double&, double&, double&, double&, double&, double&)>; // PRUEBA
+using ApplyMountModelCorrectionsCallback = std::function<AmelasError(const bool&, const bool&, const bool&, const bool&, const bool&, const bool&)>; // PRUEBA
+using SetLocationCallback                = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>; // PRUEBA
+//using SetLocationCallback                = std::function<AmelasError(const StationLocation&)>;
+using GetLocationCallback                = std::function<AmelasError(StationLocation&)>;
+using SetMeteoDataCallback               = std::function<AmelasError(const double&, const double&, const double&)>; // PRUEBA
+//using SetMeteoDataCallback               = std::function<AmelasError(const MeteoData&)>;
+using GetMeteoDataCallback               = std::function<AmelasError(MeteoData&)>;
 
-using SetWaitAltCallback = std::function<AmelasError(const double&)>;
-using GetWaitAltCallback = std::function<AmelasError(double&)>;
-
-using SetHomingOffsetsCallback = std::function<AmelasError(const AltAzAdj&)>;
-using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
-
-using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
-using SetMountModelCoefsCallback = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>;
-using GetMountModelCoefsCallback = std::function<AmelasError(double&, double&, double&, double&, double&, double&)>;
-using ApplyMountModelCorrectionsCallback = std::function<AmelasError(const bool&, const bool&, const bool&, const bool&, const bool&, const bool&)>;
-using SetMountModelCoefsFileCallback = std::function<AmelasError(const std::string&)>;
-
-using SetLocationCallback = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>;
-//using SetLocationCallback = std::function<AmelasError(const StationLocation&)>;
-using GetLocationCallback = std::function<AmelasError(StationLocation&)>;
-
-using SetMeteoDataCallback = std::function<AmelasError(const double&, const double&, const double&)>;
-//using SetMeteoDataCallback = std::function<AmelasError(const MeteoData&)>;
-using GetMeteoDataCallback = std::function<AmelasError(MeteoData&)>;
-
-using GetMotionModeCallback = std::function<AmelasError(AmelasMotionMode&)>;
-using GetMotionStateCallback = std::function<AmelasError(AmelasMotionState&, AltAzPos&)>;
-
-using SetDoStartMotionCallback = std::function<AmelasError()>;
-using SetDoPauseMotionCallback = std::function<AmelasError()>;
-using SetDoStopMotionCallback = std::function<AmelasError()>;
-
-using SetTrackPosOffsetCallback = std::function<AmelasError(const AltAzAdj&)>;
-using GetTrackPosOffsetCallback = std::function<AmelasError(AltAzAdj&)>;
-
-using SetTrackTimeBiasCallback = std::function<AmelasError(const double&)>;
-using GetTrackTimeBiasCallback = std::function<AmelasError(double&)>;
-
+// -- MOTION RELATED FUNCTIONS
+using GetMotionModeCallback          = std::function<AmelasError(AmelasMotionMode&)>;
+using GetMotionStateCallback         = std::function<AmelasError(AmelasMotionState&, AltAzPos&)>;
+using SetDoStartMotionCallback       = std::function<AmelasError()>;
+using SetDoPauseMotionCallback       = std::function<AmelasError()>;
+using SetDoStopMotionCallback        = std::function<AmelasError()>;
+using SetTrackPosOffsetCallback      = std::function<AmelasError(const AltAzAdj&)>;
+using GetTrackPosOffsetCallback      = std::function<AmelasError(AltAzAdj&)>;
+using SetTrackTimeBiasCallback       = std::function<AmelasError(const double&)>;
+using GetTrackTimeBiasCallback       = std::function<AmelasError(double&)>;
 using SetAbsoluteAltAzMotionCallback = std::function<AmelasError(const AltAzPos&, const AltAzVel&)>;
 using SetRelativeAltAzMotionCallback = std::function<AmelasError(const AltAzPos&, const AltAzVel&)>;
-using SetContAltAzMotionCallback = std::function<AmelasError(const AltAzVel&)>;
+using SetContAltAzMotionCallback     = std::function<AmelasError(const AltAzVel&)>;
+using SetIdleMotionCallback          = std::function<AmelasError()>;
+using SetParkMotionCallback          = std::function<AmelasError()>;
+using SetCalibrationMotionCallback   = std::function<AmelasError()>;
 
-using SetIdleMotionCallback = std::function<AmelasError()>;
-using SetParkMotionCallback = std::function<AmelasError()>;
-using SetCalibrationMotionCallback = std::function<AmelasError()>;
-
-using DoConnectPLC = std::function<AmelasError()>;
-using DoDisconnectPLC = std::function<AmelasError()>;
-
-using DoPruebaBucles = std::function<AmelasError()>;
-using GetPLCpruebaCallback = std::function<AmelasError(const std::string&, const std::string&)>;
+// -- OTHER FUNCTIONS
+using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
+using DoPruebaBucles      = std::function<AmelasError()>; // PRUEBA
 
 // =====================================================================================================================
 

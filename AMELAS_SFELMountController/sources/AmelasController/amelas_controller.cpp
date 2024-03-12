@@ -590,8 +590,87 @@ AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsig
 }
 
 // TODO: AmelasError AmelasController::doSyncTimeManual(const std::string &datetime)
-// TODO: AmelasError AmelasController::getMountStatus()
-// TODO: AmelasError AmelasController::getDeviceInfo()
+
+// TODO
+AmelasError AmelasController::getMountStatus(std::string &mountStatus)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "GET_MOUNT_STATUS";
+
+    // Symbols used for PLC
+
+    // Variables used for this function
+    std::ostringstream oss;
+    AltAzPos actPos(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos"), _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos"));
+    AltAzVel actVel(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActVelo"), _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActVelo"));
+    // -- Related to azimuth
+    bool azEnabled     = _plc->read<bool>("MAIN.axesController._azimuthAxis._enable");
+    bool azMoving      = _plc->read<bool>("MAIN.axesController._azimuthAxis._fbPower.Axis.Status.Moving");
+    bool azPositiveDir = _plc->read<bool>("MAIN.axesController._azimuthAxis._fbPower.Axis.Status.PositiveDirection");
+    bool azNegativeDir = _plc->read<bool>("MAIN.axesController._azimuthAxis._fbPower.Axis.Status.NegativeDirection");
+    bool azInTargetPos = _plc->read<bool>("MAIN.axesController._azimuthAxis._fbPower.Axis.Status.InTargetPosition");
+    // -- Related to elevation
+    bool elEnabled     = _plc->read<bool>("MAIN.axesController._elevationAxis._enable");
+    bool elMoving      = _plc->read<bool>("MAIN.axesController._elevationAxis._fbPower.Axis.Status.Moving");
+    bool elPositiveDir = _plc->read<bool>("MAIN.axesController._elevationAxis._fbPower.Axis.Status.PositiveDirection");
+    bool elNegativeDir = _plc->read<bool>("MAIN.axesController._elevationAxis._fbPower.Axis.Status.NegativeDirection");
+    bool elInTargetPos = _plc->read<bool>("MAIN.axesController._elevationAxis._fbPower.Axis.Status.InTargetPosition");
+
+    // Functionality
+    oss << "STATUS INFO"                        << '\n'
+        << "  Actual position:"                 << '\n'
+        << "    Az: " << actPos.az << " \370"   << '\n'
+        << "    El: " << actPos.el << " \370"   << '\n'
+        << ""                                   << '\n'
+        << "  Actual velocity:"                 << '\n'
+        << "    Az: " << actVel.az << " \370/s" << '\n'
+        << "    El: " << actVel.el << " \370/s" << '\n'
+        << ""                                   << '\n'
+        << "  Azimuth axis:"                    << '\n'
+        << "    Enabled:     " << azEnabled     << '\n'
+        << "    Moving:      " << azMoving      << '\n'
+        << "    InTargetPos: " << azInTargetPos << '\n'
+        << "    Positive:    " << azPositiveDir << '\n'
+        << "    Negative:    " << azNegativeDir << '\n'
+        << ""                                   << '\n'
+        << "  Elevation axis:"                  << '\n'
+        << "    Enabled:     " << elEnabled     << '\n'
+        << "    Moving:      " << elMoving      << '\n'
+        << "    InTargetPos: " << elInTargetPos << '\n'
+        << "    Positive:    " << elPositiveDir << '\n'
+        << "    Negative:    " << elNegativeDir << '\n';
+
+    mountStatus = oss.str();
+
+    // Log
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+// TODO
+AmelasError AmelasController::getDeviceInfo()
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "GET_MOUNT_INFO";
+
+    // Symbols used for PLC
+
+    // Variables used for this function
+
+    // Functionality
+
+    // Log
+    setLog(command, "", error);
+
+    return error;
+}
 
 AmelasError AmelasController::enableTrackingAdjusts(const bool &enabled)
 {
@@ -922,16 +1001,24 @@ AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData
     AmelasError error = AmelasError::SUCCESS;
 
     // Command used for log
-    const std::string command = "SET_MOUNT_MODEL_COEFS";
+    const std::string command = "SET_MOUNT_MODEL_COEFS_FILE";
 
     // Variables used for this function
     std::string file = "./logs/" + fileData + ".txt";
     std::ifstream logFile;
     std::string logRead;
-    std::map<std::string, double> coefs; // Almacena las variables y sus valores
+    int lineCount = 0; // Read line counter
+    std::map<std::string, double> coefs; // Stores variables and their values
     std::string coefName;
     double coefVal;
-    int lineCount = 0; // Contador de líneas leídas
+    std::ostringstream oss_aux;
+    // -- Assign the variables stored internally before the change to the "old" variables
+    double old_an = _an_tpoint;
+    double old_aw = _aw_tpoint;
+    double old_ca = _ca_tpoint;
+    double old_npae = _npae_tpoint;
+    double old_ie = _ie_tpoint;
+    double old_ia = _ia_tpoint;
 
     // Functionality
     logFile.open(file);
@@ -940,17 +1027,17 @@ AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData
     {
         while (logFile)
         {
-            std::getline (logFile, logRead); // Lee el archivo línea por línea
-            lineCount++; // Incrementa el contador de líneas
+            std::getline (logFile, logRead); // Reads the file line by line
+            lineCount++; // Increases the line counter
 
-            // Si ya se han leído dos líneas, procesa el contenido
+            // If two lines have already been read, processes the content
             if (lineCount > 2)
             {
                 std::istringstream iss(logRead);
 
-                // Lee el nombre de la variable y su valor asociado
+                // Reads the name of the variable and its associated value
                 if (iss >> coefName >> coefVal)
-                    coefs[coefName] = coefVal; // Almacena la variable y su valor asociado en el mapa
+                    coefs[coefName] = coefVal; // Stores the variable and its associated value in the map
             }
         }
     }
@@ -961,7 +1048,6 @@ AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData
 
     logFile.close();
 
-    // Imprime las variables y sus valores asociados
     for (const auto& pair : coefs)
     {
         std::cout << pair.first << ": " << pair.second << std::endl;
@@ -981,8 +1067,31 @@ AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData
     }
 
     // Log
+    if (error == AmelasError::SUCCESS)
+    {
+        oss_aux << "Old:" << '\n'
+                << "  AN:   " << old_an   << " \"" << '\n'
+                << "  AW:   " << old_aw   << " \"" << '\n'
+                << "  CA:   " << old_ca   << " \"" << '\n'
+                << "  NPAE: " << old_npae << " \"" << '\n'
+                << "  IE:   " << old_ie   << " \"" << '\n'
+                << "  IA:   " << old_ia   << " \"" << '\n'
+                << "New:" << '\n'
+                << "  AN:   " << _an_tpoint   << " \"" << '\n'
+                << "  AW:   " << _aw_tpoint   << " \"" << '\n'
+                << "  CA:   " << _ca_tpoint   << " \"" << '\n'
+                << "  NPAE: " << _npae_tpoint << " \"" << '\n'
+                << "  IE:   " << _ie_tpoint   << " \"" << '\n'
+                << "  IA:   " << _ia_tpoint   << " \"" << '\n';
+    }
+    else
+    {
+        oss_aux << "";
+    }
+
     std::ostringstream oss;
-    oss << "File: " << fileData << ".txt" << '\n';
+    oss << "File: " << fileData << ".txt" << '\n'
+        << oss_aux.str();
     setLog(command, oss.str(), error);
 
     return error;

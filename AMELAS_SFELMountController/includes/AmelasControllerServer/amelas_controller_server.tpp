@@ -572,4 +572,19 @@ void AmelasControllerServer::processSetSixBool(const CommandRequest& request, Co
         reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
 }
 
+template <typename ClbkT>
+void AmelasControllerServer::processGetString(const CommandRequest &request, CommandReply &reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+    std::string strValue;
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, strValue);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, strValue);
+}
+
 #endif

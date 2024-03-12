@@ -87,8 +87,8 @@ public:
     LIBAMELAS_EXPORT AmelasError doConnectPLC();
     LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
 
-    LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& registerValue);
-    LIBAMELAS_EXPORT AmelasError getPLCprueba(const std::string& symbol, const std::string& type); // Prueba
+    LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& registerValue); // TODO (funciona la de abajo sin estructura)
+    LIBAMELAS_EXPORT AmelasError getPLCprueba(const std::string& symbol, const std::string& type); // PRUEBA (hay que cambiar por sus estructuras)
     //=====================================================================================================================
 
 
@@ -97,13 +97,11 @@ public:
     LIBAMELAS_EXPORT AmelasError getMountLog(const std::string &day);
 
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
-    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123); // Prueba
+    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123); // PRUEBA (para ver si comunico con el objeto NTP de TwinCAT)
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
 
-    // TODO: LIBAMELAS_EXPORT AmelasError getMountStatus();
-    // TODO: LIBAMELAS_EXPORT AmelasError getDeviceInfo();
-
-    LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
+    LIBAMELAS_EXPORT AmelasError getMountStatus(std::string& mountStatus); // PRUEBA (en pruebas)
+    LIBAMELAS_EXPORT AmelasError getDeviceInfo(); // PRUEBA (en pruebas)
 
     LIBAMELAS_EXPORT AmelasError enableTrackingAdjusts(const bool& enabled);
     LIBAMELAS_EXPORT AmelasError enableMountPower(const bool& enabled);
@@ -134,19 +132,19 @@ public:
     LIBAMELAS_EXPORT AmelasError getHomingOffsets(AltAzAdj& pos);
 
     LIBAMELAS_EXPORT AmelasError enableMountModel(const bool& enabled);
-    // TODO: LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs);
-    LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const double& an, const double& aw, const double& ca, const double& npae, const double& ie, const double& ia); // Prueba
-    LIBAMELAS_EXPORT AmelasError setMountModelCoefsFile(const std::string &fileData); // Prueba
-    // TODO: LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs);
-    LIBAMELAS_EXPORT AmelasError getMountModelCoefs(double& an, double& aw, double& ca, double& npae, double& ie, double& ia); // Prueba
-    LIBAMELAS_EXPORT AmelasError applyMountModelCorrections(const bool& bAN, const bool& bAW, const bool& bCA, const bool& bNPAE, const bool& bIE, const bool& bIA); // Prueba
+    //LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs); // TODO (funciona la de abajo sin estructura)
+    LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const double& an, const double& aw, const double& ca, const double& npae, const double& ie, const double& ia); // PRUEBA (hay que cambiar por su estructura)
+    LIBAMELAS_EXPORT AmelasError setMountModelCoefsFile(const std::string &fileData); // PRUEBA (no hay definida ninguna API que sea por fichero, pero es cómodo para pruebas)
+    //LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs); // TODO (funciona la de abajo sin estructura)
+    LIBAMELAS_EXPORT AmelasError getMountModelCoefs(double& an, double& aw, double& ca, double& npae, double& ie, double& ia); // PRUEBA (hay que cambiar por su estructura)
+    LIBAMELAS_EXPORT AmelasError applyMountModelCorrections(const bool& bAN, const bool& bAW, const bool& bCA, const bool& bNPAE, const bool& bIE, const bool& bIA); // PRUEBA (no hay definida ninguna API, pero se comprueba que funcione)
 
-    //LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location); // TODO
-    LIBAMELAS_EXPORT AmelasError setLocation(const double& lat, const double& lon, const double& alt, const double& x, const double& y, const double& z); // Prueba
+    //LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location); // TODO (funciona la de abajo sin estructura)
+    LIBAMELAS_EXPORT AmelasError setLocation(const double& lat, const double& lon, const double& alt, const double& x, const double& y, const double& z); // PRUEBA (hay que cambiar por su estructura)
     LIBAMELAS_EXPORT AmelasError getLocation(StationLocation& location);
 
-    //LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo); // TODO
-    LIBAMELAS_EXPORT AmelasError setMeteoData(const double& press, const double& temp, const double& hr); // Prueba
+    //LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo); // TODO (funciona la de abajo sin estructura)
+    LIBAMELAS_EXPORT AmelasError setMeteoData(const double& press, const double& temp, const double& hr); // PRUEBA (hay que cambiar por su estructura)
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
     
     // TODO: LIBAMELAS_EXPORT AmelasError enableSimulationMode(const bool& enabled);
@@ -179,10 +177,15 @@ public:
     LIBAMELAS_EXPORT AmelasError setParkMotion();
     LIBAMELAS_EXPORT AmelasError setCalibrationMotion();
 
-    LIBAMELAS_EXPORT AmelasError pruebaBucles(); // Prueba
-
     // TODO: LIBAMELAS_EXPORT AmelasError setCPFMotion(const file& cpf, AmelasTracking& tracking);
     // TODO: LIBAMELAS_EXPORT AmelasError setStarMotion(const StarData& star_data);
+    //=====================================================================================================================
+
+
+    // OTHER FUNCTIONS
+    //=====================================================================================================================
+    LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
+    LIBAMELAS_EXPORT AmelasError pruebaBucles(); // PRUEBA (para testear bucles sobre arrays)
     //=====================================================================================================================
 
 
