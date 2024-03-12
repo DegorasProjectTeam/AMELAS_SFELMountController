@@ -534,6 +534,7 @@ AmelasError AmelasController::getMountLog(const std::string &day)
     std::string file = "./logs/daily_" + day + ".txt";
     std::ifstream logFile;
     std::string logRead;
+    std::string strLog = "";
 
     // Functionality
     logFile.open(file);
@@ -544,6 +545,7 @@ AmelasError AmelasController::getMountLog(const std::string &day)
         {
             std::getline (logFile, logRead);
             std::cout << logRead << '\n';
+            strLog = strLog + logRead + '\n';
         }
         std::cout << '\n';
     }
@@ -551,6 +553,8 @@ AmelasError AmelasController::getMountLog(const std::string &day)
     {
         error = AmelasError::FILE_ERROR;
     }
+
+    logFile.close();
 
     // Log
     std::ostringstream oss;
