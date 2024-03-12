@@ -135,9 +135,11 @@ public:
 
     LIBAMELAS_EXPORT AmelasError enableMountModel(const bool& enabled);
     // TODO: LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const MountModelCoefs& coefs);
-    LIBAMELAS_EXPORT AmelasError setMountModelCoefs(double& an, double& aw, double& ca, double& npae, double& ie, double& ia); // Prueba
+    LIBAMELAS_EXPORT AmelasError setMountModelCoefs(const double& an, const double& aw, const double& ca, const double& npae, const double& ie, const double& ia); // Prueba
+    LIBAMELAS_EXPORT AmelasError setMountModelCoefsFile(const std::string &fileData); // Prueba
     // TODO: LIBAMELAS_EXPORT AmelasError getMountModelCoefs(MountModelCoefs& coefs);
     LIBAMELAS_EXPORT AmelasError getMountModelCoefs(double& an, double& aw, double& ca, double& npae, double& ie, double& ia); // Prueba
+    LIBAMELAS_EXPORT AmelasError applyMountModelCorrections(const bool& bAN, const bool& bAW, const bool& bCA, const bool& bNPAE, const bool& bIE, const bool& bIA); // Prueba
 
     //LIBAMELAS_EXPORT AmelasError setLocation(const StationLocation& location); // TODO
     LIBAMELAS_EXPORT AmelasError setLocation(const double& lat, const double& lon, const double& alt, const double& x, const double& y, const double& z); // Prueba

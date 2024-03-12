@@ -374,8 +374,10 @@ using SetHomingOffsetsCallback = std::function<AmelasError(const AltAzAdj&)>;
 using GetHomingOffsetsCallback = std::function<AmelasError(AltAzAdj&)>;
 
 using EnableMountModelCallback = std::function<AmelasError(const bool&)>;
-using SetMountModelCoefsCallback = std::function<AmelasError(double&, double&, double&, double&, double&, double&)>;
+using SetMountModelCoefsCallback = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>;
 using GetMountModelCoefsCallback = std::function<AmelasError(double&, double&, double&, double&, double&, double&)>;
+using ApplyMountModelCorrectionsCallback = std::function<AmelasError(const bool&, const bool&, const bool&, const bool&, const bool&, const bool&)>;
+using SetMountModelCoefsFileCallback = std::function<AmelasError(const std::string&)>;
 
 using SetLocationCallback = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>;
 //using SetLocationCallback = std::function<AmelasError(const StationLocation&)>;

@@ -869,7 +869,7 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
 }
 
 // TODO: AmelasError AmelasController::setMountModelCoefs(const MountModelCoefs &coefs)
-AmelasError AmelasController::setMountModelCoefs(double &an, double &aw, double &ca, double &npae, double &ie, double &ia)
+AmelasError AmelasController::setMountModelCoefs(const double &an, const double &aw, const double &ca, const double &npae, const double &ie, const double &ia)
 {
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
@@ -878,7 +878,7 @@ AmelasError AmelasController::setMountModelCoefs(double &an, double &aw, double 
     const std::string command = "SET_MOUNT_MODEL_COEFS";
 
     // Variable used for this function
-    AltAzPos actPosRadians(deg_to_radians(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos")), deg_to_radians(_plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos")));
+    // -- Assign the variables stored internally before the change to the "old" variables
     double old_an = _an_tpoint;
     double old_aw = _aw_tpoint;
     double old_ca = _ca_tpoint;
@@ -887,40 +887,13 @@ AmelasError AmelasController::setMountModelCoefs(double &an, double &aw, double 
     double old_ia = _ia_tpoint;
 
     // Functionality
+    // -- Assigning the input coefficients to the interns
     _an_tpoint = an;
     _aw_tpoint = aw;
     _ca_tpoint = ca;
     _npae_tpoint = npae;
     _ie_tpoint = ie;
     _ia_tpoint = ia;
-
-    ie = arcsec_to_deg(ie);
-    ia = arcsec_to_deg(ia);
-    ca = arcsec_to_deg(ca);
-    an = arcsec_to_deg(an);
-    aw = arcsec_to_deg(aw);
-    npae = arcsec_to_deg(npae);
-
-    //--> IE
-    _elOffset = ie;
-
-    //--> IA
-    _azOffset = -ia;
-
-    //--> CA
-    if (cos(actPosRadians.el) != 0.0)
-        _azOffset = -ca * 1 / cos(actPosRadians.el);
-
-    //--> AN
-    _azOffset = -an * sin(actPosRadians.az) * tan(actPosRadians.el);
-    _elOffset = -an * cos(actPosRadians.az);
-
-    //--> AW
-    _azOffset = -aw * cos(actPosRadians.az) * tan(actPosRadians.el);
-    _elOffset = aw * sin(actPosRadians.az);
-
-    //--> NPAE
-    _azOffset = -npae * tan(actPosRadians.el);
 
     // Log
     std::ostringstream oss;
@@ -937,10 +910,79 @@ AmelasError AmelasController::setMountModelCoefs(double &an, double &aw, double 
         << "  CA:   " << _ca_tpoint   << " \"" << '\n'
         << "  NPAE: " << _npae_tpoint << " \"" << '\n'
         << "  IE:   " << _ie_tpoint   << " \"" << '\n'
-        << "  IA:   " << _ia_tpoint   << " \"" << '\n'
-        << "" << '\n'
-        << "  _azOffset: " << _azOffset << " \370" << '\n'
-        << "  _elOffset: " << _elOffset << " \370" << '\n';
+        << "  IA:   " << _ia_tpoint   << " \"" << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "SET_MOUNT_MODEL_COEFS";
+
+    // Variables used for this function
+    std::string file = "./logs/" + fileData + ".txt";
+    std::ifstream logFile;
+    std::string logRead;
+    std::map<std::string, double> coefs; // Almacena las variables y sus valores
+    std::string coefName;
+    double coefVal;
+    int lineCount = 0; // Contador de líneas leídas
+
+    // Functionality
+    logFile.open(file);
+
+    if (logFile.is_open())
+    {
+        while (logFile)
+        {
+            std::getline (logFile, logRead); // Lee el archivo línea por línea
+            lineCount++; // Incrementa el contador de líneas
+
+            // Si ya se han leído dos líneas, procesa el contenido
+            if (lineCount > 2)
+            {
+                std::istringstream iss(logRead);
+
+                // Lee el nombre de la variable y su valor asociado
+                if (iss >> coefName >> coefVal)
+                    coefs[coefName] = coefVal; // Almacena la variable y su valor asociado en el mapa
+            }
+        }
+    }
+    else
+    {
+        error = AmelasError::FILE_ERROR;
+    }
+
+    logFile.close();
+
+    // Imprime las variables y sus valores asociados
+    for (const auto& pair : coefs)
+    {
+        std::cout << pair.first << ": " << pair.second << std::endl;
+
+        if (pair.first == "AN")
+            _an_tpoint = pair.second;
+        else if (pair.first == "AW")
+            _aw_tpoint = pair.second;
+        else if (pair.first == "CA")
+            _ca_tpoint = pair.second;
+        else if (pair.first == "NPAE")
+            _npae_tpoint = pair.second;
+        else if (pair.first == "IE")
+            _ie_tpoint = pair.second;
+        else if (pair.first == "IA")
+            _ia_tpoint = pair.second;
+    }
+
+    // Log
+    std::ostringstream oss;
+    oss << "File: " << fileData << ".txt" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -965,6 +1007,152 @@ AmelasError AmelasController::getMountModelCoefs(double &an, double &aw, double 
 
     // Log
     setLog(command, "", error);
+
+    return error;
+}
+
+AmelasError AmelasController::applyMountModelCorrections(const bool &bAN, const bool &bAW, const bool &bCA, const bool &bNPAE, const bool &bIE, const bool &bIA)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "APPLY_MOUNT_MODEL_CORRECTIONS";
+
+    // Variable used for this function
+    std::ostringstream oss;
+    std::string str_partial = "";
+    // -- Current position in radians
+    AltAzPos actPosRadians(deg_to_radians(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos")), deg_to_radians(_plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos")));
+    // -- Offset for each coefficient
+    double azOffset_IE = 0.0;
+    double elOffset_IE = 0.0;
+    double azOffset_IA = 0.0;
+    double elOffset_IA = 0.0;
+    double azOffset_CA = 0.0;
+    double elOffset_CA = 0.0;
+    double azOffset_AN = 0.0;
+    double elOffset_AN = 0.0;
+    double azOffset_AW = 0.0;
+    double elOffset_AW = 0.0;
+    double azOffset_NPAE = 0.0;
+    double elOffset_NPAE = 0.0;
+
+    // Functionality
+    // -- Pass everything to deg
+    double ie = arcsec_to_deg(_ie_tpoint);
+    double ia = arcsec_to_deg(_ia_tpoint);
+    double ca = arcsec_to_deg(_ca_tpoint);
+    double an = arcsec_to_deg(_an_tpoint);
+    double aw = arcsec_to_deg(_aw_tpoint);
+    double npae = arcsec_to_deg(_npae_tpoint);
+
+    // -- Calculate the offstes from the coefficients
+    if (!_enable_mount_model)
+    {
+        error = AmelasError::ENABLE_WARN;
+        oss << "The use of corrections is not enabled. Enable it with command 60." << '\n';
+    }
+    else
+    {
+        // --> Elevation index error
+        if (bIE)
+        {
+            azOffset_IE = 0.0;
+            elOffset_IE = ie;
+
+            str_partial = str_partial + "  IE:   " + std::to_string(azOffset_IE) + " " + std::to_string(elOffset_IE) + '\n';
+        }
+        else
+        {
+            azOffset_IE = 0.0;
+            elOffset_IE = 0.0;
+        }
+
+        // --> Azimuth index error
+        if (bIA)
+        {
+            azOffset_IA = -ia;
+            elOffset_IA = 0.0;
+
+            str_partial = str_partial + "  IA:   " + std::to_string(azOffset_IA) + " " + std::to_string(elOffset_IA) + '\n';
+        }
+        else
+        {
+            azOffset_IA = 0.0;
+            elOffset_IA = 0.0;
+        }
+
+        // --> LR collimation error
+        if (bCA)
+        {
+            if (cos(actPosRadians.el) != 0.0)
+                azOffset_CA = -ca * 1 / cos(actPosRadians.el);
+            elOffset_CA = 0.0;
+
+            str_partial = str_partial + "  CA:   " + std::to_string(azOffset_CA) + " " + std::to_string(elOffset_CA) + '\n';
+        }
+        else
+        {
+            azOffset_CA = 0.0;
+            elOffset_CA = 0.0;
+        }
+
+        // --> Azimuth axis misalignment NS
+        if (bAN)
+        {
+            azOffset_AN = -an * sin(actPosRadians.az) * tan(actPosRadians.el);
+            elOffset_AN = -an * cos(actPosRadians.az);
+
+            str_partial = str_partial + "  AN:   " + std::to_string(azOffset_AN) + " " + std::to_string(elOffset_AN) + '\n';
+        }
+        else
+        {
+            azOffset_AN = 0.0;
+            elOffset_AN = 0.0;
+        }
+
+        // --> Azimuth axis misalignment EW
+        if (bAW)
+        {
+            azOffset_AW = -aw * cos(actPosRadians.az) * tan(actPosRadians.el);
+            elOffset_AW = aw * sin(actPosRadians.az);
+
+            str_partial = str_partial + "  AW:   " + std::to_string(azOffset_AW) + " " + std::to_string(elOffset_AW) + '\n';
+        }
+        else
+        {
+            azOffset_AW = 0.0;
+            elOffset_AW = 0.0;
+        }
+
+        // --> Az/El non-perpendicularity
+        if (bNPAE)
+        {
+            azOffset_NPAE = -npae * tan(actPosRadians.el);
+            elOffset_NPAE = 0.0;
+
+            str_partial = str_partial + "  NPAE: " + std::to_string(azOffset_NPAE) + " " + std::to_string(elOffset_NPAE) + '\n';
+        }
+        else
+        {
+            azOffset_NPAE = 0.0;
+            elOffset_NPAE = 0.0;
+        }
+
+        // -- Sum of all partial coefficients
+        _azOffset = azOffset_AN + azOffset_AW + azOffset_CA + azOffset_IA + azOffset_IE + azOffset_NPAE;
+        _elOffset = elOffset_AN + elOffset_AW + elOffset_CA + elOffset_IA + elOffset_IE + elOffset_NPAE;
+
+        oss << "Partial coefficients applied:" << '\n'
+            << str_partial
+            << "Final corrections:" << '\n'
+            << "  Az: " << _azOffset << " \370" << '\n'
+            << "  El: " << _elOffset << " \370" << '\n';
+    }
+
+    // Log
+    setLog(command, oss.str(), error);
 
     return error;
 }

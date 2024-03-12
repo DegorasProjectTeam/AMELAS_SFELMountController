@@ -742,6 +742,167 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             valid = valid_params;
 
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_APP_MOUNT_MODEL_CORRECT))
+        {
+            std::cout << "Sending set REQ_APP_MOUNT_MODEL_CORRECT command." << std::endl;
+
+            bool valid_params = true;
+            bool lat = false, lon = false, alt = false;
+            bool x = false, y = false, z = false;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                lat = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter latitude issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    lon = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter longitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    alt = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter altitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    x = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter x issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    y = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter y issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    z = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter z issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(lat, lon, alt, x, y, z);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS_FILE))
+        {
+            std::cout << "Sending REQ_SET_MOUNT_MODEL_COEFS_FILE command." << std::endl;
+
+            bool valid_params = true;
+            std::string day;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                day = std::string(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter day issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << day << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(day);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_LOCATION))
         {
             std::cout << "Sending set REQ_SET_LOCATION command." << std::endl;

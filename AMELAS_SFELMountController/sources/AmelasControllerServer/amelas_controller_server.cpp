@@ -146,6 +146,14 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS,
                                   &AmelasControllerServer::processGetSixDoubles<controller::GetMountModelCoefsCallback>);
 
+    // REQ_APP_MOUNT_MODEL_CORRECT.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_APP_MOUNT_MODEL_CORRECT,
+                                  &AmelasControllerServer::processSetSixBool<controller::ApplyMountModelCorrectionsCallback>);
+
+    // REQ_SET_MOUNT_MODEL_COEFS_FILE.
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS_FILE,
+                                  &AmelasControllerServer::processSetString<controller::SetMountModelCoefsFileCallback>);
+
     // REQ_SET_LOCATION.
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_LOCATION,
                                   &AmelasControllerServer::processSetLocation<controller::SetLocationCallback>);

@@ -100,6 +100,8 @@ enum class AmelasServerCommand : zmqutils::common::CommandType
     REQ_DO_DISCONNECT_PLC        = 89,
     REQ_DO_PRUEBA_BUCLES         = 100,
     REQ_GET_PLC_PRUEBA           = 101,
+    REQ_APP_MOUNT_MODEL_CORRECT  = 102,
+    REQ_SET_MOUNT_MODEL_COEFS_FILE = 103,
     END_IMPL_COMMANDS            = 90,
     END_AMELAS_COMMANDS          = 91
 };
