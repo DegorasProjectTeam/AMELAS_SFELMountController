@@ -76,7 +76,7 @@ AmelasError AmelasController::enableAvoidSun(const bool &enabled)
     // Functionality
     if (_avoid_sun == enabled)
     {
-        oss << "Avoid Sun is already set to " << enabled << "." << '\n';
+        oss << "Avoid Sun is already set to " << (enabled ? "true" : "false") << "." << '\n';
 
         error = AmelasError::ENABLE_WARN;
     }
@@ -342,7 +342,7 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
         if (pos != std::string::npos)
             result = plcSymbol.substr(pos + prefix.length());
 
-        oss << result << " is already set to " << enabled << "." << '\n';
+        oss << result << " is already set to " << (enabled ? "true" : "false") << "." << '\n';
 
         error = AmelasError::ENABLE_WARN;
     }
@@ -622,28 +622,28 @@ AmelasError AmelasController::getMountStatus(std::string &mountStatus)
     bool elInTargetPos = _plc->read<bool>("MAIN.axesController._elevationAxis._fbPower.Axis.Status.InTargetPosition");
 
     // Functionality
-    oss << "STATUS INFO"                        << '\n'
-        << "  Actual position:"                 << '\n'
-        << "    Az: " << actPos.az << " \370"   << '\n'
-        << "    El: " << actPos.el << " \370"   << '\n'
-        << ""                                   << '\n'
-        << "  Actual velocity:"                 << '\n'
-        << "    Az: " << actVel.az << " \370/s" << '\n'
-        << "    El: " << actVel.el << " \370/s" << '\n'
-        << ""                                   << '\n'
-        << "  Azimuth axis:"                    << '\n'
-        << "    Enabled:     " << azEnabled     << '\n'
-        << "    Moving:      " << azMoving      << '\n'
-        << "    InTargetPos: " << azInTargetPos << '\n'
-        << "    Positive:    " << azPositiveDir << '\n'
-        << "    Negative:    " << azNegativeDir << '\n'
-        << ""                                   << '\n'
-        << "  Elevation axis:"                  << '\n'
-        << "    Enabled:     " << elEnabled     << '\n'
-        << "    Moving:      " << elMoving      << '\n'
-        << "    InTargetPos: " << elInTargetPos << '\n'
-        << "    Positive:    " << elPositiveDir << '\n'
-        << "    Negative:    " << elNegativeDir << '\n';
+    oss << "STATUS INFO"                                             << '\n'
+        << "  Actual position:"                                      << '\n'
+        << "    Az: " << actPos.az << " \370"                        << '\n'
+        << "    El: " << actPos.el << " \370"                        << '\n'
+        << ""                                                        << '\n'
+        << "  Actual velocity:"                                      << '\n'
+        << "    Az: " << actVel.az << " \370/s"                      << '\n'
+        << "    El: " << actVel.el << " \370/s"                      << '\n'
+        << ""                                                        << '\n'
+        << "  Azimuth axis:"                                         << '\n'
+        << "    Enabled:     " << (azEnabled     ? "true" : "false") << '\n'
+        << "    Moving:      " << (azMoving      ? "true" : "false") << '\n'
+        << "    InTargetPos: " << (azInTargetPos ? "true" : "false") << '\n'
+        << "    Positive:    " << (azPositiveDir ? "true" : "false") << '\n'
+        << "    Negative:    " << (azNegativeDir ? "true" : "false") << '\n'
+        << ""                                                        << '\n'
+        << "  Elevation axis:"                                       << '\n'
+        << "    Enabled:     " << (elEnabled     ? "true" : "false") << '\n'
+        << "    Moving:      " << (elMoving      ? "true" : "false") << '\n'
+        << "    InTargetPos: " << (elInTargetPos ? "true" : "false") << '\n'
+        << "    Positive:    " << (elPositiveDir ? "true" : "false") << '\n'
+        << "    Negative:    " << (elNegativeDir ? "true" : "false") << '\n';
 
     mountStatus = oss.str();
 
@@ -934,7 +934,7 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
     // Functionality
     if (_enable_mount_model == enabled)
     {
-        oss << "Mount model is already set to " << enabled << "." << '\n';
+        oss << "Mount model is already set to " << (enabled ? "true" : "false") << "." << '\n';
 
         error = AmelasError::ENABLE_WARN;
     }

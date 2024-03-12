@@ -147,15 +147,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(name, port);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, port);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
 
                 valid_params = true;
@@ -202,15 +202,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(enable);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
 
                 valid_params = true;
@@ -270,15 +270,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(address);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, address);*/
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, symbol);
 
                 valid_params = true;
@@ -327,15 +327,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(name, type);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, type);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
 
                 valid_params = true;
@@ -370,15 +370,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(day);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
 
                 valid_params = true;
@@ -443,15 +443,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(host, port, timeout);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, host, port, timeout);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, host, port, timeout);
 
                 valid_params = true;
@@ -489,15 +489,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(datetime);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, datetime);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, datetime);
 
                 valid_params = true;
@@ -575,15 +575,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(pos);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
 
                 valid_params = true;
@@ -653,15 +653,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(alt);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, alt);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, alt);
 
                 valid_params = true;
@@ -779,15 +779,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(lat, lon, alt, x, y, z);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
 
                 valid_params = true;
@@ -822,15 +822,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(day);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
 
                 valid_params = true;
@@ -940,15 +940,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(lat, lon, alt, x, y, z);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
 
                 valid_params = true;
@@ -1067,15 +1067,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(lat, lon, alt, x, y, z);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
 
                 valid_params = true;
@@ -1148,15 +1148,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(press, temp, hr);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, press, temp, hr);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, press);
 
                 valid_params = true;
@@ -1279,15 +1279,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(pos, vel);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos, vel);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
 
                 valid_params = true;
@@ -1339,15 +1339,15 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(pos);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
 
                 valid_params = true;
@@ -1409,7 +1409,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 if (client_result == OperationResult::COMMAND_OK)
                 {
-                    std::cout<<"Server time: "<<datetime<<std::endl;
+                    std::cout << "Server time: " << datetime << std::endl;
 
                     delete[] command_str;
                     return;
@@ -1418,14 +1418,14 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             else
                 client_result = client.sendCommand(command_msg, reply);
 
-            std::cerr << "Client Result: " << static_cast<int>(client_result)<<std::endl;
+            std::cerr << "Client Result: " << static_cast<int>(client_result) <<std::endl;
 
             if (client_result != OperationResult::COMMAND_OK)
             {
             }
             else
             {
-                std::cout<<"Server result: "<<static_cast<int>(reply.server_result)<<std::endl;
+                std::cout << "Server result: " << static_cast<int>(reply.server_result) << std::endl;
 
                 if(reply.server_result != OperationResult::COMMAND_OK)
                 {
@@ -1441,11 +1441,11 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     AmelasError error;
 
                     BinarySerializer ser(reply.params.get(), reply.params_size);
-                    std::cout<<ser.toJsonString()<<std::endl;
+                    std::cout << ser.toJsonString() << std::endl;
 
                     ser.read(error);
 
-                    std::cout<<"Controller error: "<<static_cast<int>(error)<<std::endl;
+                    std::cout << "Controller error: " << static_cast<int>(error) << std::endl;
                 }
 
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION)
@@ -1493,7 +1493,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1518,7 +1518,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1544,7 +1544,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1571,7 +1571,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1605,7 +1605,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1627,7 +1627,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1649,7 +1649,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1672,7 +1672,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1711,7 +1711,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1736,7 +1736,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -1793,7 +1793,7 @@ int main(int, char**)
 
     if(!started)
     {
-        std::cout<<"Unable to start the client.";
+        std::cout << "Unable to start the client.";
         return 1;
     }
 
@@ -1804,24 +1804,24 @@ int main(int, char**)
     while(!console_cfg.closeStatus())
     {
         // Get the command and parameters.
-        std::cout<<""<<std::endl;
-        std::cout<<"------------------------------------------------------"<<std::endl;
-        std::cout<<"-- Commands --"<<std::endl;
-        std::cout<<"- REQ_CONNECT:                   0"<<std::endl;
-        std::cout<<"- REQ_DISCONNECT:                1"<<std::endl;
-        std::cout<<"- REQ_ALIVE:                     2"<<std::endl;
-        std::cout<<"- REQ_GET_SERVER_TIME:           3"<<std::endl;
-        std::cout<<"- CUSTOM:                        cmd param1 param2 ..."<<std::endl;
-        std::cout<<""<<std::endl;
-        std::cout<<"-- Other --"<<std::endl;
-        std::cout<<"- Client exit:                   exit"<<std::endl;
-        std::cout<<"- Enable auto-alive:             auto_alive_en"<<std::endl;
-        std::cout<<"- Disable auto-alive:            auto_alive_ds"<<std::endl;
-        std::cout<<"- Enable auto-alive clbk:        auto_alive_clbk_en"<<std::endl;
-        std::cout<<"- Disable auto-alive clbk:       auto_alive_clbk_ds"<<std::endl;
-        std::cout<<"- Shows all the custom commands: commands"<<std::endl;
-        std::cout<<"------------------------------------------------------"<<std::endl;
-        std::cout<<"Write a command: ";
+        std::cout << "" << std::endl;
+        std::cout << "------------------------------------------------------" << std::endl;
+        std::cout << "-- Commands --" << std::endl;
+        std::cout << "- REQ_CONNECT:                   0" << std::endl;
+        std::cout << "- REQ_DISCONNECT:                1" << std::endl;
+        std::cout << "- REQ_ALIVE:                     2" << std::endl;
+        std::cout << "- REQ_GET_SERVER_TIME:           3" << std::endl;
+        std::cout << "- CUSTOM:                        cmd param1 param2 ..." << std::endl;
+        std::cout << "" << std::endl;
+        std::cout << "-- Other --" << std::endl;
+        std::cout << "- Client exit:                   exit" << std::endl;
+        std::cout << "- Enable auto-alive:             auto_alive_en" << std::endl;
+        std::cout << "- Disable auto-alive:            auto_alive_ds" << std::endl;
+        std::cout << "- Enable auto-alive clbk:        auto_alive_clbk_en" << std::endl;
+        std::cout << "- Disable auto-alive clbk:       auto_alive_clbk_ds" << std::endl;
+        std::cout << "- Shows all the custom commands: commands" << std::endl;
+        std::cout << "------------------------------------------------------" << std::endl;
+        std::cout << "Write a command: ";
         std::getline(std::cin, command);
 
         // Check for other commands.
