@@ -286,6 +286,64 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             valid = valid_params;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_PRUEBA))
+        {
+            std::cout << "Sending REQ_GET_PLC_PRUEBA command." << std::endl;
+
+            bool valid_params = true;
+            std::string name, type;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                name = std::string(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter name issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    type = std::string(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter type issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << name << " " << type << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(name, type);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, type);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_LOG))
         {
             std::cout << "Sending REQ_GET_MOUNT_LOG command." << std::endl;
@@ -455,12 +513,12 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_MOUNT_INFO command." << std::endl;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION)
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS)
-                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
         {
             if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION))
@@ -619,10 +677,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_HOMING_OFFSETS command." << std::endl;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS))
-        {
-            std::cout << "Sending REQ_GET_MOUNT_MODEL_COEFS command." << std::endl;
-        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS))
         {
             std::cout << "Sending set REQ_SET_MOUNT_MODEL_COEFS command." << std::endl;
@@ -630,125 +684,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             bool valid_params = true;
             double lat = 0., lon = 0., alt = 0.;
             double x = 0., y = 0., z = 0.;
-            char *param_token = std::strtok(nullptr, " ");
-
-            try
-            {
-                lat = std::stod(param_token);
-            }
-            catch (...)
-            {
-                std::cerr << "Bad parameter latitude issued.";
-                valid_params = false;
-            }
-
-            if (valid_params)
-            {
-                param_token = std::strtok(nullptr, " ");
-
-                try
-                {
-                    lon = std::stod(param_token);
-                }
-                catch (...)
-                {
-                    std::cerr << "Bad parameter longitude issued.";
-                    valid_params = false;
-                }
-            }
-
-            if (valid_params)
-            {
-                param_token = std::strtok(nullptr, " ");
-
-                try
-                {
-                    alt = std::stod(param_token);
-                }
-                catch (...)
-                {
-                    std::cerr << "Bad parameter altitude issued.";
-                    valid_params = false;
-                }
-            }
-
-            if (valid_params)
-            {
-                param_token = std::strtok(nullptr, " ");
-
-                try
-                {
-                    x = std::stod(param_token);
-                }
-                catch (...)
-                {
-                    std::cerr << "Bad parameter x issued.";
-                    valid_params = false;
-                }
-            }
-
-            if (valid_params)
-            {
-                param_token = std::strtok(nullptr, " ");
-
-                try
-                {
-                    y = std::stod(param_token);
-                }
-                catch (...)
-                {
-                    std::cerr << "Bad parameter y issued.";
-                    valid_params = false;
-                }
-            }
-
-            if (valid_params)
-            {
-                param_token = std::strtok(nullptr, " ");
-
-                try
-                {
-                    z = std::stod(param_token);
-                }
-                catch (...)
-                {
-                    std::cerr << "Bad parameter z issued.";
-                    valid_params = false;
-                }
-            }
-
-            if (valid_params)
-            {
-                std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
-
-                BinarySerializer serializer;
-
-                serializer.write(lat, lon, alt, x, y, z);
-
-                std::cout<<serializer.toJsonString();
-
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
-
-                std::cout<<std::endl;
-            }
-            else
-            {
-                std::cout<<"Sending invalid command: "<<std::endl;
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
-
-                valid_params = true;
-            }
-
-            valid = valid_params;
-
-        }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_APP_MOUNT_MODEL_CORRECT))
-        {
-            std::cout << "Sending set REQ_APP_MOUNT_MODEL_CORRECT command." << std::endl;
-
-            bool valid_params = true;
-            bool lat = false, lon = false, alt = false;
-            bool x = false, y = false, z = false;
             char *param_token = std::strtok(nullptr, " ");
 
             try
@@ -902,6 +837,129 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             }
 
             valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_APP_MOUNT_MODEL_CORRECT))
+        {
+            std::cout << "Sending set REQ_APP_MOUNT_MODEL_CORRECT command." << std::endl;
+
+            bool valid_params = true;
+            bool lat = false, lon = false, alt = false;
+            bool x = false, y = false, z = false;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                lat = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter latitude issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    lon = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter longitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    alt = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter altitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    x = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter x issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    y = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter y issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    z = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter z issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(lat, lon, alt, x, y, z);
+
+                std::cout<<serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
+
+                std::cout<<std::endl;
+            }
+            else
+            {
+                std::cout<<"Sending invalid command: "<<std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS))
+        {
+            std::cout << "Sending REQ_GET_MOUNT_MODEL_COEFS command." << std::endl;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_LOCATION))
         {
@@ -1317,64 +1375,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_DO_PRUEBA_BUCLES command." << std::endl;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_PRUEBA))
-        {
-            std::cout << "Sending REQ_GET_PLC_PRUEBA command." << std::endl;
-
-            bool valid_params = true;
-            std::string name, type;
-            char *param_token = std::strtok(nullptr, " ");
-
-            try
-            {
-                name = std::string(param_token);
-            }
-            catch (...)
-            {
-                std::cerr << "Bad parameter name issued.";
-                valid_params = false;
-            }
-
-            if (valid_params)
-            {
-                param_token = std::strtok(nullptr, " ");
-
-                try
-                {
-                    type = std::string(param_token);
-                }
-                catch (...)
-                {
-                    std::cerr << "Bad parameter type issued.";
-                    valid_params = false;
-                }
-            }
-
-            if (valid_params)
-            {
-                std::cout << "Sending: " << name << " " << type << std::endl;
-
-                BinarySerializer serializer;
-
-                serializer.write(name, type);
-
-                std::cout<<serializer.toJsonString();
-
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, type);
-
-                std::cout<<std::endl;
-            }
-            else
-            {
-                std::cout<<"Sending invalid command: "<<std::endl;
-                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
-
-                valid_params = true;
-            }
-
-            valid = valid_params;
-
-        }
         else
         {
             valid = false;
@@ -1401,8 +1401,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     delete[] command_str;
                     return;
                 }
-
-
             }
             else if(command_msg.command == ServerCommand::REQ_GET_SERVER_TIME)
             {
@@ -1416,7 +1414,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     delete[] command_str;
                     return;
                 }
-
             }
             else
                 client_result = client.sendCommand(command_msg, reply);
@@ -1428,8 +1425,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             }
             else
             {
-
-
                 std::cout<<"Server result: "<<static_cast<int>(reply.server_result)<<std::endl;
 
                 if(reply.server_result != OperationResult::COMMAND_OK)
@@ -1722,7 +1717,8 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     }
                 }
 
-                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT))
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS))
                 {
                     try
                     {
@@ -1733,28 +1729,10 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, waitAlt);
 
                         // Generate the struct.
-                        std::cout << "Wait alt: " << waitAlt << std::endl;
-                    }
-                    catch(...)
-                    {
-                        std::cout<<"BAD PARAMS"<<std::endl;
-                        // RETURN BAD PARAMS
-                        //result = ClientResult::
-                    }
-                }
-
-                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS))
-                {
-                    try
-                    {
-                        AmelasError error;   // Trash. The controller error must be checked.
-                        double timeBias;
-
-                        // Deserialize the parameters.
-                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, timeBias);
-
-                        // Generate the struct.
-                        std::cout << "Track time bias: " << timeBias << " ms" << std::endl;
+                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT))
+                            std::cout << "Wait alt: " << waitAlt << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS))
+                            std::cout << "Track time bias: " << waitAlt << " ms" << std::endl;
                     }
                     catch(...)
                     {
@@ -1880,81 +1858,84 @@ int main(int, char**)
         }
         else if(command == "commands")
         {
-            std::cout << "Showing all custom commands:" << std::endl;
-            std::cout << "" << std::endl;
-            std::cout << "\t- REQ_DO_CONNECT_PLC:           88" << std::endl;
-            std::cout << "\t- REQ_DO_DISCONNECT_PLC:        89" << std::endl;
-            std::cout << "" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "    SAFETY RELATED FUNCTIONS" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "\t- REQ_DO_RESET_STATE:           33" << std::endl;
-            std::cout << "\t- REQ_EN_AVOID_SUN:             34 bool" << std::endl;
-            std::cout << "" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "    LOW LEVEL PLC REGISTERS RELATED FUNCTIONS" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "\t- REQ_GET_PLC_REGISTERS:        35 (TODO)" << std::endl;
-            std::cout << "" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "    STATUS & CONFIGURATION RELATED FUNCTIONS" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "\t- REQ_GET_MOUNT_LOG:            36 YYYY-MM-DD" << std::endl;
-            std::cout << "\t- REQ_DO_SYNC_NTP:              37 (TODO)" << std::endl;
-            std::cout << "\t- REQ_DO_SYNC_MANUAL:           38 (TODO)" << std::endl;
-            std::cout << "\t- REQ_GET_MOUNT_STATUS:         39" << std::endl;
-            std::cout << "\t- REQ_GET_MOUNT_INFO:           40" << std::endl;
-            std::cout << "\t- REQ_EN_TRACK_ADJ:             41 bool" << std::endl;
-            std::cout << "\t- REQ_EN_MOUNT_POWER:           42 bool" << std::endl;
-            std::cout << "\t- REQ_SET_SLEW_SPEED:           43 double double" << std::endl;
-            std::cout << "\t- REQ_GET_SLEW_SPEED:           44" << std::endl;
-            std::cout << "\t- REQ_SET_HOME_POSITION:        45 double double" << std::endl;
-            std::cout << "\t- REQ_GET_HOME_POSITION:        46" << std::endl;
-            std::cout << "\t- REQ_SET_IDLE_POS:             47 double double" << std::endl;
-            std::cout << "\t- REQ_GET_IDLE_POS:             48" << std::endl;
-            std::cout << "\t- REQ_SET_PARK_POS:             49 double double" << std::endl;
-            std::cout << "\t- REQ_GET_PARK_POS:             50" << std::endl;
-            std::cout << "\t- REQ_SET_CALIBRATION_POS:      51 double double" << std::endl;
-            std::cout << "\t- REQ_GET_CALIBRATION_POS:      52" << std::endl;
-            std::cout << "\t- REQ_SET_IDLE_POS_HERE:        53" << std::endl;
-            std::cout << "\t- REQ_SET_PARK_POS_HERE:        54" << std::endl;
-            std::cout << "\t- REQ_SET_CALIBRATION_POS_HERE: 55" << std::endl;
-            std::cout << "\t- REQ_SET_WAIT_ALT:             56 double" << std::endl;
-            std::cout << "\t- REQ_GET_WAIT_ALT:             57" << std::endl;
-            std::cout << "\t- REQ_SET_HOMING_OFFSETS:       58 double double" << std::endl;
-            std::cout << "\t- REQ_GET_HOMING_OFFSETS:       59" << std::endl;
-            std::cout << "\t- REQ_EN_MOUNT_MODEL:           60 bool" << std::endl;
-            std::cout << "\t- REQ_SET_MOUNT_MODEL_COEFS:    61 double double double double double double" << std::endl;
-            std::cout << "\t- REQ_GET_MOUNT_MODEL_COEFS:    62" << std::endl;
-            std::cout << "\t- REQ_SET_LOCATION:             63 (TODO)" << std::endl;
-            std::cout << "\t- REQ_GET_LOCATION:             64" << std::endl;
-            std::cout << "\t- REQ_SET_METEO_DATA:           65 (TODO)" << std::endl;
-            std::cout << "\t- REQ_GET_METEO_DATA:           66" << std::endl;
-            std::cout << "\t- REQ_EN_SIMULATION_MODE:       67 (TODO)" << std::endl;
-            std::cout << "\t- REQ_GET_SIMULATION_STATE:     68 (TODO)" << std::endl;
-            std::cout << "\t- REQ_SET_SIMULATION_TIME:      69 (TODO)" << std::endl;
-            std::cout << "" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "    MOTION RELATED FUNCTIONS" << std::endl;
-            std::cout << "    " << std::string(70, '-') << '\n';
-            std::cout << "\t- REQ_GET_MOTION_MODE:          70" << std::endl;
-            std::cout << "\t- REQ_GET_MOTION_STATE:         71" << std::endl;
-            std::cout << "\t- REQ_DO_START_MOTION:          72" << std::endl;
-            std::cout << "\t- REQ_DO_PAUSE_MOTION:          73" << std::endl;
-            std::cout << "\t- REQ_DO_STOP_MOTION:           74" << std::endl;
-            std::cout << "\t- REQ_SET_TRACK_POS_OFFSET:     75 double double" << std::endl;
-            std::cout << "\t- REQ_GET_TRACK_POS_OFFSET:     76" << std::endl;
-            std::cout << "\t- REQ_SET_TRACK_TIME_BIAS:      77 double" << std::endl;
-            std::cout << "\t- REQ_GET_TRACK_TIME_BIAS:      78" << std::endl;
-            std::cout << "\t- REQ_SET_ABS_ALTAZ_MOTION:     79 double double double double" << std::endl;
-            std::cout << "\t- REQ_SET_REL_ALTAZ_MOTION:     80 double double double double" << std::endl;
-            std::cout << "\t- REQ_SET_CON_ALTAZ_MOTION:     81 double double" << std::endl;
-            std::cout << "\t- REQ_SET_HOMING_MOTION:        82 (TODO)" << std::endl;
-            std::cout << "\t- REQ_SET_IDLE_MOTION:          83" << std::endl;
-            std::cout << "\t- REQ_SET_PARK_MOTION:          84" << std::endl;
-            std::cout << "\t- REQ_SET_CALIBRATION_MOTION:   85" << std::endl;
-            std::cout << "\t- REQ_SET_CPF_MOTION:           86 (TODO)" << std::endl;
-            std::cout << "\t- REQ_SET_STAR_MOTION:          87 (TODO)" << std::endl;
+            std::cout << "Showing all custom commands:"                                                                                << std::endl;
+            std::cout << ""                                                                                                            << std::endl;
+            std::cout << "\t- REQ_DO_CONNECT_PLC:              88"                                                                     << std::endl;
+            std::cout << "\t- REQ_DO_DISCONNECT_PLC:           89"                                                                     << std::endl;
+            std::cout << ""                                                                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "    SAFETY RELATED FUNCTIONS"                                                                                << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "\t- REQ_DO_RESET_STATE:              33"                                                                     << std::endl;
+            std::cout << "\t- REQ_EN_AVOID_SUN:                34 bool"                                                                << std::endl;
+            std::cout << ""                                                                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "    LOW LEVEL PLC REGISTERS RELATED FUNCTIONS"                                                               << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "\t- REQ_GET_PLC_REGISTERS:           35 (TODO)"                                                              << std::endl;
+            std::cout << "\t- REQ_GET_PLC_PRUEBA:             101 string(symbol) string(type)"                                         << std::endl;
+            std::cout << ""                                                                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "    STATUS & CONFIGURATION RELATED FUNCTIONS"                                                                << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "\t- REQ_GET_MOUNT_LOG:               36 string(YYYY-MM-DD)"                                                  << std::endl;
+            std::cout << "\t- REQ_DO_SYNC_NTP:                 37 (TODO)"                                                              << std::endl;
+            std::cout << "\t- REQ_DO_SYNC_MANUAL:              38 (TODO)"                                                              << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_STATUS:            39"                                                                     << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_INFO:              40"                                                                     << std::endl;
+            std::cout << "\t- REQ_EN_TRACK_ADJ:                41 bool"                                                                << std::endl;
+            std::cout << "\t- REQ_EN_MOUNT_POWER:              42 bool"                                                                << std::endl;
+            std::cout << "\t- REQ_SET_SLEW_SPEED:              43 double(vel.az) double(vel.el)"                                       << std::endl;
+            std::cout << "\t- REQ_GET_SLEW_SPEED:              44"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_HOME_POSITION:           45 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- REQ_GET_HOME_POSITION:           46"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_IDLE_POS:                47 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- REQ_GET_IDLE_POS:                48"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_PARK_POS:                49 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- REQ_GET_PARK_POS:                50"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_CALIBRATION_POS:         51 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- REQ_GET_CALIBRATION_POS:         52"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_IDLE_POS_HERE:           53"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_PARK_POS_HERE:           54"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_CALIBRATION_POS_HERE:    55"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_WAIT_ALT:                56 double(alt)"                                                         << std::endl;
+            std::cout << "\t- REQ_GET_WAIT_ALT:                57"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_HOMING_OFFSETS:          58 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- REQ_GET_HOMING_OFFSETS:          59"                                                                     << std::endl;
+            std::cout << "\t- REQ_EN_MOUNT_MODEL:              60 bool"                                                                << std::endl;
+            std::cout << "\t- REQ_SET_MOUNT_MODEL_COEFS:       61 double(AN) double(AW) double(CA) double(NPAE) double(IE) double(IA)" << std::endl;
+            std::cout << "\t- REQ_SET_MOUNT_MODEL_COEFS_FILE: 103 string(test_azel_model_v1)"                                          << std::endl;
+            std::cout << "\t- REQ_APP_MOUNT_MODEL_CORRECT:    102 bool(AN) bool(AW) bool(CA) bool(NPAE) bool(IE) bool(IA)"             << std::endl;
+            std::cout << "\t- REQ_GET_MOUNT_MODEL_COEFS:       62"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_LOCATION:                63 double(lat) double(lon) double(alt) double(x) double(y) double(z)"   << std::endl;
+            std::cout << "\t- REQ_GET_LOCATION:                64"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_METEO_DATA:              65 double(press) double(temp) double(hr)"                               << std::endl;
+            std::cout << "\t- REQ_GET_METEO_DATA:              66"                                                                     << std::endl;
+            std::cout << "\t- REQ_EN_SIMULATION_MODE:          67 (TODO)"                                                              << std::endl;
+            std::cout << "\t- REQ_GET_SIMULATION_STATE:        68 (TODO)"                                                              << std::endl;
+            std::cout << "\t- REQ_SET_SIMULATION_TIME:         69 (TODO)"                                                              << std::endl;
+            std::cout << ""                                                                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "    MOTION RELATED FUNCTIONS"                                                                                << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                                << '\n';
+            std::cout << "\t- REQ_GET_MOTION_MODE:             70"                                                                     << std::endl;
+            std::cout << "\t- REQ_GET_MOTION_STATE:            71"                                                                     << std::endl;
+            std::cout << "\t- REQ_DO_START_MOTION:             72"                                                                     << std::endl;
+            std::cout << "\t- REQ_DO_PAUSE_MOTION:             73"                                                                     << std::endl;
+            std::cout << "\t- REQ_DO_STOP_MOTION:              74"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_TRACK_POS_OFFSET:        75 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- REQ_GET_TRACK_POS_OFFSET:        76"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_TRACK_TIME_BIAS:         77 double(time)"                                                        << std::endl;
+            std::cout << "\t- REQ_GET_TRACK_TIME_BIAS:         78"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_ABS_ALTAZ_MOTION:        79 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
+            std::cout << "\t- REQ_SET_REL_ALTAZ_MOTION:        80 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
+            std::cout << "\t- REQ_SET_CON_ALTAZ_MOTION:        81 double(vel.az) double(vel.el)"                                       << std::endl;
+            std::cout << "\t- REQ_SET_HOMING_MOTION:           82 (TODO)"                                                              << std::endl;
+            std::cout << "\t- REQ_SET_IDLE_MOTION:             83"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_PARK_MOTION:             84"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_CALIBRATION_MOTION:      85"                                                                     << std::endl;
+            std::cout << "\t- REQ_SET_CPF_MOTION:              86 (TODO)"                                                              << std::endl;
+            std::cout << "\t- REQ_SET_STAR_MOTION:             87 (TODO)"                                                              << std::endl;
             continue;
         }
 
