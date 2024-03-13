@@ -152,6 +152,8 @@ AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegis
         registerValue.value = std::to_string(_plc->read<short int>(address.symbol));
     else if (address.type == "bool")
         registerValue.value = std::to_string(_plc->read<bool>(address.symbol));
+    else if (address.type == "T_FILETIME64")
+        registerValue.value = std::to_string(_plc->read<unsigned long long>(address.symbol));
 
     // Log
     std::ostringstream oss;
@@ -179,6 +181,8 @@ AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std:
         value = std::to_string(_plc->read<short int>(symbol));
     else if (type == "bool")
         value = std::to_string(_plc->read<bool>(symbol));
+    else if (type == "T_FILETIME64")
+        value = std::to_string(_plc->read<unsigned long long>(symbol));
 
     // Log
     std::ostringstream oss;
@@ -240,28 +244,28 @@ AmelasMotionMode AmelasController::motionModes()
     AmelasMotionMode motion_mode;
 
     // Functionality
-    if (_plc->read<double>(symbol) == 0.0)
+    if (_plc->read<short int>(symbol) == 0)
         motion_mode = AmelasMotionMode::NO_MOTION;
-    else if (_plc->read<double>(symbol) == 1.0)
+    else if (_plc->read<short int>(symbol) == 1)
         motion_mode = AmelasMotionMode::ABSOLUTE_MOTION;
-    else if (_plc->read<double>(symbol) == 2.0)
+    else if (_plc->read<short int>(symbol) == 2)
         motion_mode = AmelasMotionMode::RELATIVE_MOTION;
-    else if (_plc->read<double>(symbol) == 3.0)
+    else if (_plc->read<short int>(symbol) == 3)
         motion_mode = AmelasMotionMode::CONTINUOUS;
-    else if (_plc->read<double>(symbol) == 4.0)
+    else if (_plc->read<short int>(symbol) == 4)
         motion_mode = AmelasMotionMode::HOMING_OP;
-    else if (_plc->read<double>(symbol) == 5.0)
+    else if (_plc->read<short int>(symbol) == 5)
         motion_mode = AmelasMotionMode::TO_IDLE;
-    else if (_plc->read<double>(symbol) == 6.0)
+    else if (_plc->read<short int>(symbol) == 6)
         motion_mode = AmelasMotionMode::TO_PARK;
-    else if (_plc->read<double>(symbol) == 7.0)
+    else if (_plc->read<short int>(symbol) == 7)
         motion_mode = AmelasMotionMode::TO_CALIBRATION;
-    else if (_plc->read<double>(symbol) == 8.0)
+    else if (_plc->read<short int>(symbol) == 8)
         motion_mode = AmelasMotionMode::CPF;
-    else if (_plc->read<double>(symbol) == 9.0)
+    else if (_plc->read<short int>(symbol) == 9)
         motion_mode = AmelasMotionMode::STAR;
     // TODO
-    // else if (_plc->read<double>(symbol) == X.0)
+    // else if (_plc->read<short int>(symbol) == X)
     //     motion_mode = AmelasMotionMode::TLE;
     else
         motion_mode = AmelasMotionMode::UNKNOWN;
@@ -280,12 +284,12 @@ AmelasMotionState AmelasController::motionStates()
     AmelasMotionState motion_state;
 
     // Functionality
-    if (_plc->read<double>(sState) == 4.0      // Homing
-        || _plc->read<double>(sState) == 6.0   // MovingAbsolute
-        || _plc->read<double>(sState) == 7.0   // MovingRelative
-        || _plc->read<double>(sState) == 13.0) // MovingVelocity
+    if (_plc->read<short int>(sState) == 4      // Homing
+        || _plc->read<short int>(sState) == 6   // MovingAbsolute
+        || _plc->read<short int>(sState) == 7   // MovingRelative
+        || _plc->read<short int>(sState) == 13) // MovingVelocity
         motion_state = AmelasMotionState::MOVING;
-    else if (_plc->read<double>(sState) == 8.0) // Halting
+    else if (_plc->read<short int>(sState) == 8) // Halting
         motion_state = AmelasMotionState::PAUSED;
     else if (motionModes() == AmelasMotionMode::ABSOLUTE_MOTION   // LoadMoveAbsolute
             || motionModes() == AmelasMotionMode::RELATIVE_MOTION // LoadMoveRelative
@@ -297,25 +301,25 @@ AmelasMotionState AmelasController::motionStates()
             || motionModes() == AmelasMotionMode::CPF             // LoadMoveCPFMotion
             || motionModes() == AmelasMotionMode::STAR)           // LoadMoveStarMotion
         motion_state = AmelasMotionState::WAITING_START;
-    else if (_plc->read<double>(sState) == 3.0 // Standstill
+    else if (_plc->read<short int>(sState) == 3 // Standstill
             && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.IdlePosition.Azimuth")
             && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.IdlePosition.Elevation"))
         motion_state = AmelasMotionState::IDLE;
-    else if (_plc->read<double>(sState) == 3.0 // Standstill
+    else if (_plc->read<short int>(sState) == 3 // Standstill
             && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.ParkPosition.Azimuth")
             && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.ParkPosition.Elevation"))
         motion_state = AmelasMotionState::PARK;
-    else if (_plc->read<double>(sState) == 3.0 // Standstill
+    else if (_plc->read<short int>(sState) == 3 // Standstill
             && _plc->read<double>(sActPosAz) == _plc->read<double>("MAIN.commander.CalibrationPosition.Azimuth")
             && _plc->read<double>(sActPosEl) == _plc->read<double>("MAIN.commander.CalibrationPosition.Elevation"))
         motion_state = AmelasMotionState::CALIBRATION;
-    else if (_plc->read<double>(sState) == 3.0) // Standstill
+    else if (_plc->read<short int>(sState) == 3) // Standstill
         motion_state = AmelasMotionState::STOPPED;
-    else if (_plc->read<double>(sState) == 10.0) // Error
+    else if (_plc->read<short int>(sState) == 10) // Error
         motion_state = AmelasMotionState::INVALID_ERROR;
-    else if (_plc->read<double>(sState) == 0.0) // Disabled
+    else if (_plc->read<short int>(sState) == 0) // Disabled
         motion_state = AmelasMotionState::DISABLED;
-    else if (_plc->read<double>(sState) == 11.0) // Reset
+    else if (_plc->read<short int>(sState) == 11) // Reset
         motion_state = AmelasMotionState::RESET;
     else
         motion_state = AmelasMotionState::UNKNOWN;
@@ -1041,7 +1045,7 @@ AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData
             {
                 std::istringstream iss(logRead);
 
-                // Reads the name of the variable and its associated value
+                // Read the name of the variable and its associated value
                 if (iss >> coefName >> coefVal)
                     coefs[coefName] = coefVal; // Stores the variable and its associated value in the map
             }
@@ -1056,7 +1060,7 @@ AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData
 
     for (const auto& pair : coefs)
     {
-        std::cout << pair.first << ": " << pair.second << std::endl;
+        //std::cout << pair.first << ": " << pair.second << std::endl;
 
         if (pair.first == "AN")
             _an_tpoint = pair.second;
@@ -1255,11 +1259,11 @@ AmelasError AmelasController::applyMountModelCorrections(const bool &bAN, const 
             elOffset_NPAE = 0.0;
         }
 
-        // -- Sum of all partial coefficients
+        // -- Sum of all partial offsets
         _azOffset = azOffset_AN + azOffset_AW + azOffset_CA + azOffset_IA + azOffset_IE + azOffset_NPAE;
         _elOffset = elOffset_AN + elOffset_AW + elOffset_CA + elOffset_IA + elOffset_IE + elOffset_NPAE;
 
-        oss << "Partial coefficients applied:" << '\n'
+        oss << "Partial offsets applied:" << '\n'
             << str_partial
             << "Final corrections:" << '\n'
             << "  Az: " << _azOffset << " \370" << '\n'
@@ -1296,13 +1300,13 @@ AmelasError AmelasController::setLocation(const double &lat, const double &lon, 
     std::ostringstream oss;
     oss << "  Station location: " << '\n'
         << "    Geodetic coordinates: " << '\n'
-        << "      Lat: " << lat << '\n'
-        << "      Lon: " << lon << '\n'
-        << "      Alt: " << alt << '\n'
+        << "      Lat: " << std::fixed << std::setprecision(8) << lat << " \370" << '\n'
+        << "      Lon: " << std::fixed << std::setprecision(8) << lon << " \370" << '\n'
+        << "      Alt: " << std::fixed << std::setprecision(3) << alt << " m" << '\n'
         << "    Geocentric coordinates: " << '\n'
-        << "      x:   " << x << '\n'
-        << "      y:   " << y << '\n'
-        << "      z:   " << z << '\n';
+        << "      x:   " << std::fixed << std::setprecision(3) << x << " m" << '\n'
+        << "      y:   " << std::fixed << std::setprecision(3) << y << " m" << '\n'
+        << "      z:   " << std::fixed << std::setprecision(3) << z << " m" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -1363,13 +1367,13 @@ AmelasError AmelasController::getLocation(StationLocation &location)
     std::ostringstream oss;
     oss << "  Station location: " << '\n'
         << "    Geodetic coordinates: " << '\n'
-        << "      Lat: " << location.wgs84.lat << '\n'
-        << "      Lon: " << location.wgs84.lon << '\n'
-        << "      Alt: " << location.wgs84.alt << '\n'
+        << "      Lat: " << std::fixed << std::setprecision(8) << location.wgs84.lat << " \370" << '\n'
+        << "      Lon: " << std::fixed << std::setprecision(8) << location.wgs84.lon << " \370" << '\n'
+        << "      Alt: " << std::fixed << std::setprecision(3) << location.wgs84.alt << " m" << '\n'
         << "    Geocentric coordinates: " << '\n'
-        << "      x:   " << location.ecef.x << '\n'
-        << "      y:   " << location.ecef.y << '\n'
-        << "      z:   " << location.ecef.z << '\n';
+        << "      x:   " << std::fixed << std::setprecision(3) << location.ecef.x << " m" << '\n'
+        << "      y:   " << std::fixed << std::setprecision(3) << location.ecef.y << " m" << '\n'
+        << "      z:   " << std::fixed << std::setprecision(3) << location.ecef.z << " m" << '\n';
     setLog(command, oss.str(), error);
     
     return error;

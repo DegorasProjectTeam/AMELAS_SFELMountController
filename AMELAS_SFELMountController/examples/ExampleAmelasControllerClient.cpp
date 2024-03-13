@@ -1595,13 +1595,13 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         std::cout << "" << std::endl;
                         std::cout << "Station location: " << std::endl;
                         std::cout << "  Geodetic coordinates: " << std::endl;
-                        std::cout << "    Lat: " << lat << std::endl;
-                        std::cout << "    Lon: " << lon << std::endl;
-                        std::cout << "    Alt: " << alt << std::endl;
+                        std::cout << "    Lat: " << std::fixed << std::setprecision(8) << lat << " \370" << std::endl;
+                        std::cout << "    Lon: " << std::fixed << std::setprecision(8) << lon << " \370" << std::endl;
+                        std::cout << "    Alt: " << std::fixed << std::setprecision(3) << alt << " m" << std::endl;
                         std::cout << "  Geocentric coordinates: " << std::endl;
-                        std::cout << "    x:   " << x << std::endl;
-                        std::cout << "    y:   " << y << std::endl;
-                        std::cout << "    z:   " << z << std::endl;
+                        std::cout << "    x:   " << std::fixed << std::setprecision(3) << x << " m" << std::endl;
+                        std::cout << "    y:   " << std::fixed << std::setprecision(3) << y << " m" << std::endl;
+                        std::cout << "    z:   " << std::fixed << std::setprecision(3) << z << " m" << std::endl;
                     }
                     catch(...)
                     {
