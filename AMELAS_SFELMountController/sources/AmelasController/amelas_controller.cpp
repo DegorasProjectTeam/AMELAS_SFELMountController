@@ -24,6 +24,7 @@
 // PROJECT INCLUDES
 // =====================================================================================================================
 #include "AmelasController/amelas_controller.h"
+#include "LibDegorasSLR/libdegorasslr_init.h"
 // =====================================================================================================================
 
 // AMELAS NAMESPACES
@@ -528,6 +529,8 @@ double AmelasController::arcsec_to_deg(const double &arcsec)
 
 AmelasError AmelasController::getMountLog(const std::string &day)
 {
+    dpslr::DegorasInit::init();
+
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
 
