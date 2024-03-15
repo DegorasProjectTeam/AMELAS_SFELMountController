@@ -158,6 +158,8 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processEmptyArguments<controller::SetParkMotionCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION,
                                   &AmelasControllerServer::processEmptyArguments<controller::SetCalibrationMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CPF_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetCPFMotionCallback>);
 
     // -- OTHER FUNCTIONS
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,

@@ -24,7 +24,14 @@
 // PROJECT INCLUDES
 // =====================================================================================================================
 #include "AmelasController/amelas_controller.h"
+#include "LibDegorasSLR/Astronomical/predictors/predictor_sun_base.h"
+#include "LibDegorasSLR/Astronomical/predictors/predictor_sun_fast.h"
+#include "LibDegorasSLR/TrackingMount/types/tracking_types.h"
+#include "LibDegorasSLR/Timing/types/base_time_types.h"
+#include "LibDegorasSLR/Timing/time_utils.h"
 #include "LibDegorasSLR/libdegorasslr_init.h"
+#include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_base.h"
+#include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_cpf.h"
 // =====================================================================================================================
 
 // AMELAS NAMESPACES
@@ -173,7 +180,7 @@ AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std:
     const std::string command = "GET_PLC_REGISTER";
 
     // Variable used for this function
-    std::string value;
+    std::string value; // TODO: pass to the client
 
     // Functionality
     if (type == "double")
@@ -347,7 +354,7 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
         if (pos != std::string::npos)
             result = plcSymbol.substr(pos + prefix.length());
 
-        oss << result << " is already set to " << (enabled ? "true" : "false") << "." << '\n';
+        oss << result << " is already set to " << (enabled ? "true" : "false") << "." << '\n'; // TODO: pass to the client
 
         error = AmelasError::ENABLE_WARN;
     }
@@ -376,6 +383,7 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
 
         // Functionality
         _plc->write(plcSymbol, enabled);
+        // TODO: pass to the client (success message)
     }
 
     // Log
@@ -421,6 +429,7 @@ AmelasError AmelasController::setPosition(const AltAzPos &pos, const std::string
 
     _plc->write(plcSymbol + ".Azimuth", pos.az);
     _plc->write(plcSymbol + ".Elevation", pos.el);
+    // TODO: pass to the client (success message)
 
     // Log
     std::ostringstream oss;    
@@ -465,6 +474,7 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
     if (vel.az < 0.0 ||  vel.el < 0.0)
     {
         error = AmelasError::INVALID_SPEED;
+        // TODO: pass to the client (failure message)
     }
     else
     {
@@ -474,6 +484,7 @@ AmelasError AmelasController::setSpeed(const AltAzVel &vel, const std::string pl
 
         _plc->write(plcSymbol + ".Azimuth", vel.az);
         _plc->write(plcSymbol + ".Elevation", vel.el);
+        // TODO: pass to the client (success message)
     }
 
     if (motionStates() == AmelasMotionState::MOVING)
@@ -529,8 +540,6 @@ double AmelasController::arcsec_to_deg(const double &arcsec)
 
 AmelasError AmelasController::getMountLog(const std::string &day)
 {
-    dpslr::DegorasInit::init();
-
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
 
@@ -552,7 +561,7 @@ AmelasError AmelasController::getMountLog(const std::string &day)
         {
             std::getline (logFile, logRead);
             std::cout << logRead << '\n';
-            strLog = strLog + logRead + '\n';
+            strLog = strLog + logRead + '\n'; // TODO: pass to the client
         }
         std::cout << '\n';
     }
@@ -833,6 +842,7 @@ AmelasError AmelasController::setIdlePositionHere()
 {
     // Functionality
     AltAzPos pos(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos"), _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos"));
+    // TODO: pass to the client (success or failure message)
     return setIdlePosition(pos);
 }
 
@@ -840,6 +850,7 @@ AmelasError AmelasController::setParkPositionHere()
 {
     // Functionality
     AltAzPos pos(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos"), _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos"));
+    // TODO: pass to the client (success or failure message)
     return setParkPosition(pos);
 }
 
@@ -847,6 +858,7 @@ AmelasError AmelasController::setCalibrationPositionHere()
 {
     // Functionality
     AltAzPos pos(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos"), _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos"));
+    // TODO: pass to the client (success or failure message)
     return setCalibrationPosition(pos);
 }
 
@@ -865,6 +877,7 @@ AmelasError AmelasController::setWaitAlt(const double &alt)
 
     // Functionality
     _plc->write(symbol, alt);
+    // TODO: pass to the client (success or failure message)
 
     // Log
     std::ostringstream oss;
@@ -941,8 +954,7 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
     // Functionality
     if (_enable_mount_model == enabled)
     {
-        oss << "Mount model is already set to " << (enabled ? "true" : "false") << "." << '\n';
-
+        oss << "Mount model is already set to " << (enabled ? "true" : "false") << "." << '\n'; // TODO: pass to the client
         error = AmelasError::ENABLE_WARN;
     }
     else
@@ -952,6 +964,7 @@ AmelasError AmelasController::enableMountModel(const bool &enabled)
             << "  New: " << enabled << '\n';
 
         _enable_mount_model = enabled;
+        // TODO: pass to the client (success message)
     }
 
     // Log
@@ -986,6 +999,7 @@ AmelasError AmelasController::setMountModelCoefs(const double &an, const double 
     _npae_tpoint = npae;
     _ie_tpoint = ie;
     _ia_tpoint = ia;
+    // TODO: pass to the client (success message)
 
     // Log
     std::ostringstream oss;
@@ -1053,10 +1067,12 @@ AmelasError AmelasController::setMountModelCoefsFile(const std::string &fileData
                     coefs[coefName] = coefVal; // Stores the variable and its associated value in the map
             }
         }
+        // TODO: pass to the client (success message)
     }
     else
     {
         error = AmelasError::FILE_ERROR;
+        // TODO: pass to the client (failure message)
     }
 
     logFile.close();
@@ -1298,6 +1314,7 @@ AmelasError AmelasController::setLocation(const double &lat, const double &lon, 
     _plc->write(symbol + ".ecef.x", x);
     _plc->write(symbol + ".ecef.y", y);
     _plc->write(symbol + ".ecef.z", z);
+    // TODO: pass to the client (success or failure message)
 
     // Log
     std::ostringstream oss;
@@ -1398,6 +1415,7 @@ AmelasError AmelasController::setMeteoData(const double &press, const double &te
     _plc->write(symbol + ".press", press);
     _plc->write(symbol + ".temp", temp);
     _plc->write(symbol + ".hr", hr);
+    // TODO: pass to the client (success or failure message)
 
     // Log
     std::ostringstream oss;
@@ -1547,13 +1565,14 @@ AmelasError AmelasController::doStartMotion()
     {
         //error = AmelasError::MOUNT_UNSAFE_STATE;
         error = AmelasError::START_WARN;
-        oss << "There is no move loaded, so the operation cannot be carried out." << '\n';
+        oss << "There is no move loaded, so the operation cannot be carried out." << '\n'; // TODO: pass to the client
     }
     else
     {
         // CHECK: _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
         oss << "";
+        // TODO: pass to the client (success message)
     }
 
     // Log
@@ -1581,13 +1600,14 @@ AmelasError AmelasController::doPauseMotion()
     {
         //error = AmelasError::MOUNT_UNSAFE_STATE;
         error = AmelasError::STOP_WARN;
-        oss << "The mount is already stopped, so the operation cannot be carried out." << '\n';
+        oss << "The mount is already stopped, so the operation cannot be carried out." << '\n'; // TODO: pass to the client
     }
     else
     {
         // CHECK: _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
         oss << "";
+        // TODO: pass to the client (success message)
     }
 
     // Log
@@ -1615,13 +1635,14 @@ AmelasError AmelasController::doStopMotion()
     {
         //error = AmelasError::MOUNT_UNSAFE_STATE;
         error = AmelasError::STOP_WARN;
-        oss << "The mount is already stopped, so the operation cannot be carried out." << '\n';
+        oss << "The mount is already stopped, so the operation cannot be carried out." << '\n'; // TODO: pass to the client
     }
     else
     {
         // CHECK: _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
         oss << "";
+        // TODO: pass to the client (success message)
     }
 
     // Log
@@ -1669,6 +1690,7 @@ AmelasError AmelasController::setTrackTimeBias(const double &time)
 
     // Functionality
     _plc->write(symbol, time);
+    // TODO: pass to the client (success or failure message)
 
     // Log
     std::ostringstream oss;
@@ -1751,6 +1773,7 @@ AmelasError AmelasController::setRelativeAltAzMotion(const AltAzPos &pos, const 
     _plc->write(symbol + "Velocity.Elevation", vel.el);
     // CHECK: _plc->executeCommand(symbol + "Cmd");
     _plc->write(symbol + "Cmd.cmd", true);
+    // TODO: pass to the client (success or failure message)
 
     // Log
     std::ostringstream oss;
@@ -1777,6 +1800,7 @@ AmelasError AmelasController::setContAltAzMotion(const AltAzVel &vel)
     _plc->write(symbol + "Velocity.Elevation", vel.el);
     // CHECK: _plc->executeCommand(symbol + "Cmd");
     _plc->write(symbol + "Cmd.cmd", true);
+    // TODO: pass to the client (success or failure message)
 
     // Log
     std::ostringstream oss;
@@ -1808,7 +1832,7 @@ AmelasError AmelasController::setIdleMotion()
 
         // Log
         std::ostringstream oss;
-        oss << "There is no speed defined in SlewSpeed." << '\n';
+        oss << "There is no speed defined in SlewSpeed." << '\n'; // TODO: pass to the client
         setLog(command, oss.str(), error);
     }
     else
@@ -1816,6 +1840,7 @@ AmelasError AmelasController::setIdleMotion()
         // Functionality
         // CHECK: _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
+        // TODO: pass to the client (success message)
 
         // Log
         setLog(command, "", error);
@@ -1842,7 +1867,7 @@ AmelasError AmelasController::setParkMotion()
 
         // Log
         std::ostringstream oss;
-        oss << "There is no speed defined in SlewSpeed." << '\n';
+        oss << "There is no speed defined in SlewSpeed." << '\n'; // TODO: pass to the client
         setLog(command, oss.str(), error);
     }
     else
@@ -1850,6 +1875,7 @@ AmelasError AmelasController::setParkMotion()
         // Functionality
         // CHECK: _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
+        // TODO: pass to the client (success message)
 
         // Log
         setLog(command, "", error);
@@ -1876,7 +1902,7 @@ AmelasError AmelasController::setCalibrationMotion()
 
         // Log
         std::ostringstream oss;
-        oss << "There is no speed defined in SlewSpeed." << '\n';
+        oss << "There is no speed defined in SlewSpeed." << '\n'; // TODO: pass to the client
         setLog(command, oss.str(), error);
     }
     else
@@ -1884,6 +1910,7 @@ AmelasError AmelasController::setCalibrationMotion()
         // Functionality
         // CHECK: _plc->executeCommand(symbol);
         _plc->write(symbol + ".cmd", true);
+        // TODO: pass to the client (success message)
 
         // Log
         setLog(command, "", error);
@@ -1939,6 +1966,135 @@ AmelasError AmelasController::pruebaBucles()
 }
 
 // TODO: AmelasError AmelasController::setCPFMotion(const file &cpf, AmelasTracking &tracking)
+
+AmelasError AmelasController::setCPFMotion()
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "SET_CPF_MOTION";
+
+    // Symbol used for PLC
+    const std::string symbol = "GLOBALS.Parameters.Commander.StationLocation";
+
+    // Auxiliar struct
+    struct ExampleData
+    {
+        ExampleData(PredictorSunPtr sun_pred,
+                    const dpslr::mount::TrackingAnalyzerConfig& cfg,
+                    const std::string& alias,
+                    const std::string& cpf,
+                    const dpslr::timing::types::Iso8601Str& start,
+                    const dpslr::timing::types::Iso8601Str& end):
+            example_alias(alias),
+            cpf_name(cpf),
+            predictor_sun(sun_pred),
+            analyzer_cfg(cfg)
+        {
+            this->mjdt_start = dpslr::timing::timePointToModifiedJulianDateTime(dpslr::timing::iso8601DatetimeToTimePoint(start));
+            this->mjdt_end = dpslr::timing::timePointToModifiedJulianDateTime(dpslr::timing::iso8601DatetimeToTimePoint(end));
+        }
+
+        // Specific example data.
+        std::string example_alias;    // Example alias for file generation.
+        std::string cpf_name;         // CPF ephemeris namefile.
+        MJDateTime mjdt_start;        // Space object pass fragment start Modified Julian Datetime.
+        MJDateTime mjdt_end;          // Space object pass fragment end Modified Julian Datetime.
+        PredictorSunPtr predictor_sun;       // Predictor Sun that will be used.
+        dpslr::mount::TrackingAnalyzerConfig analyzer_cfg; // Analyzer configuration.
+    };
+
+    // -------------------- INITIALIZATION -----------------------------------------------------------------------------
+    // Initialize LibDegorasSLR.
+    dpslr::DegorasInit::init();
+
+    // -------------------- EXAMPLES CONFIGURATION ---------------------------------------------------------------------
+    // Example selector.
+    size_t example_selector = 1;  // Select the example to process.
+    bool plot_data = true;        // Flag for enable the data plotting using a Python3 (>3.9) helper script.
+
+    // SFEL station geodetic position in degrees (north and east > 0)
+    // Altitude in meters
+    Degrees latitude = _plc->read<double>(symbol + ".wgs84.lat");
+    Degrees longitude = _plc->read<double>(symbol + ".wgs84.lon");
+    Meters alt = _plc->read<double>(symbol + ".wgs84.alt");
+
+    // SFEL station geocentric coordinates in meters
+    Meters x = _plc->read<double>(symbol + ".ecef.x");
+    Meters y = _plc->read<double>(symbol + ".ecef.y");
+    Meters z = _plc->read<double>(symbol + ".ecef.z");
+
+    // Generic config for SLR tracks.
+    MillisecondsU step = 500;         // Steps into which the algorithm will divide the pass for initial analysis.
+    DegreesU min_el = 10;             // Minimum acceptable elevation for the mount.
+    DegreesU max_el = 85;             // Maximum acceptable elevation for the mount.
+    DegreesU sun_avoid_angle = 15;    // Sun avoidance angle to make Sun the security sectors.
+    bool avoid_sun = true;            // Flag for enable or disable the Sun avoidance utility.
+
+    // Configure the CPF input folder.
+    std::string current_dir = dpslr::helpers::files::getCurrentDir();
+    std::string input_dir(current_dir + "/inputs");
+    std::string output_dir(current_dir + "/outputs");
+
+    // Configure the python script executable.
+    std::string python_plot_analysis(current_dir + "/python_scripts/Helper_Plotting_Analysis.py");
+    std::string python_plot_track(current_dir + "/python_scripts/Helper_Plotting_Track.py");
+    std::string python_cmd_analysis = "python \"" + python_plot_analysis + "\" ";
+
+    // Create the ouput directory.
+    if (!dpslr::helpers::files::directoryExists(output_dir))
+        dpslr::helpers::files::createDirectory(output_dir);
+
+    // -------------------- EXAMPLES PREPARATION -----------------------------------------------------------------------
+    // Store the local geocentric and geodetic coordinates.
+    dpslr::geo::types::GeocentricPoint stat_geoc(x,y,z);
+    dpslr::geo::types::GeodeticPoint<Degrees> stat_geod(latitude, longitude, alt);
+
+    // Prepare the different tracking analyzer configurations. The first will be the generic for SLR trackings.
+    dpslr::mount::TrackingAnalyzerConfig analyzer_cfg_1(step, sun_avoid_angle, min_el, max_el, avoid_sun);
+
+    // Prepare the Sun predictors to be used.
+    // Real Sun predictor.
+    PredictorSunPtr pred_sun_real = dpslr::astro::PredictorSunBase::factory<dpslr::astro::PredictorSunFast>(stat_geod);
+
+    // Real examples vector with their configurations.
+    // Sun Predictor - Tracking Analyzer - Alias - CPF - Pass Start - Pass End
+    std::vector<ExampleData> examples =
+    {
+        // Example 0: Lares | Sun at beginning | SW-N_CW
+        {pred_sun_real, analyzer_cfg_1, "Lares_SunBeg", "38077_cpf_240128_02901.sgf", "2024-01-31T15:45:25Z", "2024-01-31T16:02:35Z"},
+
+        // Example 1: Jason 3 | Sun at middle | NW-SE-CCW
+        {pred_sun_real, analyzer_cfg_1, "Jason3_SunMid", "41240_cpf_240128_02801.hts", "2024-01-31T11:42:20Z", "2024-01-31T11:59:10Z"},
+
+        // Example 2: Explorer 27 | Sun at end | El deviation | WW-ESE-CCW
+        {pred_sun_real, analyzer_cfg_1, "Explorer27_SunEnd", "1328_cpf_240128_02901.sgf", "2024-01-31T08:31:27Z", "2024-01-31T08:44:27Z"},
+
+        // Example 3: Jason 3 | No Sun | N-E-CW
+        {pred_sun_real, analyzer_cfg_1, "Jason3_NoSun", "41240_cpf_240128_02801.hts", "2024-01-31T09:47:30Z", "2024-01-31T10:01:00Z"}
+    };
+
+    // Get band store the example data.
+    std::string cpf_path = input_dir + "/" + examples[example_selector].cpf_name;
+    MJDateTime pass_start = examples[example_selector].mjdt_start;
+    MJDateTime pass_end = examples[example_selector].mjdt_end;
+    std::string example_alias = examples[example_selector].example_alias;
+    PredictorSunPtr predictor_sun = examples[example_selector].predictor_sun;
+    dpslr::mount::TrackingAnalyzerConfig analyzer_cfg = examples[example_selector].analyzer_cfg;
+    std::string track_csv_filename = example_alias + "_track_analyzed.csv";
+    std::string realtime_csv_filename = example_alias + "_track_realtime.csv";
+
+    // -------------------- PREDICTOR MOUNT PREPARATION  ---------------------------------------------------------------
+    // Prepare the SLR predictor to be used.
+    dpslr::utils::PredictorSlrPtr predictor_cpf = dpslr::utils::PredictorSlrBase::factory<dpslr::utils::PredictorSlrCPF>(cpf_path, stat_geod, stat_geoc);
+
+    // Log
+    setLog(command, "", error);
+
+    return error;
+}
+
 // TODO: AmelasError AmelasController::setStarMotion(const StarData &star_data)
 // =====================================================================================================================
 

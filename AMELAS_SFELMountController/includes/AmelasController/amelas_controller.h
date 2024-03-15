@@ -178,6 +178,7 @@ public:
     LIBAMELAS_EXPORT AmelasError setCalibrationMotion();
 
     // TODO: LIBAMELAS_EXPORT AmelasError setCPFMotion(const file& cpf, AmelasTracking& tracking);
+    LIBAMELAS_EXPORT AmelasError setCPFMotion();
     // TODO: LIBAMELAS_EXPORT AmelasError setStarMotion(const StarData& star_data);
     //=====================================================================================================================
 

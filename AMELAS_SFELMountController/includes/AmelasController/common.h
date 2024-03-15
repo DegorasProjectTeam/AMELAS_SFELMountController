@@ -396,6 +396,7 @@ using SetContAltAzMotionCallback     = std::function<AmelasError(const AltAzVel&
 using SetIdleMotionCallback          = std::function<AmelasError()>;
 using SetParkMotionCallback          = std::function<AmelasError()>;
 using SetCalibrationMotionCallback   = std::function<AmelasError()>;
+using SetCPFMotionCallback           = std::function<AmelasError()>;
 
 // -- OTHER FUNCTIONS
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;

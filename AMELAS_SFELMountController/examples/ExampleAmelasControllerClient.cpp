@@ -1371,6 +1371,10 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_SET_CALIBRATION_MOTION command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CPF_MOTION))
+        {
+            std::cout << "Sending REQ_SET_CPF_MOTION command." << std::endl;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES))
         {
             std::cout << "Sending REQ_DO_PRUEBA_BUCLES command." << std::endl;

@@ -339,6 +339,9 @@ int main(int, char**)
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION,
                                              &amelas_controller,
                                              &AmelasController::setCalibrationMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CPF_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setCPFMotion);
 
     // -- OTHER FUNCTIONS
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
