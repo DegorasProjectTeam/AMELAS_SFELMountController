@@ -152,6 +152,8 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                    &AmelasControllerServer::processSetAbsRelAltAzMotion<controller::SetRelativeAltAzMotionCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CON_ALTAZ_MOTION,
                                    &AmelasControllerServer::processSetPositionOrSpeed<controller::SetContAltAzMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_HOMING_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetHomingMotionCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_IDLE_MOTION,
                                   &AmelasControllerServer::processEmptyArguments<controller::SetIdleMotionCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_PARK_MOTION,

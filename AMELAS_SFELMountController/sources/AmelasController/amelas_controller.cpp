@@ -31,7 +31,7 @@
 #include "LibDegorasSLR/Timing/time_utils.h"
 #include "LibDegorasSLR/libdegorasslr_init.h"
 #include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_base.h"
-#include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_cpf.h"
+//#include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_cpf.h"
 // =====================================================================================================================
 
 // AMELAS NAMESPACES
@@ -1811,7 +1811,57 @@ AmelasError AmelasController::setContAltAzMotion(const AltAzVel &vel)
     return error;
 }
 
-// TODO: AmelasError AmelasController::setHomingMotion()
+AmelasError AmelasController::setHomingMotion()
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "SET_HOMING_MOTION";
+
+    // Symbol used for PLC
+    const std::string symbol = "MAIN.commander.moveRelative";
+    
+    // Variables used for this function
+    std::ostringstream oss;
+
+    // Functionality
+    AltAzPos actPos(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos"), _plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos"));
+
+    if (actPos.az <= 30.0 && actPos.az >= -30.0)
+    {
+        oss << "Azimuth is in: " << actPos.az << " \370 (ABSOLUTE region)." << '\n'
+            << "It is not necessary to make homing sequence." << '\n';
+    }
+    else if (actPos.az < -30.0)
+    {
+        _plc->write(symbol + "Position.Azimuth", abs(actPos.az) - 30.0);
+        _plc->write(symbol + "Position.Elevation", 0.0);
+        _plc->write(symbol + "Velocity.Azimuth", 4.0);
+        _plc->write(symbol + "Velocity.Elevation", 4.0);
+        _plc->write(symbol + "Cmd.cmd", true);
+
+        oss << "Azimuth is in: " << actPos.az << " \370 (region with negative overlap)." << '\n'
+            << "Azimuth will move " << abs(actPos.az) - 30.0 << " \370." << '\n';
+    }
+    else if (actPos.az > 30.0)
+    {
+        _plc->write(symbol + "Position.Azimuth", 30 - actPos.az);
+        _plc->write(symbol + "Position.Elevation", 0.0);
+        _plc->write(symbol + "Velocity.Azimuth", 2.0);
+        _plc->write(symbol + "Velocity.Elevation", 4.0);
+        _plc->write(symbol + "Cmd.cmd", true);
+
+        oss << "Azimuth is in: " << actPos.az << " \370 (region with positive overlap)." << '\n'
+            << "Azimuth will move " << 30 - actPos.az << " \370." << '\n';
+    }
+    // TODO: pass to the client (success or failure message)
+
+    // Log
+    setLog(command, oss.str(), error);
+
+    return error;
+}
 
 AmelasError AmelasController::setIdleMotion()
 {
@@ -2087,7 +2137,7 @@ AmelasError AmelasController::setCPFMotion()
 
     // -------------------- PREDICTOR MOUNT PREPARATION  ---------------------------------------------------------------
     // Prepare the SLR predictor to be used.
-    dpslr::utils::PredictorSlrPtr predictor_cpf = dpslr::utils::PredictorSlrBase::factory<dpslr::utils::PredictorSlrCPF>(cpf_path, stat_geod, stat_geoc);
+    //dpslr::utils::PredictorSlrPtr predictor_cpf = dpslr::utils::PredictorSlrBase::factory<dpslr::utils::PredictorSlrCPF>(cpf_path, stat_geod, stat_geoc);
 
     // Log
     setLog(command, "", error);
