@@ -202,6 +202,40 @@ void AmelasControllerServer::processSetBool(const CommandRequest& request, Comma
 }
 
 template <typename ClbkT>
+void AmelasControllerServer::processSetUShort(const CommandRequest& request, CommandReply& reply)
+{
+    // Auxiliar variables and containers.
+    controller::AmelasError ctrl_err;
+
+    unsigned short int enable;
+
+    // Check the request parameters size.
+    if (request.params_size == 0 || !request.params)
+    {
+        reply.server_result = OperationResult::EMPTY_PARAMS;
+        return;
+    }
+
+    // Try to read the parameters data.
+    try
+    {
+        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, enable);
+    }
+    catch(...)
+    {
+        reply.server_result = OperationResult::BAD_PARAMETERS;
+        return;
+    }
+
+    // Now we will process the command in the controller.
+    ctrl_err = this->invokeCallback<ClbkT>(request, reply, enable);
+
+    // Serialize parameters if all ok.
+    if(reply.server_result == OperationResult::COMMAND_OK)
+        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
+}
+
+template <typename ClbkT>
 void AmelasControllerServer::processSetDouble(const CommandRequest& request, CommandReply& reply)
 {
     // Auxiliar variables and containers.

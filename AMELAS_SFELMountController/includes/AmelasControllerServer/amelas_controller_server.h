@@ -102,6 +102,8 @@ private:
     template <typename ClbkT>
     void processSetSixBool(const CommandRequest &request, CommandReply &reply);
     template <typename ClbkT>
+    void processSetUShort(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
     void processSetDouble(const CommandRequest &request, CommandReply &reply);
     template <typename ClbkT>
     void processSetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);

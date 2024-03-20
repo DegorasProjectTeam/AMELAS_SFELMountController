@@ -141,6 +141,11 @@ AmelasError AmelasController::doDisconnectPLC()
     return error;
 }
 
+// TODO: AmelasError AmelasController::getPLCregisters(std::string &plcRegisters)
+//       {
+//           
+//       }
+
 // TODO
 AmelasError AmelasController::getPLCregister(const PLCAddress &address, PLCRegisterValue &registerValue)
 {
@@ -357,6 +362,9 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
         if (pos != std::string::npos)
             result = plcSymbol.substr(pos + prefix.length());
 
+        if (command == "EN_EXT_PPS")
+            result = "ExtPPS";
+
         oss << result << " is already set to " << (enabled ? "true" : "false") << "." << '\n'; // TODO: pass to the client
 
         error = AmelasError::ENABLE_WARN;
@@ -380,6 +388,12 @@ AmelasError AmelasController::setEnable(const bool &enabled, const std::string p
         else if (command == "EN_MOUNT_MODEL")
         {
             oss << "Mount model" << '\n'
+                << "  Old: " << oldEn   << '\n'
+                << "  New: " << enabled << '\n';
+        }
+        else if (command == "EN_EXT_PPS")
+        {
+            oss << "External PPS" << '\n'
                 << "  Old: " << oldEn   << '\n'
                 << "  New: " << enabled << '\n';
         }
@@ -607,87 +621,6 @@ AmelasError AmelasController::getMountLog(const std::string &day)
     return error;
 }
 
-// TODO: AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port, const unsigned &timeout)
-
-// TODO
-AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port)
-{
-    // Auxiliar result
-    AmelasError error = AmelasError::SUCCESS;
-
-    // Command used for log
-    const std::string command = "DO_SYNC_NTP";
-
-    // Symbols used for PLC
-    const std::string symbolEnable = "Object1.ClientPara.bEnable";
-    const std::string symbolHost   = "Object1.ClientPara.sServerName";
-    const std::string symbolPort   = "Object1.ClientPara.nServerPort";
-
-    // Functionality
-    _plc->write(symbolEnable, true);
-    _plc->write<unsigned short int>(symbolPort, port);
-    _clock_source = 0;
-
-    // Log
-    std::ostringstream oss;
-    oss << "Server name: " << host << '\n'
-        << "Server port: " << port << '\n';
-    setLog(command, oss.str(), error);
-
-    return error;
-}
-
-// TODO
-AmelasError AmelasController::doSyncTimeManual(const std::string &datetime)
-{
-    // Auxiliar result
-    AmelasError error = AmelasError::SUCCESS;
-
-    // Command used for log
-    const std::string command = "DO_SYNC_MANUAL";
-
-    // Symbols used for PLC
-    const std::string bEnable = "MAIN.timeManager._bEnableManualSync";
-    const std::string ftDatetime = "MAIN.timeManager._ftManualDatetime";
-
-    // Variables used for this function
-    std::ostringstream oss;
-
-    // Functionality
-    // Auxiliar variables
-    int y,m,d,h,M, s;
-    std::smatch match;
-
-    // Regex
-    std::regex iso8601_regex_extended(R"(^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$)");
-    std::regex iso8601_regex_basic(R"(^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(?:\.(\d+))?Z$)");
-
-    // Check the regexes
-    if (!std::regex_search(datetime, match, iso8601_regex_extended))
-    {
-        if (!std::regex_search(datetime, match, iso8601_regex_basic))
-        {
-            oss << "Invalid argument: " << datetime << '\n'; // TODO: pass to the client
-            error = AmelasError::INVALID_ARG;
-        }
-    }
-
-    if (std::regex_search(datetime, match, iso8601_regex_extended) || std::regex_search(datetime, match, iso8601_regex_basic))
-    {
-        _plc->write(bEnable, true);
-        _plc->write(ftDatetime, iso8601DatetimeTowin32Ticks(datetime));
-        _clock_source = 1;
-
-        oss << "Date introduced: " << datetime << '\n'; // TODO: pass to the client
-    }
-
-    // Log
-    setLog(command, oss.str(), error);
-
-    return error;
-}
-
-// TODO
 AmelasError AmelasController::getMountStatus(std::string &mountStatus)
 {
     // Auxiliar result
@@ -745,7 +678,6 @@ AmelasError AmelasController::getMountStatus(std::string &mountStatus)
     return error;
 }
 
-// TODO
 AmelasError AmelasController::getDeviceInfo(std::string &deviceInfo)
 {
     // Auxiliar result
@@ -770,6 +702,132 @@ AmelasError AmelasController::getDeviceInfo(std::string &deviceInfo)
     return error;
 }
 
+AmelasError AmelasController::setTimeSource(const unsigned short int &clock)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "SET_TIME_SOURCE";
+
+    // Symbols used for PLC
+    const std::string bEnableNTP = "MAIN.timeManager._bEnableNTPSync";
+    const std::string bEnableManual = "MAIN.timeManager._bEnableManualSync";
+
+    // Variables used for this function
+    std::ostringstream oss;
+
+    if (clock == AmelasClockSource::NTP)
+    {
+        _plc->write(bEnableManual, false);
+        _plc->write(bEnableNTP, true);
+        oss << "Configured clock: NTP" << '\n';
+    }
+    else if (clock == AmelasClockSource::MANUAL)
+    {
+        _plc->write(bEnableManual, true);
+        _plc->write(bEnableNTP, false);
+        oss << "Configured clock: MANUAL" << '\n';
+    }
+    else
+    {
+        error = AmelasError::INVALID_ARG;
+        oss << "Configured clock: UNKNOWN" << '\n';
+    }
+
+    // Log
+    setLog(command, oss.str(), error); // TODO: pass to the client
+
+    return error;
+}
+
+AmelasError AmelasController::doSyncTimeManual(const std::string &datetime)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "DO_SYNC_MANUAL";
+
+    // Symbols used for PLC
+    const std::string ftDatetime = "MAIN.timeManager._ftManualDatetime";
+
+    // Variables used for this function
+    std::ostringstream oss;
+
+    // Functionality
+    // Auxiliar variables
+    int y,m,d,h,M, s;
+    std::smatch match;
+
+    // Regex
+    std::regex iso8601_regex_extended(R"(^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$)");
+    std::regex iso8601_regex_basic(R"(^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(?:\.(\d+))?Z$)");
+
+    // Check the regexes
+    if (!std::regex_search(datetime, match, iso8601_regex_extended))
+    {
+        if (!std::regex_search(datetime, match, iso8601_regex_basic))
+        {
+            oss << "Invalid argument: " << datetime << '\n'; // TODO: pass to the client
+            error = AmelasError::INVALID_ARG;
+        }
+    }
+
+    if (std::regex_search(datetime, match, iso8601_regex_extended) || std::regex_search(datetime, match, iso8601_regex_basic))
+    {
+        _plc->write(ftDatetime, iso8601DatetimeTowin32Ticks(datetime));
+
+        oss << "Date introduced: " << datetime << '\n'; // TODO: pass to the client
+    }
+
+    // Log
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+// TODO: AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port, const unsigned &timeout)
+
+// TODO
+AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsigned &port)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "DO_SYNC_NTP";
+
+    // Symbols used for PLC
+    const std::string symbolEnable = "Object1.ClientPara.bEnable";
+    const std::string symbolHost   = "Object1.ClientPara.sServerName";
+    const std::string symbolPort   = "Object1.ClientPara.nServerPort";
+
+    // Functionality
+    _plc->write(symbolEnable, true);
+    _plc->write<unsigned short int>(symbolPort, port);
+
+    // Log
+    std::ostringstream oss;
+    oss << "Server name: " << host << '\n'
+        << "Server port: " << port << '\n';
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
+AmelasError AmelasController::enableExtPPS(const bool &enabled)
+{
+    // Command used for log
+    const std::string command = "EN_EXT_PPS";
+
+    // Symbol used for PLC
+    const std::string symbol = "MAIN.timeManager.bEnableExtSync";
+
+    // Functionality
+    return setEnable(enabled, symbol, command);
+}
+
 AmelasError AmelasController::enableTrackingAdjusts(const bool &enabled)
 {
     // Command used for log
@@ -792,54 +850,6 @@ AmelasError AmelasController::enableMountPower(const bool &enabled)
 
     // Functionality
     return setEnable(enabled, symbol, command);
-}
-
-AmelasError AmelasController::setSlewSpeed(const AltAzVel &vel)
-{
-    // Command used for log
-    const std::string command = "SET_SLEW_SPEED";
-
-    // Symbol used for PLC
-    const std::string symbol = "MAIN.commander.SlewSpeed";
-
-    // Functionality
-    return setSpeed(vel, symbol, command);
-}
-
-AmelasError AmelasController::getSlewSpeed(AltAzVel &vel)
-{
-    // Command used for log
-    const std::string command = "GET_SLEW_SPEED";
-
-    // Symbol used for PLC
-    const std::string symbol = "MAIN.commander.SlewSpeed";
-
-    // Functionality
-    return getSpeed(vel, symbol, command);
-}
-
-AmelasError AmelasController::setHomePosition(const AltAzPos &pos)
-{
-    // Command used for log
-    const std::string command = "SET_HOME_POSITION";
-
-    // Symbol used for PLC
-    const std::string symbol = "MAIN.commander.HomePosition";
-
-    // Functionality
-    return setPosition(pos, symbol, command);
-}
-
-AmelasError AmelasController::getHomePosition(AltAzPos &pos)
-{
-    // Command used for log
-    const std::string command = "GET_HOME_POSITION";
-
-    // Symbol used for PLC
-    const std::string symbol = "MAIN.commander.HomePosition";
-
-    // Functionality
-    return getPosition(pos, symbol, command);
 }
 
 AmelasError AmelasController::setIdlePosition(const AltAzPos &pos)
@@ -1573,39 +1583,29 @@ AmelasError AmelasController::getMeteoData(MeteoData &meteo)
     return error;
 }
 
-// TODO: AmelasError AmelasController::enableSimulationMode(const bool &enabled)
-
-// TODO
-AmelasError AmelasController::getSimulationState(std::string &clockSource)
+AmelasError AmelasController::setSlewSpeed(const AltAzVel &vel)
 {
-    // Auxiliar result
-    AmelasError error = AmelasError::SUCCESS;
-
     // Command used for log
-    const std::string command = "GET_SIMULATION_STATE";
+    const std::string command = "SET_SLEW_SPEED";
 
-    // Variables used for this function
-    std::ostringstream oss;
+    // Symbol used for PLC
+    const std::string symbol = "MAIN.commander.SlewSpeed";
 
     // Functionality
-    if (_clock_source == 0)
-        oss << "Clock source: NTP" << '\n';
-    else if (_clock_source == 1)
-        oss << "Clock source: MANUAL" << '\n';
-    else if (_clock_source == 2)
-        oss << "Clock source: SIMULATION" << '\n';
-    else
-        oss << "Clock source: UNKNOWN" << '\n';
-
-    clockSource = oss.str();
-
-    // Log
-    setLog(command, oss.str(), error);
-
-    return error;
+    return setSpeed(vel, symbol, command);
 }
 
-// TODO: AmelasError AmelasController::setSimulationTime(const std::string &datetime)
+AmelasError AmelasController::getSlewSpeed(AltAzVel &vel)
+{
+    // Command used for log
+    const std::string command = "GET_SLEW_SPEED";
+
+    // Symbol used for PLC
+    const std::string symbol = "MAIN.commander.SlewSpeed";
+
+    // Functionality
+    return getSpeed(vel, symbol, command);
+}
 //=====================================================================================================================
 
 

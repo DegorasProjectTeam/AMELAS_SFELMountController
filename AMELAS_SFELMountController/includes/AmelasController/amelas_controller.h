@@ -87,6 +87,7 @@ public:
     LIBAMELAS_EXPORT AmelasError doConnectPLC();
     LIBAMELAS_EXPORT AmelasError doDisconnectPLC();
 
+    // TODO: LIBAMELAS_EXPORT AmelasError getPLCregisters(std::string& plcRegisters);
     LIBAMELAS_EXPORT AmelasError getPLCregister(const PLCAddress& address, PLCRegisterValue& registerValue); // TODO (funciona la de abajo sin estructura)
     LIBAMELAS_EXPORT AmelasError getPLCprueba(const std::string& symbol, const std::string& type); // PRUEBA (hay que cambiar por sus estructuras)
     //=====================================================================================================================
@@ -95,22 +96,17 @@ public:
     // STATUS AND CONFIGURATION RELATED FUNCTIONS
     //=====================================================================================================================
     LIBAMELAS_EXPORT AmelasError getMountLog(const std::string &day);
+    LIBAMELAS_EXPORT AmelasError getMountStatus(std::string& mountStatus);
+    LIBAMELAS_EXPORT AmelasError getDeviceInfo(std::string& deviceInfo);
 
-    // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
-    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123); // PRUEBA (para ver si comunico con el objeto NTP de TwinCAT)
+    LIBAMELAS_EXPORT AmelasError setTimeSource(const unsigned short int& clock);
     LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
-
-    LIBAMELAS_EXPORT AmelasError getMountStatus(std::string& mountStatus); // PRUEBA (en pruebas)
-    LIBAMELAS_EXPORT AmelasError getDeviceInfo(std::string& deviceInfo); // PRUEBA (en pruebas)
+    // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123, const unsigned& timeout);
+    LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123); // PRUEBA (para ver si comunico con el objeto NTP de TwinCAT)
+    LIBAMELAS_EXPORT AmelasError enableExtPPS(const bool& enabled);
 
     LIBAMELAS_EXPORT AmelasError enableTrackingAdjusts(const bool& enabled);
     LIBAMELAS_EXPORT AmelasError enableMountPower(const bool& enabled);
-
-    LIBAMELAS_EXPORT AmelasError setSlewSpeed(const AltAzVel& vel);
-    LIBAMELAS_EXPORT AmelasError getSlewSpeed(AltAzVel& vel);
-
-    LIBAMELAS_EXPORT AmelasError setHomePosition(const AltAzPos& pos);
-    LIBAMELAS_EXPORT AmelasError getHomePosition(AltAzPos& pos);
 
     LIBAMELAS_EXPORT AmelasError setIdlePosition(const AltAzPos& pos);
     LIBAMELAS_EXPORT AmelasError getIdlePosition(AltAzPos& pos);
@@ -146,10 +142,9 @@ public:
     //LIBAMELAS_EXPORT AmelasError setMeteoData(const MeteoData& meteo); // TODO (funciona la de abajo sin estructura)
     LIBAMELAS_EXPORT AmelasError setMeteoData(const double& press, const double& temp, const double& hr); // PRUEBA (hay que cambiar por su estructura)
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
-    
-    // TODO: LIBAMELAS_EXPORT AmelasError enableSimulationMode(const bool& enabled);
-    LIBAMELAS_EXPORT AmelasError getSimulationState(std::string& clockSource);
-    // TODO: LIBAMELAS_EXPORT AmelasError setSimulationTime(const std::string& datetime);
+
+    LIBAMELAS_EXPORT AmelasError setSlewSpeed(const AltAzVel& vel);
+    LIBAMELAS_EXPORT AmelasError getSlewSpeed(AltAzVel& vel);
     // =====================================================================================================================
 
 
@@ -218,7 +213,6 @@ private:
     double _npae_tpoint = 0.0;
     double _elOffset = 0.0;
     double _azOffset = 0.0;
-    unsigned short int _clock_source = 0; // 0: NTP; 1: manual; 2: simulation
 };
 
 }} // END NAMESPACES.

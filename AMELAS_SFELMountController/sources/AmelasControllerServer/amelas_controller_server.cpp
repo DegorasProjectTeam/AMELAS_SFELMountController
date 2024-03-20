@@ -64,10 +64,14 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     // -- STATUS AND CONFIGURATION RELATED FUNCTIONS
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_LOG,
                                   &AmelasControllerServer::processSetString<controller::GetMountLogCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_TIME_SOURCE,
+                                  &AmelasControllerServer::processSetUShort<controller::SetTimeSourceCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_NTP,
                                   &AmelasControllerServer::processSetNTPserver<controller::DoSyncTimeNTPCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_MANUAL,
                                   &AmelasControllerServer::processSetString<controller::DoSyncTimeManualCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_EXT_PPS,
+                                  &AmelasControllerServer::processSetBool<controller::EnableExtPPSCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_STATUS,
                                   &AmelasControllerServer::processGetString<controller::GetMountStatusCallback>); // PRUEBA
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_INFO,
@@ -80,10 +84,6 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processSetPositionOrSpeed<controller::SetSlewSpeedCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_SLEW_SPEED,
                                   &AmelasControllerServer::processGetPositionOrSpeed<controller::GetSlewSpeedCallback>);
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_HOME_POSITION,
-                                  &AmelasControllerServer::processSetPositionOrSpeed<controller::SetHomePositionCallback>);
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_HOME_POSITION,
-                                  &AmelasControllerServer::processGetPositionOrSpeed<controller::GetHomePositionCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_IDLE_POS,
                                   &AmelasControllerServer::processSetPositionOrSpeed<controller::SetIdlePositionCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_IDLE_POS,
@@ -128,8 +128,6 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processSetMeteoData<controller::SetMeteoDataCallback>); // PRUEBA
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_METEO_DATA,
                                   &AmelasControllerServer::processGetMeteoData<controller::GetMeteoDataCallback>);
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_SIMULATION_STATE,
-                                  &AmelasControllerServer::processGetString<controller::GetSimulationStateCallback>);
 
     // -- MOTION RELATED FUNCTIONS
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOTION_MODE,

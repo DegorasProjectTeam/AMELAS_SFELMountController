@@ -104,6 +104,48 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_DO_RESET_STATE command." << std::endl;
         }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TIME_SOURCE))
+        {
+            std::cout << "Sending REQ_SET_TIME_SOURCE command." << std::endl;
+
+            bool valid_params = true;
+            unsigned short int enable = 0;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                enable = (unsigned short int) std::stoi(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << enable << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(enable);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_NTP))
         {
             std::cout << "Sending REQ_DO_SYNC_NTP command." << std::endl;
@@ -164,21 +206,21 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             valid = valid_params;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_AVOID_SUN)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_EXT_PPS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER)
-                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL)
-                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_SIMULATION_MODE))
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL))
         {
             if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_AVOID_SUN))
                 std::cout << "Sending REQ_EN_AVOID_SUN command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_EXT_PPS))
+                std::cout << "Sending REQ_EN_EXT_PPS command." << std::endl;
             else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ))
                 std::cout << "Sending REQ_EN_TRACK_ADJ command." << std::endl;
             else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER))
                 std::cout << "Sending REQ_EN_MOUNT_POWER command." << std::endl;
             else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL))
                 std::cout << "Sending REQ_EN_MOUNT_MODEL command." << std::endl;
-            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_SIMULATION_MODE))
-                std::cout << "Sending REQ_EN_SIMULATION_MODE command." << std::endl;
 
             bool valid_params = true;
             bool enable = false;
@@ -459,13 +501,10 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             valid = valid_params;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_MANUAL)
-                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SIMULATION_TIME))
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_MANUAL))
         {
             if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_MANUAL))
                 std::cout << "Sending REQ_DO_SYNC_MANUAL command." << std::endl;
-            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SIMULATION_TIME))
-                std::cout << "Sending REQ_SET_SIMULATION_TIME command." << std::endl;
 
             bool valid_params = true;
             std::string datetime = "";
@@ -514,16 +553,13 @@ void parseCommand(CommandClientBase &client, const std::string &command)
             std::cout << "Sending REQ_GET_MOUNT_INFO command." << std::endl;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED)
-                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS)
                 || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
         {
-            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION))
-                std::cout << "Sending REQ_SET_HOME_POSITION command." << std::endl;
-            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS))
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS))
                 std::cout << "Sending REQ_SET_IDLE_POS command." << std::endl;
             else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS))
                 std::cout << "Sending REQ_SET_PARK_POS command." << std::endl;
@@ -594,10 +630,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED))
         {
             std::cout << "Sending REQ_GET_SLEW_SPEED command." << std::endl;
-        }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION))
-        {
-            std::cout << "Sending REQ_GET_HOME_POSITION command." << std::endl;
         }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
         {
@@ -1168,10 +1200,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_METEO_DATA command." << std::endl;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SIMULATION_STATE))
-        {
-            std::cout << "Sending REQ_GET_SIMULATION_STATE command." << std::endl;
-        }
         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_MODE))
         {
             std::cout << "Sending REQ_GET_MOTION_MODE command." << std::endl;
@@ -1452,8 +1480,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     std::cout << "Controller error: " << static_cast<int>(error) << std::endl;
                 }
 
-                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION)
-                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS)
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS)
                     || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS)
                     || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_CALIBRATION_POS)
                     || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET)
@@ -1471,9 +1498,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                         std::cout << "" << std::endl;
 
-                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION))
-                            std::cout << "Home position:" << std::endl;
-                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
+                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
                             std::cout << "Idle position:" << std::endl;
                         else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS))
                             std::cout << "Parking position:" << std::endl;
@@ -1638,28 +1663,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                 }
 
                 if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_INFO))
-                {
-                    try
-                    {
-                        AmelasError error;   // Trash. The controller error must be checked.
-                        std::string strVal;
-
-                        // Deserialize the parameters.
-                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, strVal);
-
-                        // Generate the struct.
-                        std::cout << "" << std::endl;
-                        std::cout << strVal;
-                    }
-                    catch(...)
-                    {
-                        std::cout << "BAD PARAMS" << std::endl;
-                        // RETURN BAD PARAMS
-                        //result = ClientResult::
-                    }
-                }
-
-                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SIMULATION_STATE))
                 {
                     try
                     {
@@ -1886,8 +1889,8 @@ int main(int, char**)
         {
             std::cout << "Showing all custom commands:"                                                                            << std::endl;
             std::cout << ""                                                                                                        << std::endl;
-            std::cout << "\t- DO_CONNECT_PLC:              88"                                                                     << std::endl;
-            std::cout << "\t- DO_DISCONNECT_PLC:           89"                                                                     << std::endl;
+            std::cout << "\t- DO_CONNECT_PLC:              86"                                                                     << std::endl;
+            std::cout << "\t- DO_DISCONNECT_PLC:           87"                                                                     << std::endl;
             std::cout << ""                                                                                                        << std::endl;
             std::cout << "    " << std::string(70, '-')                                                                            << '\n';
             std::cout << "    SAFETY RELATED FUNCTIONS"                                                                            << std::endl;
@@ -1899,69 +1902,67 @@ int main(int, char**)
             std::cout << "    LOW LEVEL PLC REGISTERS RELATED FUNCTIONS"                                                           << std::endl;
             std::cout << "    " << std::string(70, '-')                                                                            << '\n';
             std::cout << "\t- GET_PLC_REGISTERS:           35 (TODO)"                                                              << std::endl;
+            std::cout << "\t- GET_PLC_REGISTER:            36 (TODO)"                                                              << std::endl;
             std::cout << "\t- GET_PLC_PRUEBA:             101 string(symbol) string(type)"                                         << std::endl;
             std::cout << ""                                                                                                        << std::endl;
             std::cout << "    " << std::string(70, '-')                                                                            << '\n';
             std::cout << "    STATUS & CONFIGURATION RELATED FUNCTIONS"                                                            << std::endl;
             std::cout << "    " << std::string(70, '-')                                                                            << '\n';
-            std::cout << "\t- GET_MOUNT_LOG:               36 string(YYYY-MM-DD)"                                                  << std::endl;
-            std::cout << "\t- DO_SYNC_NTP:                 37 (TODO)"                                                              << std::endl;
-            std::cout << "\t- DO_SYNC_MANUAL:              38 string(YYYY-MM-DDTHH:MM:SS.sssZ) or string(YYYYMMDDTHHMMSS.sssZ)"    << std::endl;
-            std::cout << "\t- GET_MOUNT_STATUS:            39"                                                                     << std::endl;
-            std::cout << "\t- GET_MOUNT_INFO:              40"                                                                     << std::endl;
-            std::cout << "\t- EN_TRACK_ADJ:                41 bool"                                                                << std::endl;
-            std::cout << "\t- EN_MOUNT_POWER:              42 bool"                                                                << std::endl;
-            std::cout << "\t- SET_SLEW_SPEED:              43 double(vel.az) double(vel.el)"                                       << std::endl;
-            std::cout << "\t- GET_SLEW_SPEED:              44"                                                                     << std::endl;
-            std::cout << "\t- SET_HOME_POSITION:           45 double(pos.az) double(pos.el)"                                       << std::endl;
-            std::cout << "\t- GET_HOME_POSITION:           46"                                                                     << std::endl;
-            std::cout << "\t- SET_IDLE_POS:                47 double(pos.az) double(pos.el)"                                       << std::endl;
-            std::cout << "\t- GET_IDLE_POS:                48"                                                                     << std::endl;
-            std::cout << "\t- SET_PARK_POS:                49 double(pos.az) double(pos.el)"                                       << std::endl;
-            std::cout << "\t- GET_PARK_POS:                50"                                                                     << std::endl;
-            std::cout << "\t- SET_CALIBRATION_POS:         51 double(pos.az) double(pos.el)"                                       << std::endl;
-            std::cout << "\t- GET_CALIBRATION_POS:         52"                                                                     << std::endl;
-            std::cout << "\t- SET_IDLE_POS_HERE:           53"                                                                     << std::endl;
-            std::cout << "\t- SET_PARK_POS_HERE:           54"                                                                     << std::endl;
-            std::cout << "\t- SET_CALIBRATION_POS_HERE:    55"                                                                     << std::endl;
-            std::cout << "\t- SET_WAIT_ALT:                56 double(alt)"                                                         << std::endl;
-            std::cout << "\t- GET_WAIT_ALT:                57"                                                                     << std::endl;
-            std::cout << "\t- SET_HOMING_OFFSETS:          58 double(pos.az) double(pos.el)"                                       << std::endl;
-            std::cout << "\t- GET_HOMING_OFFSETS:          59"                                                                     << std::endl;
-            std::cout << "\t- EN_MOUNT_MODEL:              60 bool"                                                                << std::endl;
-            std::cout << "\t- SET_MOUNT_MODEL_COEFS:       61 double(AN) double(AW) double(CA) double(NPAE) double(IE) double(IA)" << std::endl;
-            std::cout << "\t- SET_MOUNT_MODEL_COEFS_FILE: 103 string(test_azel_model_v1)"                                          << std::endl;
-            std::cout << "\t- APP_MOUNT_MODEL_CORRECT:    102 bool(AN) bool(AW) bool(CA) bool(NPAE) bool(IE) bool(IA)"             << std::endl;
-            std::cout << "\t- GET_MOUNT_MODEL_COEFS:       62"                                                                     << std::endl;
-            std::cout << "\t- SET_LOCATION:                63 double(lat) double(lon) double(alt) double(x) double(y) double(z)"   << std::endl;
-            std::cout << "\t- GET_LOCATION:                64"                                                                     << std::endl;
-            std::cout << "\t- SET_METEO_DATA:              65 double(press) double(temp) double(hr)"                               << std::endl;
-            std::cout << "\t- GET_METEO_DATA:              66"                                                                     << std::endl;
-            std::cout << "\t- EN_SIMULATION_MODE:          67 (TODO)"                                                              << std::endl;
-            std::cout << "\t- GET_SIMULATION_STATE:        68"                                                                     << std::endl;
-            std::cout << "\t- SET_SIMULATION_TIME:         69 (TODO)"                                                              << std::endl;
+            std::cout << "\t- GET_MOUNT_LOG:               37 string(YYYY-MM-DD)"                                                  << std::endl;
+            std::cout << "\t- GET_MOUNT_STATUS:            38"                                                                     << std::endl;
+            std::cout << "\t- GET_MOUNT_INFO:              39"                                                                     << std::endl;
+            std::cout << "\t- SET_TIME_SOURCE:             40 u_short(0: NTP    1: MANUAL)"                                        << std::endl;
+            std::cout << "\t- DO_SYNC_MANUAL:              41 string(YYYY-MM-DDTHH:MM:SS.sssZ) or string(YYYYMMDDTHHMMSS.sssZ)"    << std::endl;
+            std::cout << "\t- DO_SYNC_NTP:                 42 (TODO)"                                                              << std::endl;
+            std::cout << "\t- EN_EXT_PPS:                  43 bool"                                                                << std::endl;
+            std::cout << "\t- EN_TRACK_ADJ:                44 bool"                                                                << std::endl;
+            std::cout << "\t- EN_MOUNT_POWER:              45 bool"                                                                << std::endl;
+            std::cout << "\t- SET_IDLE_POS:                46 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_IDLE_POS:                47"                                                                     << std::endl;
+            std::cout << "\t- SET_PARK_POS:                48 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_PARK_POS:                49"                                                                     << std::endl;
+            std::cout << "\t- SET_CALIBRATION_POS:         50 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_CALIBRATION_POS:         51"                                                                     << std::endl;
+            std::cout << "\t- SET_IDLE_POS_HERE:           52"                                                                     << std::endl;
+            std::cout << "\t- SET_PARK_POS_HERE:           53"                                                                     << std::endl;
+            std::cout << "\t- SET_CALIBRATION_POS_HERE:    54"                                                                     << std::endl;
+            std::cout << "\t- SET_WAIT_ALT:                55 double(alt)"                                                         << std::endl;
+            std::cout << "\t- GET_WAIT_ALT:                56"                                                                     << std::endl;
+            std::cout << "\t- SET_HOMING_OFFSETS:          57 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_HOMING_OFFSETS:          58"                                                                     << std::endl;
+            std::cout << "\t- EN_MOUNT_MODEL:              59 bool"                                                                << std::endl;
+            std::cout << "\t- SET_MOUNT_MODEL_COEFS:       60 double(AN) double(AW) double(CA) double(NPAE) double(IE) double(IA)" << std::endl;
+            std::cout << "\t- SET_MOUNT_MODEL_COEFS_FILE: 102 string(test_azel_model_v1)"                                          << std::endl;
+            std::cout << "\t- APP_MOUNT_MODEL_CORRECT:    103 bool(AN) bool(AW) bool(CA) bool(NPAE) bool(IE) bool(IA)"             << std::endl;
+            std::cout << "\t- GET_MOUNT_MODEL_COEFS:       61"                                                                     << std::endl;
+            std::cout << "\t- SET_LOCATION:                62 double(lat) double(lon) double(alt) double(x) double(y) double(z)"   << std::endl;
+            std::cout << "\t- GET_LOCATION:                63"                                                                     << std::endl;
+            std::cout << "\t- SET_METEO_DATA:              64 double(press) double(temp) double(hr)"                               << std::endl;
+            std::cout << "\t- GET_METEO_DATA:              65"                                                                     << std::endl;
+            std::cout << "\t- SET_SLEW_SPEED:              66 double(vel.az) double(vel.el)"                                       << std::endl;
+            std::cout << "\t- GET_SLEW_SPEED:              67"                                                                     << std::endl;
             std::cout << ""                                                                                                        << std::endl;
             std::cout << "    " << std::string(70, '-')                                                                            << '\n';
             std::cout << "    MOTION RELATED FUNCTIONS"                                                                            << std::endl;
             std::cout << "    " << std::string(70, '-')                                                                            << '\n';
-            std::cout << "\t- GET_MOTION_MODE:             70"                                                                     << std::endl;
-            std::cout << "\t- GET_MOTION_STATE:            71"                                                                     << std::endl;
-            std::cout << "\t- DO_START_MOTION:             72"                                                                     << std::endl;
-            std::cout << "\t- DO_PAUSE_MOTION:             73"                                                                     << std::endl;
-            std::cout << "\t- DO_STOP_MOTION:              74"                                                                     << std::endl;
-            std::cout << "\t- SET_TRACK_POS_OFFSET:        75 double(pos.az) double(pos.el)"                                       << std::endl;
-            std::cout << "\t- GET_TRACK_POS_OFFSET:        76"                                                                     << std::endl;
-            std::cout << "\t- SET_TRACK_TIME_BIAS:         77 double(time)"                                                        << std::endl;
-            std::cout << "\t- GET_TRACK_TIME_BIAS:         78"                                                                     << std::endl;
-            std::cout << "\t- SET_ABS_ALTAZ_MOTION:        79 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
-            std::cout << "\t- SET_REL_ALTAZ_MOTION:        80 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
-            std::cout << "\t- SET_CON_ALTAZ_MOTION:        81 double(vel.az) double(vel.el)"                                       << std::endl;
-            std::cout << "\t- SET_HOMING_MOTION:           82"                                                                     << std::endl;
-            std::cout << "\t- SET_IDLE_MOTION:             83"                                                                     << std::endl;
-            std::cout << "\t- SET_PARK_MOTION:             84"                                                                     << std::endl;
-            std::cout << "\t- SET_CALIBRATION_MOTION:      85"                                                                     << std::endl;
-            std::cout << "\t- SET_CPF_MOTION:              86 (TODO)"                                                              << std::endl;
-            std::cout << "\t- SET_STAR_MOTION:             87 (TODO)"                                                              << std::endl;
+            std::cout << "\t- GET_MOTION_MODE:             68"                                                                     << std::endl;
+            std::cout << "\t- GET_MOTION_STATE:            69"                                                                     << std::endl;
+            std::cout << "\t- DO_START_MOTION:             70"                                                                     << std::endl;
+            std::cout << "\t- DO_PAUSE_MOTION:             71"                                                                     << std::endl;
+            std::cout << "\t- DO_STOP_MOTION:              72"                                                                     << std::endl;
+            std::cout << "\t- SET_TRACK_POS_OFFSET:        73 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_TRACK_POS_OFFSET:        74"                                                                     << std::endl;
+            std::cout << "\t- SET_TRACK_TIME_BIAS:         75 double(time)"                                                        << std::endl;
+            std::cout << "\t- GET_TRACK_TIME_BIAS:         76"                                                                     << std::endl;
+            std::cout << "\t- SET_ABS_ALTAZ_MOTION:        77 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
+            std::cout << "\t- SET_REL_ALTAZ_MOTION:        78 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
+            std::cout << "\t- SET_CON_ALTAZ_MOTION:        79 double(vel.az) double(vel.el)"                                       << std::endl;
+            std::cout << "\t- SET_HOMING_MOTION:           80"                                                                     << std::endl;
+            std::cout << "\t- SET_IDLE_MOTION:             81"                                                                     << std::endl;
+            std::cout << "\t- SET_PARK_MOTION:             82"                                                                     << std::endl;
+            std::cout << "\t- SET_CALIBRATION_MOTION:      83"                                                                     << std::endl;
+            std::cout << "\t- SET_CPF_MOTION:              84 (TODO)"                                                              << std::endl;
+            std::cout << "\t- SET_STAR_MOTION:             85 (TODO)"                                                              << std::endl;
             continue;
         }
 

@@ -59,6 +59,12 @@ namespace controller{
 
 class AmelasController;
 
+enum AmelasClockSource : unsigned short int
+{
+    NTP    = 0,
+    MANUAL = 1
+};
+
 enum class AmelasError : std::int32_t
 {
     INVALID_ERROR      = -1,
@@ -343,21 +349,21 @@ using EnableAvoidSunCallback = std::function<AmelasError(const bool&)>;
 // -- LOW LEVEL PLC REGISTERS RELATED FUNCTIONS
 using DoConnectPLCCallback    = std::function<AmelasError()>;
 using DoDisconnectPLCCallback = std::function<AmelasError()>;
+//TODO: using GetPLCRegistersCallback = std::function<AmelasError(std::string&)>;
 using GetPLCRegisterCallback  = std::function<AmelasError(const PLCAddress&, PLCRegisterValue&)>;
 using GetPLCpruebaCallback    = std::function<AmelasError(const std::string&, const std::string&)>; // PRUEBA
 
 // -- STATUS AND CONFIGURATION RELATED FUNCTIONS
 using GetMountLogCallback                = std::function<AmelasError(const std::string&)>;
+using GetMountStatusCallback             = std::function<AmelasError(std::string&)>;
+using GetDeviceInfoCallback              = std::function<AmelasError(std::string&)>;
+using SetTimeSourceCallback              = std::function<AmelasError(const unsigned short int&)>;
+using DoSyncTimeManualCallback           = std::function<AmelasError(const std::string&)>;
+// TODO: using DoSyncTimeNTPCallback              = std::function<AmelasError(const std::string&, const unsigned&, const unsigned&)>;
 using DoSyncTimeNTPCallback              = std::function<AmelasError(const std::string&, const unsigned&)>; // PRUEBA
-using DoSyncTimeManualCallback              = std::function<AmelasError(const std::string&)>;
-using GetMountStatusCallback             = std::function<AmelasError(std::string&)>; // PRUEBA
-using GetDeviceInfoCallback              = std::function<AmelasError(std::string&)>; // PRUEBA
+using EnableExtPPSCallback               = std::function<AmelasError(const bool&)>;
 using EnableTrackingAdjustsCallback      = std::function<AmelasError(const bool&)>;
 using EnableMountPowerCallback           = std::function<AmelasError(const bool&)>;
-using SetSlewSpeedCallback               = std::function<AmelasError(const AltAzVel&)>;
-using GetSlewSpeedCallback               = std::function<AmelasError(AltAzVel&)>;
-using SetHomePositionCallback            = std::function<AmelasError(const AltAzPos&)>;
-using GetHomePositionCallback            = std::function<AmelasError(AltAzPos&)>;
 using SetIdlePositionCallback            = std::function<AmelasError(const AltAzPos&)>;
 using GetIdlePositionCallback            = std::function<AmelasError(AltAzPos&)>;
 using SetParkPositionCallback            = std::function<AmelasError(const AltAzPos&)>;
@@ -377,12 +383,13 @@ using SetMountModelCoefsFileCallback     = std::function<AmelasError(const std::
 using GetMountModelCoefsCallback         = std::function<AmelasError(double&, double&, double&, double&, double&, double&)>; // PRUEBA
 using ApplyMountModelCorrectionsCallback = std::function<AmelasError(const bool&, const bool&, const bool&, const bool&, const bool&, const bool&)>; // PRUEBA
 using SetLocationCallback                = std::function<AmelasError(const double&, const double&, const double&, const double&, const double&, const double&)>; // PRUEBA
-//using SetLocationCallback                = std::function<AmelasError(const StationLocation&)>;
+// TODO: using SetLocationCallback                = std::function<AmelasError(const StationLocation&)>;
 using GetLocationCallback                = std::function<AmelasError(StationLocation&)>;
 using SetMeteoDataCallback               = std::function<AmelasError(const double&, const double&, const double&)>; // PRUEBA
-//using SetMeteoDataCallback               = std::function<AmelasError(const MeteoData&)>;
+// TODO: using SetMeteoDataCallback               = std::function<AmelasError(const MeteoData&)>;
 using GetMeteoDataCallback               = std::function<AmelasError(MeteoData&)>;
-using GetSimulationStateCallback         = std::function<AmelasError(std::string&)>;
+using SetSlewSpeedCallback               = std::function<AmelasError(const AltAzVel&)>;
+using GetSlewSpeedCallback               = std::function<AmelasError(AltAzVel&)>;
 
 // -- MOTION RELATED FUNCTIONS
 using GetMotionModeCallback          = std::function<AmelasError(AmelasMotionMode&)>;
