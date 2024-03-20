@@ -23,6 +23,7 @@
 
 // PROJECT INCLUDES
 // =====================================================================================================================
+#include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_cpf.h"
 #include "AmelasController/amelas_controller.h"
 #include "LibDegorasSLR/Astronomical/predictors/predictor_sun_base.h"
 #include "LibDegorasSLR/Astronomical/predictors/predictor_sun_fast.h"
@@ -31,7 +32,6 @@
 #include "LibDegorasSLR/Timing/time_utils.h"
 #include "LibDegorasSLR/libdegorasslr_init.h"
 #include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_base.h"
-//#include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_cpf.h"
 // =====================================================================================================================
 
 // AMELAS NAMESPACES
@@ -190,7 +190,10 @@ AmelasError AmelasController::getPLCprueba(const std::string &symbol, const std:
     else if (type == "bool")
         value = std::to_string(_plc->read<bool>(symbol));
     else if (type == "T_FILETIME64")
-        value = std::to_string(_plc->read<unsigned long long>(symbol));
+    {
+        //value = std::to_string(_plc->read<unsigned long long>(symbol));
+        value = dpslr::timing::timePointToIso8601(dpslr::timing::win32TicksToTimePoint(_plc->read<unsigned long long>(symbol)));
+    }
 
     // Log
     std::ostringstream oss;
@@ -538,6 +541,30 @@ double AmelasController::arcsec_to_deg(const double &arcsec)
     return arcsec * (1 / 3600.0);
 }
 
+unsigned long long AmelasController::iso8601DatetimeTowin32Ticks(const std::string &datetime)
+{
+    // Converts a datetime string formatted according to ISO 8601 into a HRTimePointStd time point
+    dpslr::timing::types::HRTimePointStd tp = dpslr::timing::iso8601DatetimeToTimePoint(datetime);
+
+    // Get the time in seconds from the epoch
+    auto duration = tp.time_since_epoch();
+    auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+
+    // Calculate the second from the Windows epoch (1601-01-01 UTC)
+    unsigned long long windowsEpochSeconds = 11644473600ULL; // Seconds between the epoch of Unix and Windows
+    unsigned long long windowsSeconds = seconds + windowsEpochSeconds;
+
+    // Convert the second to windows ticks
+    unsigned long long ticksPerSecond = 10000000ULL; // Windows Ticks per second
+    unsigned long long ticks = windowsSeconds * ticksPerSecond;
+
+    // Add second fractions ticks
+    //unsigned long long ticksFraction = std::chrono::duration_cast<std::chrono::nanoseconds>(duration % std::chrono::seconds(1)).count() * 100ULL;
+    //ticks += ticksFraction;
+
+    return ticks;
+}
+
 AmelasError AmelasController::getMountLog(const std::string &day)
 {
     // Auxiliar result
@@ -599,6 +626,7 @@ AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsig
     // Functionality
     _plc->write(symbolEnable, true);
     _plc->write<unsigned short int>(symbolPort, port);
+    _clock_source = 0;
 
     // Log
     std::ostringstream oss;
@@ -609,7 +637,55 @@ AmelasError AmelasController::doSyncTimeNTP(const std::string &host, const unsig
     return error;
 }
 
-// TODO: AmelasError AmelasController::doSyncTimeManual(const std::string &datetime)
+// TODO
+AmelasError AmelasController::doSyncTimeManual(const std::string &datetime)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "DO_SYNC_MANUAL";
+
+    // Symbols used for PLC
+    const std::string bEnable = "MAIN.timeManager._bEnableManualSync";
+    const std::string ftDatetime = "MAIN.timeManager._ftManualDatetime";
+
+    // Variables used for this function
+    std::ostringstream oss;
+
+    // Functionality
+    // Auxiliar variables
+    int y,m,d,h,M, s;
+    std::smatch match;
+
+    // Regex
+    std::regex iso8601_regex_extended(R"(^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$)");
+    std::regex iso8601_regex_basic(R"(^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(?:\.(\d+))?Z$)");
+
+    // Check the regexes
+    if (!std::regex_search(datetime, match, iso8601_regex_extended))
+    {
+        if (!std::regex_search(datetime, match, iso8601_regex_basic))
+        {
+            oss << "Invalid argument: " << datetime << '\n'; // TODO: pass to the client
+            error = AmelasError::INVALID_ARG;
+        }
+    }
+
+    if (std::regex_search(datetime, match, iso8601_regex_extended) || std::regex_search(datetime, match, iso8601_regex_basic))
+    {
+        _plc->write(bEnable, true);
+        _plc->write(ftDatetime, iso8601DatetimeTowin32Ticks(datetime));
+        _clock_source = 1;
+
+        oss << "Date introduced: " << datetime << '\n'; // TODO: pass to the client
+    }
+
+    // Log
+    setLog(command, oss.str(), error);
+
+    return error;
+}
 
 // TODO
 AmelasError AmelasController::getMountStatus(std::string &mountStatus)
@@ -1161,7 +1237,7 @@ AmelasError AmelasController::applyMountModelCorrections(const bool &bAN, const 
     std::ostringstream oss;
     std::string str_partial = "";
     // -- Current position in radians
-    AltAzPos actPosRadians(deg_to_radians(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.ActPos")), deg_to_radians(_plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.ActPos")));
+    AltAzPos setPosRad(deg_to_radians(_plc->read<double>("MAIN.axesController._azimuthAxis._axis.NcToPlc.SetPos")), deg_to_radians(_plc->read<double>("MAIN.axesController._elevationAxis._axis.NcToPlc.SetPos")));
     // -- Offset for each coefficient
     double azOffset_IE = 0.0;
     double elOffset_IE = 0.0;
@@ -1224,8 +1300,8 @@ AmelasError AmelasController::applyMountModelCorrections(const bool &bAN, const 
         // --> LR collimation error
         if (bCA)
         {
-            if (cos(actPosRadians.el) != 0.0)
-                azOffset_CA = -ca * 1 / cos(actPosRadians.el);
+            if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+                azOffset_CA = -ca * 1 / cos(setPosRad.el);
             elOffset_CA = 0.0;
 
             str_partial = str_partial + "  CA:   " + std::to_string(azOffset_CA) + " " + std::to_string(elOffset_CA) + '\n';
@@ -1239,8 +1315,9 @@ AmelasError AmelasController::applyMountModelCorrections(const bool &bAN, const 
         // --> Azimuth axis misalignment NS
         if (bAN)
         {
-            azOffset_AN = -an * sin(actPosRadians.az) * tan(actPosRadians.el);
-            elOffset_AN = -an * cos(actPosRadians.az);
+            if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+                azOffset_AN = -an * sin(setPosRad.az) * tan(setPosRad.el);
+            elOffset_AN = -an * cos(setPosRad.az);
 
             str_partial = str_partial + "  AN:   " + std::to_string(azOffset_AN) + " " + std::to_string(elOffset_AN) + '\n';
         }
@@ -1253,8 +1330,9 @@ AmelasError AmelasController::applyMountModelCorrections(const bool &bAN, const 
         // --> Azimuth axis misalignment EW
         if (bAW)
         {
-            azOffset_AW = -aw * cos(actPosRadians.az) * tan(actPosRadians.el);
-            elOffset_AW = aw * sin(actPosRadians.az);
+            if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+                azOffset_AW = -aw * cos(setPosRad.az) * tan(setPosRad.el);
+            elOffset_AW = aw * sin(setPosRad.az);
 
             str_partial = str_partial + "  AW:   " + std::to_string(azOffset_AW) + " " + std::to_string(elOffset_AW) + '\n';
         }
@@ -1267,7 +1345,8 @@ AmelasError AmelasController::applyMountModelCorrections(const bool &bAN, const 
         // --> Az/El non-perpendicularity
         if (bNPAE)
         {
-            azOffset_NPAE = -npae * tan(actPosRadians.el);
+            if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+                azOffset_NPAE = -npae * tan(setPosRad.el);
             elOffset_NPAE = 0.0;
 
             str_partial = str_partial + "  NPAE: " + std::to_string(azOffset_NPAE) + " " + std::to_string(elOffset_NPAE) + '\n';
@@ -1308,6 +1387,9 @@ AmelasError AmelasController::setLocation(const double &lat, const double &lon, 
     const std::string symbol = "GLOBALS.Parameters.Commander.StationLocation";
 
     // Functionality
+    WGS84Coords geod(lat, lon, alt);
+    ECEFCoords geoc(x, y, z);
+    StationLocation location(geod, geoc);
     _plc->write(symbol + ".wgs84.lat", lat);
     _plc->write(symbol + ".wgs84.lon", lon);
     _plc->write(symbol + ".wgs84.alt", alt);
@@ -1318,15 +1400,24 @@ AmelasError AmelasController::setLocation(const double &lat, const double &lon, 
 
     // Log
     std::ostringstream oss;
+    //oss << "  Station location: " << '\n'
+    //    << "    Geodetic coordinates: " << '\n'
+    //    << "      Lat: " << std::fixed << std::setprecision(8) << lat << " \370" << '\n'
+    //    << "      Lon: " << std::fixed << std::setprecision(8) << lon << " \370" << '\n'
+    //    << "      Alt: " << std::fixed << std::setprecision(3) << alt << " m" << '\n'
+    //    << "    Geocentric coordinates: " << '\n'
+    //    << "      x:   " << std::fixed << std::setprecision(3) << x << " m" << '\n'
+    //    << "      y:   " << std::fixed << std::setprecision(3) << y << " m" << '\n'
+    //    << "      z:   " << std::fixed << std::setprecision(3) << z << " m" << '\n';
     oss << "  Station location: " << '\n'
         << "    Geodetic coordinates: " << '\n'
-        << "      Lat: " << std::fixed << std::setprecision(8) << lat << " \370" << '\n'
-        << "      Lon: " << std::fixed << std::setprecision(8) << lon << " \370" << '\n'
-        << "      Alt: " << std::fixed << std::setprecision(3) << alt << " m" << '\n'
+        << "      Lat: " << std::fixed << std::setprecision(8) << location.wgs84.lat << " \370" << '\n'
+        << "      Lon: " << std::fixed << std::setprecision(8) << location.wgs84.lon << " \370" << '\n'
+        << "      Alt: " << std::fixed << std::setprecision(3) << location.wgs84.alt << " m" << '\n'
         << "    Geocentric coordinates: " << '\n'
-        << "      x:   " << std::fixed << std::setprecision(3) << x << " m" << '\n'
-        << "      y:   " << std::fixed << std::setprecision(3) << y << " m" << '\n'
-        << "      z:   " << std::fixed << std::setprecision(3) << z << " m" << '\n';
+        << "      x:   " << std::fixed << std::setprecision(3) << location.ecef.x << " m" << '\n'
+        << "      y:   " << std::fixed << std::setprecision(3) << location.ecef.y << " m" << '\n'
+        << "      z:   " << std::fixed << std::setprecision(3) << location.ecef.z << " m" << '\n';
     setLog(command, oss.str(), error);
 
     return error;
@@ -1483,7 +1574,37 @@ AmelasError AmelasController::getMeteoData(MeteoData &meteo)
 }
 
 // TODO: AmelasError AmelasController::enableSimulationMode(const bool &enabled)
-// TODO: AmelasError AmelasController::getSimulationState(bool &enabled)
+
+// TODO
+AmelasError AmelasController::getSimulationState(std::string &clockSource)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "GET_SIMULATION_STATE";
+
+    // Variables used for this function
+    std::ostringstream oss;
+
+    // Functionality
+    if (_clock_source == 0)
+        oss << "Clock source: NTP" << '\n';
+    else if (_clock_source == 1)
+        oss << "Clock source: MANUAL" << '\n';
+    else if (_clock_source == 2)
+        oss << "Clock source: SIMULATION" << '\n';
+    else
+        oss << "Clock source: UNKNOWN" << '\n';
+
+    clockSource = oss.str();
+
+    // Log
+    setLog(command, oss.str(), error);
+
+    return error;
+}
+
 // TODO: AmelasError AmelasController::setSimulationTime(const std::string &datetime)
 //=====================================================================================================================
 
@@ -1821,7 +1942,7 @@ AmelasError AmelasController::setHomingMotion()
 
     // Symbol used for PLC
     const std::string symbol = "MAIN.commander.moveRelative";
-    
+
     // Variables used for this function
     std::ostringstream oss;
 
@@ -1830,7 +1951,7 @@ AmelasError AmelasController::setHomingMotion()
 
     if (actPos.az <= 30.0 && actPos.az >= -30.0)
     {
-        oss << "Azimuth is in: " << actPos.az << " \370 (ABSOLUTE region)." << '\n'
+        oss << "Azimuth axis is in: " << actPos.az << " \370 (ABSOLUTE region)." << '\n'
             << "It is not necessary to make homing sequence." << '\n';
     }
     else if (actPos.az < -30.0)
@@ -1841,8 +1962,8 @@ AmelasError AmelasController::setHomingMotion()
         _plc->write(symbol + "Velocity.Elevation", 4.0);
         _plc->write(symbol + "Cmd.cmd", true);
 
-        oss << "Azimuth is in: " << actPos.az << " \370 (region with negative overlap)." << '\n'
-            << "Azimuth will move " << abs(actPos.az) - 30.0 << " \370." << '\n';
+        oss << "Azimuth axis is in: " << actPos.az << " \370 (region with negative overlap)." << '\n'
+            << "The axis will move " << abs(actPos.az) - 30.0 << " \370." << '\n';
     }
     else if (actPos.az > 30.0)
     {
@@ -1852,8 +1973,8 @@ AmelasError AmelasController::setHomingMotion()
         _plc->write(symbol + "Velocity.Elevation", 4.0);
         _plc->write(symbol + "Cmd.cmd", true);
 
-        oss << "Azimuth is in: " << actPos.az << " \370 (region with positive overlap)." << '\n'
-            << "Azimuth will move " << 30 - actPos.az << " \370." << '\n';
+        oss << "Azimuth axis is in: " << actPos.az << " \370 (region with positive overlap)." << '\n'
+            << "The axis will move " << 30 - actPos.az << " \370." << '\n';
     }
     // TODO: pass to the client (success or failure message)
 
@@ -2137,7 +2258,7 @@ AmelasError AmelasController::setCPFMotion()
 
     // -------------------- PREDICTOR MOUNT PREPARATION  ---------------------------------------------------------------
     // Prepare the SLR predictor to be used.
-    //dpslr::utils::PredictorSlrPtr predictor_cpf = dpslr::utils::PredictorSlrBase::factory<dpslr::utils::PredictorSlrCPF>(cpf_path, stat_geod, stat_geoc);
+    dpslr::utils::PredictorSlrPtr predictor_cpf = dpslr::utils::PredictorSlrBase::factory<dpslr::utils::PredictorSlrCPF>(cpf_path, stat_geod, stat_geoc);
 
     // Log
     setLog(command, "", error);

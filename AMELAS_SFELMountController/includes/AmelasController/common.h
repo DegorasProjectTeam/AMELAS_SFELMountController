@@ -79,11 +79,12 @@ enum class AmelasError : std::int32_t
     ENABLE_WARN        = 14,
     START_WARN         = 15,
     STOP_WARN          = 16,
-    FILE_ERROR         = 17
+    FILE_ERROR         = 17,
+    INVALID_ARG        = 18
 
 };
 
-static constexpr std::array<const char*, 18> ControllerErrorStr
+static constexpr std::array<const char*, 19> ControllerErrorStr
 {
     "SUCCESS - Controller process success.",
     "MOUNT_UNSAFE_STATE - The mount is in an unsafe state, so the operation cannot be done.",
@@ -102,7 +103,8 @@ static constexpr std::array<const char*, 18> ControllerErrorStr
     "It is already at the desired value.",
     "There is no move loaded, so the operation cannot be carried out.",
     "The mount is already stopped, so the operation cannot be carried out.",
-    "FILE_ERROR - Can't open file. Is it possible it was moved, renamed or deleted?"
+    "FILE_ERROR - Can't open file. Is it possible it was moved, renamed or deleted?",
+    "INVALID_ARG - The argument introduced does not match that of the function."
 };
 
 enum class AmelasMotionMode : std::int32_t
@@ -347,6 +349,7 @@ using GetPLCpruebaCallback    = std::function<AmelasError(const std::string&, co
 // -- STATUS AND CONFIGURATION RELATED FUNCTIONS
 using GetMountLogCallback                = std::function<AmelasError(const std::string&)>;
 using DoSyncTimeNTPCallback              = std::function<AmelasError(const std::string&, const unsigned&)>; // PRUEBA
+using DoSyncTimeManualCallback              = std::function<AmelasError(const std::string&)>;
 using GetMountStatusCallback             = std::function<AmelasError(std::string&)>; // PRUEBA
 using GetDeviceInfoCallback              = std::function<AmelasError(std::string&)>; // PRUEBA
 using EnableTrackingAdjustsCallback      = std::function<AmelasError(const bool&)>;
@@ -379,6 +382,7 @@ using GetLocationCallback                = std::function<AmelasError(StationLoca
 using SetMeteoDataCallback               = std::function<AmelasError(const double&, const double&, const double&)>; // PRUEBA
 //using SetMeteoDataCallback               = std::function<AmelasError(const MeteoData&)>;
 using GetMeteoDataCallback               = std::function<AmelasError(MeteoData&)>;
+using GetSimulationStateCallback         = std::function<AmelasError(std::string&)>;
 
 // -- MOTION RELATED FUNCTIONS
 using GetMotionModeCallback          = std::function<AmelasError(AmelasMotionMode&)>;

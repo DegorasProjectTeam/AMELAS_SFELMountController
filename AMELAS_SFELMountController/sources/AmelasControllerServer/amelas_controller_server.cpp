@@ -66,6 +66,8 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processSetString<controller::GetMountLogCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_NTP,
                                   &AmelasControllerServer::processSetNTPserver<controller::DoSyncTimeNTPCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_MANUAL,
+                                  &AmelasControllerServer::processSetString<controller::DoSyncTimeManualCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_STATUS,
                                   &AmelasControllerServer::processGetString<controller::GetMountStatusCallback>); // PRUEBA
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_INFO,
@@ -126,6 +128,8 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processSetMeteoData<controller::SetMeteoDataCallback>); // PRUEBA
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_METEO_DATA,
                                   &AmelasControllerServer::processGetMeteoData<controller::GetMeteoDataCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_SIMULATION_STATE,
+                                  &AmelasControllerServer::processGetString<controller::GetSimulationStateCallback>);
 
     // -- MOTION RELATED FUNCTIONS
     this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOTION_MODE,

@@ -98,7 +98,7 @@ public:
 
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host, const unsigned& port, const unsigned& timeout);
     LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123); // PRUEBA (para ver si comunico con el objeto NTP de TwinCAT)
-    // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
+    LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
 
     LIBAMELAS_EXPORT AmelasError getMountStatus(std::string& mountStatus); // PRUEBA (en pruebas)
     LIBAMELAS_EXPORT AmelasError getDeviceInfo(std::string& deviceInfo); // PRUEBA (en pruebas)
@@ -148,7 +148,7 @@ public:
     LIBAMELAS_EXPORT AmelasError getMeteoData(MeteoData& meteo);
     
     // TODO: LIBAMELAS_EXPORT AmelasError enableSimulationMode(const bool& enabled);
-    // TODO: LIBAMELAS_EXPORT AmelasError getSimulationState(bool& enabled);
+    LIBAMELAS_EXPORT AmelasError getSimulationState(std::string& clockSource);
     // TODO: LIBAMELAS_EXPORT AmelasError setSimulationTime(const std::string& datetime);
     // =====================================================================================================================
 
@@ -202,6 +202,7 @@ private:
     double deg_to_radians(const double& degrees);
     double arcsec_to_radians(const double& arcsec);
     double arcsec_to_deg(const double& arcsec);
+    unsigned long long iso8601DatetimeTowin32Ticks(const std::string& datetime);
 
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
@@ -217,6 +218,7 @@ private:
     double _npae_tpoint = 0.0;
     double _elOffset = 0.0;
     double _azOffset = 0.0;
+    unsigned short int _clock_source = 0; // 0: NTP; 1: manual; 2: simulation
 };
 
 }} // END NAMESPACES.

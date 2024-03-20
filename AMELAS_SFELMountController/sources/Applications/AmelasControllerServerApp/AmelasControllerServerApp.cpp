@@ -202,6 +202,9 @@ int main(int, char**)
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_SYNC_NTP,
                                              &amelas_controller,
                                              &AmelasController::doSyncTimeNTP); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_SYNC_MANUAL,
+                                             &amelas_controller,
+                                             &AmelasController::doSyncTimeManual);
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOUNT_STATUS,
                                              &amelas_controller,
                                              &AmelasController::getMountStatus); // PRUEBA
@@ -292,6 +295,9 @@ int main(int, char**)
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_METEO_DATA,
                                              &amelas_controller,
                                              &AmelasController::getMeteoData);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_SIMULATION_STATE,
+                                             &amelas_controller,
+                                             &AmelasController::getSimulationState);
 
     // -- MOTION RELATED FUNCTIONS
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOTION_MODE,
