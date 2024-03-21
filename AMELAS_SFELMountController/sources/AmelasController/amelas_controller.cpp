@@ -32,6 +32,10 @@
 #include "LibDegorasSLR/Timing/time_utils.h"
 #include "LibDegorasSLR/libdegorasslr_init.h"
 #include "LibDegorasSLR/UtilitiesSLR/predictors/predictor_slr_base.h"
+#include "LibDegorasSLR/TrackingMount/predictors/predictor_mount_slr.h"
+#include "LibDegorasSLR/Astronomical/predictors/predictor_sun_fixed.h"
+#include "LibDegorasSLR/Astronomical/types/astro_types.h"
+#include "LibDegorasSLR/Helpers/types/numeric_strong_type.h"
 // =====================================================================================================================
 
 // AMELAS NAMESPACES
@@ -717,27 +721,124 @@ AmelasError AmelasController::setTimeSource(const unsigned short int &clock)
     // Variables used for this function
     std::ostringstream oss;
 
-    if (clock == AmelasClockSource::NTP)
+    if (clock == AmelasClockSource::OFF)
     {
-        _plc->write(bEnableManual, false);
-        _plc->write(bEnableNTP, true);
-        oss << "Configured clock: NTP" << '\n';
+        if (_clockSource == AmelasClockSource::OFF || (!_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+        {
+            error = AmelasError::ENABLE_WARN;
+            oss << "The clock is already OFF." << '\n';
+        }
+        else
+        {
+            if (_clockSource == AmelasClockSource::NTP || (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+            {
+                oss << "Configured clock" << '\n'
+                    << "  Old: NTP"       << '\n'
+                    << "  New: OFF"       << '\n';
+            }
+            else if (_clockSource == AmelasClockSource::MANUAL || (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual)))
+            {
+                oss << "Configured clock" << '\n'
+                    << "  Old: MANUAL"    << '\n'
+                    << "  New: OFF"       << '\n';
+            }
+            _plc->write(bEnableManual, false);
+            _plc->write(bEnableNTP, false);
+            _clockSource = AmelasClockSource::OFF;
+        }
+    }
+    else if (clock == AmelasClockSource::NTP)
+    {
+        if (_clockSource == AmelasClockSource::NTP || (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+        {
+            error = AmelasError::ENABLE_WARN;
+            oss << "NTP sync is already activated." << '\n';
+        }
+        else
+        {
+            if (_clockSource == AmelasClockSource::MANUAL || (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual)))
+            {
+                oss << "Configured clock" << '\n'
+                    << "  Old: MANUAL"    << '\n'
+                    << "  New: NTP"       << '\n';
+            }
+            else
+            {
+                oss << "Configured clock" << '\n'
+                    << "  Old: OFF"       << '\n'
+                    << "  New: NTP"       << '\n';
+            }
+            _plc->write(bEnableManual, false);
+            _plc->write(bEnableNTP, true);
+            _clockSource = AmelasClockSource::NTP;
+        }
     }
     else if (clock == AmelasClockSource::MANUAL)
     {
-        _plc->write(bEnableManual, true);
-        _plc->write(bEnableNTP, false);
-        oss << "Configured clock: MANUAL" << '\n';
+        if (_clockSource == AmelasClockSource::MANUAL || (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual)))
+        {
+            error = AmelasError::ENABLE_WARN;
+            oss << "MANUAL sync is already activated." << '\n';
+        }
+        else
+        {
+            if (_clockSource == AmelasClockSource::NTP || (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+            {
+                oss << "Configured clock" << '\n'
+                    << "  Old: NTP"       << '\n'
+                    << "  New: MANUAL"    << '\n';
+            }
+            else
+            {
+                oss << "Configured clock" << '\n'
+                    << "  Old: OFF"       << '\n'
+                    << "  New: MANUAL"    << '\n';
+            }
+            _plc->write(bEnableManual, true);
+            _plc->write(bEnableNTP, false);
+            _clockSource = AmelasClockSource::MANUAL;
+        }
     }
     else
     {
         error = AmelasError::INVALID_ARG;
+        _clockSource = AmelasClockSource::UNKNOWN;
         oss << "Configured clock: UNKNOWN" << '\n';
     }
 
     // Log
     setLog(command, oss.str(), error); // TODO: pass to the client
 
+    return error;
+}
+
+AmelasError AmelasController::getTimeSource(unsigned short int &clock)
+{
+    // Auxiliar result
+    AmelasError error = AmelasError::SUCCESS;
+
+    // Command used for log
+    const std::string command = "GET_TIME_SOURCE";
+
+    // Symbols used for PLC
+    const std::string bEnableNTP = "MAIN.timeManager._bEnableNTPSync";
+    const std::string bEnableManual = "MAIN.timeManager._bEnableManualSync";
+
+    // Functionality
+    if (_clockSource == AmelasClockSource::OFF || (!_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+        clock = AmelasClockSource::OFF;
+    else if (_clockSource == AmelasClockSource::NTP || (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+        clock = AmelasClockSource::NTP;
+    else if (_clockSource == AmelasClockSource::MANUAL || (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual)))
+        clock = AmelasClockSource::MANUAL;
+    else
+        clock = AmelasClockSource::UNKNOWN;
+
+    // Log
+    std::ostringstream oss;
+    oss << "Clock source: " << ClockSourceStr[static_cast<size_t>(clock)] << '\n';
+    setLog(command, oss.str(), error);
+    
     return error;
 }
 
@@ -2138,7 +2239,7 @@ AmelasError AmelasController::pruebaBucles()
 
 // TODO: AmelasError AmelasController::setCPFMotion(const file &cpf, AmelasTracking &tracking)
 
-AmelasError AmelasController::setCPFMotion()
+AmelasError AmelasController::setCPFMotion(const unsigned short int &example_selector)
 {
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
@@ -2182,14 +2283,14 @@ AmelasError AmelasController::setCPFMotion()
 
     // -------------------- EXAMPLES CONFIGURATION ---------------------------------------------------------------------
     // Example selector.
-    size_t example_selector = 1;  // Select the example to process.
+    //size_t example_selector = 1;  // Select the example to process.
     bool plot_data = true;        // Flag for enable the data plotting using a Python3 (>3.9) helper script.
 
     // SFEL station geodetic position in degrees (north and east > 0)
     // Altitude in meters
-    Degrees latitude = _plc->read<double>(symbol + ".wgs84.lat");
+    Degrees latitude  = _plc->read<double>(symbol + ".wgs84.lat");
     Degrees longitude = _plc->read<double>(symbol + ".wgs84.lon");
-    Meters alt = _plc->read<double>(symbol + ".wgs84.alt");
+    Meters alt        = _plc->read<double>(symbol + ".wgs84.alt");
 
     // SFEL station geocentric coordinates in meters
     Meters x = _plc->read<double>(symbol + ".ecef.x");
@@ -2219,15 +2320,20 @@ AmelasError AmelasController::setCPFMotion()
 
     // -------------------- EXAMPLES PREPARATION -----------------------------------------------------------------------
     // Store the local geocentric and geodetic coordinates.
-    dpslr::geo::types::GeocentricPoint stat_geoc(x,y,z);
+    dpslr::geo::types::GeocentricPoint stat_geoc(x, y, z);
     dpslr::geo::types::GeodeticPoint<Degrees> stat_geod(latitude, longitude, alt);
 
     // Prepare the different tracking analyzer configurations. The first will be the generic for SLR trackings.
     dpslr::mount::TrackingAnalyzerConfig analyzer_cfg_1(step, sun_avoid_angle, min_el, max_el, avoid_sun);
+    dpslr::mount::TrackingAnalyzerConfig analyzer_cfg_2(step, sun_avoid_angle, 18, 70, avoid_sun);
 
     // Prepare the Sun predictors to be used.
     // Real Sun predictor.
     PredictorSunPtr pred_sun_real = dpslr::astro::PredictorSunBase::factory<dpslr::astro::PredictorSunFast>(stat_geod);
+    // Sintetic Sun predictors.
+    PredictorSunPtr pred_sun_sin_1 = dpslr::astro::PredictorSunBase::factory<dpslr::astro::PredictorSunFixed>(dpslr::astro::types::AltAzPos(20L,30L));
+    PredictorSunPtr pred_sun_sin_2 = dpslr::astro::PredictorSunBase::factory<dpslr::astro::PredictorSunFixed>(dpslr::astro::types::AltAzPos(225L,70L));
+    PredictorSunPtr pred_sun_sin_3 = dpslr::astro::PredictorSunBase::factory<dpslr::astro::PredictorSunFixed>(dpslr::astro::types::AltAzPos(90L,25L));
 
     // Real examples vector with their configurations.
     // Sun Predictor - Tracking Analyzer - Alias - CPF - Pass Start - Pass End
@@ -2243,7 +2349,22 @@ AmelasError AmelasController::setCPFMotion()
         {pred_sun_real, analyzer_cfg_1, "Explorer27_SunEnd", "1328_cpf_240128_02901.sgf", "2024-01-31T08:31:27Z", "2024-01-31T08:44:27Z"},
 
         // Example 3: Jason 3 | No Sun | N-E-CW
-        {pred_sun_real, analyzer_cfg_1, "Jason3_NoSun", "41240_cpf_240128_02801.hts", "2024-01-31T09:47:30Z", "2024-01-31T10:01:00Z"}
+        {pred_sun_real, analyzer_cfg_1, "Jason3_NoSun", "41240_cpf_240128_02801.hts", "2024-01-31T09:47:30Z", "2024-01-31T10:01:00Z"},
+
+        // Example 4: Jason 3 | Sun at middle | N-E-CW
+        {pred_sun_sin_1, analyzer_cfg_1, "Jason3_SunMid_Sintetic_1", "41240_cpf_240128_02801.hts", "2024-01-31T09:47:30Z", "2024-01-31T10:01:00Z"},
+
+        // Example 5: Jason 3 | Sun at middle | N-E-CW
+        {pred_sun_sin_1, analyzer_cfg_2, "Jason3_SunMid_Sintetic_2", "41240_cpf_240128_02801.hts", "2024-01-31T09:47:30Z", "2024-01-31T10:01:00Z"},
+
+        // Example 6: Jason 3 | Sun at middle in high el | NW-SE-CCW
+        {pred_sun_sin_2, analyzer_cfg_1, "Jason3_SunMid_Sintetic_3", "41240_cpf_240128_02801.hts", "2024-01-31T11:42:20Z", "2024-01-31T11:59:10Z"},
+
+        // Example 7: Jason 3 | Sun at beginning | NE-E-CW
+        {pred_sun_sin_1, analyzer_cfg_1, "Jason3_SunMid_Sintetic_4", "41240_cpf_240128_02801.hts", "2024-01-31T09:51:00Z", "2024-01-31T10:01:00Z"},
+
+        // Example 8: Jason 3 | Sun at end | N-ENE-CW
+        {pred_sun_sin_3, analyzer_cfg_1, "Jason3_SunMid_Sintetic_5", "41240_cpf_240128_02801.hts", "2024-01-31T09:47:30Z", "2024-01-31T09:59:00Z"}
     };
 
     // Get band store the example data.
@@ -2258,10 +2379,241 @@ AmelasError AmelasController::setCPFMotion()
 
     // -------------------- PREDICTOR MOUNT PREPARATION  ---------------------------------------------------------------
     // Prepare the SLR predictor to be used.
-    dpslr::utils::PredictorSlrPtr predictor_cpf = dpslr::utils::PredictorSlrBase::factory<dpslr::utils::PredictorSlrCPF>(cpf_path, stat_geod, stat_geoc);
+    PredictorSlrPtr predictor_cpf = dpslr::utils::PredictorSlrBase::factory<dpslr::utils::PredictorSlrCPF>(cpf_path, stat_geod, stat_geoc);
+
+    // Check if the predictor is ready.
+    if (!predictor_cpf->isReady())
+    {
+        std::cerr << "Module: TrackingMount   |   Example: PredictorMountSLR" << std::endl;
+        std::cerr << "Error: The PredictorSlrCPF is not ready, check CPF inputs." << std::endl;
+        std::cerr << "Example finished. Press Enter to exit..." << std::endl;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        //return -1;
+    }
+
+    // Prepare the mount slr predictor.
+    dpslr::mount::PredictorMountSLR predictor_mount(pass_start, pass_end, predictor_cpf, predictor_sun, analyzer_cfg);
+
+    // Check if the tracking is ready.
+    if (!predictor_mount.isReady())
+    {
+        std::cerr << "Module: TrackingMount   |   Example: PredictorMountSLR" << std::endl;
+        std::cerr << "Error: The PredictorMountSLR is not ready, maybe there is no valid pass." << std::endl;
+        std::cerr << "Example finished. Press Enter to exit..." << std::endl;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        //return -1;
+    }
+
+    // -------------------- ALL IS OK. WE WILL SEE THE ANALYZED DATA ---------------------------------------------------
+    // Get the specializated SLR predictor to get useful information.
+    dpslr::utils::PredictorSlrCPFPtr pred_cpf_recover = dpslr::utils::PredictorSlrBase::specialization<dpslr::utils::PredictorSlrCPF>(predictor_cpf);
+
+    // Get the analyzed mount track with all the relevant data.
+    const dpslr::mount::MountTrackingSLR& mount_track =  predictor_mount.getMountTrackingSLR();
+
+    // Log the pass and tracking information (illustrative example).
+    std::stringstream border, lines, data;
+    border.width(80);
+    lines.width(80);
+    border.fill('=');
+    lines.fill('-');
+    border << "\n";
+    lines << "\n";
+    data << border.str();
+    data << "= Module: TrackingMount   |   Example: PredictorMountSLR" << std::endl;
+    data << border.str();
+    data << "= Intputs:" << std::endl;
+    data << lines.str();
+    data << "= File:        " << pred_cpf_recover->getCPF().getSourceFilename() << std::endl;
+    data << "= Object:      " << pred_cpf_recover->getCPF().getHeader().basicInfo1Header()->target_name << std::endl;
+    //std::cout << "= Pass interval: " << mount_track. << std::endl;
+    data << "= Avoid Sun:   " << (mount_track.config.sun_avoid ? "true" : "false") << std::endl;
+    data << "= Avoid angle: " << mount_track.config.sun_avoid_angle                << std::endl;
+    data << "= Delta:       " << mount_track.config.time_delta                     << std::endl;
+    data << "= Min el:      " << mount_track.config.min_elev                       << std::endl;
+    data << border.str();
+    data << "= Outputs:" << std::endl;
+    data << lines.str();
+    //std::cout << "= Track interval: " << mount_track. << std::endl;
+    data << "= Trim at start: " << (mount_track.track_info.trim_at_start ? "true" : "false")          << std::endl;
+    data << "= Trim at end:   " << (mount_track.track_info.trim_at_end ? "true" : "false")            << std::endl;
+    data << "= Sun collision: " << (mount_track.track_info.sun_collision ? "true" : "false")          << std::endl;
+    data << "= Sun at start:  " << (mount_track.track_info.sun_collision_at_start ? "true" : "false") << std::endl;
+    data << "= Sun at end:    " << (mount_track.track_info.sun_collision_at_end ? "true" : "false")   << std::endl;
+    data << "= Sun deviation: " << (mount_track.track_info.sun_deviation ? "true" : "false")          << std::endl;
+    data << "= El deviation:  " << (mount_track.track_info.el_deviation ? "true" : "false")           << std::endl;
+    //TODO Etc
+    data << border.str();
+    // Show the data.
+    //std::cout << data.str();
+
+    // Store the analyzed track data into a CSV file (only part of the data for easy usage).
+    // Create the file and header.
+    std::ofstream file_analyzed_track(output_dir + "/" + track_csv_filename, std::ios_base::out);
+    file_analyzed_track << data.str();
+    file_analyzed_track << "mjd;sod;pass_az;pass_el;track_az;track_el;sun_az;sun_el";
+
+    // Iterate the predictions. At this point, all the the real satellite position data must be valid. If the
+    // predictor had failed or the data entered did not match a pass, the tracking would not be valid directly.
+    for (const auto& pred : mount_track.predictions)
+    {
+        // Auxiliar container for track data.
+        std::string track_az = "";
+        std::string track_el = "";
+
+        // At this point, you only must check if the prediction is outside track. This is becaouse, for example,
+        // the beginning of the real satellite pass may coincide with the Sun sector, so at those points there
+        // would be no data from the mount's track, only the real pass.
+        if (pred.status != dpslr::mount::PositionStatus::OUT_OF_TRACK)
+        {
+            track_az = dpslr::helpers::strings::numberToStr(pred.mount_pos->altaz_coord.az,7, 4);
+            track_el = dpslr::helpers::strings::numberToStr(pred.mount_pos->altaz_coord.el,7, 4);
+
+            // Store the data.
+            file_analyzed_track <<'\n';
+            file_analyzed_track << std::to_string(pred.mjdt.datetime()) <<";";
+            file_analyzed_track << dpslr::helpers::strings::numberToStr(pred.slr_pred->instant_data->altaz_coord.az, 7, 4) <<";";
+            file_analyzed_track << dpslr::helpers::strings::numberToStr(pred.slr_pred->instant_data->altaz_coord.el, 7, 4) <<";";
+            file_analyzed_track << track_az <<";";
+            file_analyzed_track << track_el <<";";
+            file_analyzed_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.az, 7, 4) <<";";
+            file_analyzed_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.el, 7, 4);
+        }
+    }
+
+    // Close the file.
+    file_analyzed_track.close();
+
+    if(plot_data)
+    {
+        std::cout << "Plotting analyzed data using Python helpers..." << std::endl;
+        if (system(std::string(python_cmd_analysis + output_dir + "/" + track_csv_filename).c_str()))
+            std::cout << "Plotting failed!!" << std::endl;
+    }
+
+    // -------------------- NOW LET'S START CALCULATING PREDICTIONS SIMULATING REAL TIME PROCESS -----------------------
+    // Get the new tracking start and end date. If there is sun overlapping at start or end, the affected date
+    // is changed so the tracking will start or end after/before the sun security sector.
+    MJDateTime track_start = predictor_mount.getMountTrackingSLR().track_info.mjdt_start;
+    MJDateTime track_end = predictor_mount.getMountTrackingSLR().track_info.mjdt_end;
+
+    // Store the real time track data into a CSV file (only part of the data for easy usage).
+    // Create the file and header.
+    std::ofstream file_realtime_track(output_dir + "/" + realtime_csv_filename, std::ios_base::out);
+    file_realtime_track << data.str();
+    file_realtime_track << "mjd;sod;pass_az;pass_el;track_az;track_el;sun_az;sun_el";
+
+    // Now, we are simulating real time prediction operations. We can now predict any position within the valid
+    // tracking time window (stored in TrackingInfo struct). For the example, we will ask predictions from start to
+    // end with a step of 0.1 (simulating real time operations at 10 Hz in the tracking mount).
+
+    // Containers.
+    MJDateTime mjd = track_start;
+    dpslr::mount::MountPredictionSLRV results;
+
+    while (mjd < track_end)
+    {
+        // Store the resulting prediction
+        results.push_back({});
+        auto status = predictor_mount.predict(mjd, results.back());
+
+        if (status == dpslr::mount::PositionStatus::ELEVATION_CLIPPED)
+        {
+            //
+        }
+        else if (status == dpslr::mount::PositionStatus::OUTSIDE_SUN)
+        {
+            // In this case the position predicted is valid and it is going outside a sun security sector. This is the
+            // normal case.
+        }
+        else if (status == dpslr::mount::PositionStatus::INSIDE_SUN)
+        {
+            // In this case the position predicted is valid, but it is going through a sun security sector.
+            // This case is only possible if sun avoid algorithm is disabled.
+            // BEWARE. If the mount points directly to this position it could be dangerous.
+        }
+
+        else if (status == dpslr::mount::PositionStatus::AVOIDING_SUN)
+        {
+            // In this case the position predicted is valid and it is going through an alternative way to avoid a sun
+            // security sector. While the tracking returns this status, the tracking_position member in result
+            // represents the position used to avoid the sun (the secure position), while prediction_result contains
+            // the true position of the object (not secure).
+
+        }
+        else if (status == dpslr::mount::PositionStatus::CANT_AVOID_SUN)
+        {
+            // In this case the position predicted is valid and it is going through an alternative way to avoid a sun
+            // security sector. While the tracking returns this status, the tracking_position member in result
+            // represents the position used to avoid the sun (the secure position), while prediction_result contains
+            // the true position of the object (not secure).
+
+        }
+        else if (status == dpslr::mount::PositionStatus::OUT_OF_TRACK)
+        {
+            // Bad situation, the prediction time requested is out of track. Stop the tracking and notify to client.
+            // However, this should not happen if all is ok in the mount tracking controller software. Maybe if
+            // something is wrong with the CPF or in the timing tracking mount subsystem or in the SLR station system.
+            std::cerr << "Module: TrackingMount   |   Example: PredictorMountSLR" << std::endl;
+            std::cerr << "Error: The requested position is in OUT_OF_TRACK state." << std::endl;
+            std::cerr << "Example finished. Press Enter to exit..." << std::endl;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            //return -1;
+        }
+        else if (status == dpslr::mount::PositionStatus::PREDICTION_ERROR)
+        {
+            // Bad situation, stop the tracking and notify to client. However, this should not happen if all is ok in
+            // the mount tracking controller software. Maybe if something is wrong with the with the CPF or in the
+            // timing tracking mount subsystem or in the SLR station system.
+            std::cerr << "Module: TrackingMount   |   Example: PredictorMountSLR" << std::endl;
+            std::cerr << "Error: The requested position is in PREDICTION_ERROR state." << std::endl;
+            std::cerr << "Example finished. Press Enter to exit..." << std::endl;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            //return -1;
+        }
+
+        // Advance to next position
+        mjd.add(0.1L);
+    }
+
+    // Iterate the real time simulated predictions.
+    for(const auto& pred : results)
+    {
+        // Auxiliar container for track data.
+        std::string track_az = "";
+        std::string track_el = "";
+        //
+        // At this point, you only must check if the prediction is outside track. This is becaouse, for example,
+        // the beginning of the real satellite pass may coincide with the Sun sector, so at those points there
+        // would be no data from the mount's track, only the real pass.
+        if(pred.status != dpslr::mount::PositionStatus::OUT_OF_TRACK)
+        {
+            track_az = dpslr::helpers::strings::numberToStr(pred.mount_pos->altaz_coord.az,7, 4);
+            track_el = dpslr::helpers::strings::numberToStr(pred.mount_pos->altaz_coord.el,7, 4);
+
+            // Store the data.
+            file_realtime_track <<'\n';
+            file_realtime_track << std::to_string(pred.mjdt.datetime()) <<";";
+            file_realtime_track << dpslr::helpers::strings::numberToStr(pred.slr_pred->instant_data->altaz_coord.az, 7, 4) <<";";
+            file_realtime_track << dpslr::helpers::strings::numberToStr(pred.slr_pred->instant_data->altaz_coord.el, 7, 4) <<";";
+            file_realtime_track << track_az <<";";
+            file_realtime_track << track_el <<";";
+            file_realtime_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.az, 7, 4) <<";";
+            file_realtime_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.el, 7, 4);
+        }
+    }
+    // Close the file.
+    file_realtime_track.close();
+
+    if(plot_data)
+    {
+        std::cout<<"Plotting real time simulated data using Python helpers..."<<std::endl;
+        if(system(std::string(python_cmd_analysis + output_dir + "/" + realtime_csv_filename).c_str()))
+            std::cout<<"Plotting failed!!"<<std::endl;
+    }
 
     // Log
-    setLog(command, "", error);
+    setLog(command, data.str(), error);
 
     return error;
 }

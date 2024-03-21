@@ -100,6 +100,7 @@ public:
     LIBAMELAS_EXPORT AmelasError getDeviceInfo(std::string& deviceInfo);
 
     LIBAMELAS_EXPORT AmelasError setTimeSource(const unsigned short int& clock);
+    LIBAMELAS_EXPORT AmelasError getTimeSource(unsigned short int& clock);
     LIBAMELAS_EXPORT AmelasError doSyncTimeManual(const std::string& datetime);
     // TODO: LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123, const unsigned& timeout);
     LIBAMELAS_EXPORT AmelasError doSyncTimeNTP(const std::string& host = "hora.roa.es", const unsigned& port = 123); // PRUEBA (para ver si comunico con el objeto NTP de TwinCAT)
@@ -173,7 +174,7 @@ public:
     LIBAMELAS_EXPORT AmelasError setCalibrationMotion();
 
     // TODO: LIBAMELAS_EXPORT AmelasError setCPFMotion(const file& cpf, AmelasTracking& tracking);
-    LIBAMELAS_EXPORT AmelasError setCPFMotion();
+    LIBAMELAS_EXPORT AmelasError setCPFMotion(const unsigned short int& example_selector);
     // TODO: LIBAMELAS_EXPORT AmelasError setStarMotion(const StarData& star_data);
     //=====================================================================================================================
 
@@ -213,6 +214,7 @@ private:
     double _npae_tpoint = 0.0;
     double _elOffset = 0.0;
     double _azOffset = 0.0;
+    unsigned short int _clockSource = 0;
 };
 
 }} // END NAMESPACES.

@@ -202,6 +202,9 @@ int main(int, char**)
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_TIME_SOURCE,
                                              &amelas_controller,
                                              &AmelasController::setTimeSource);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_TIME_SOURCE,
+                                             &amelas_controller,
+                                             &AmelasController::getTimeSource);
     amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_SYNC_NTP,
                                              &amelas_controller,
                                              &AmelasController::doSyncTimeNTP); // PRUEBA

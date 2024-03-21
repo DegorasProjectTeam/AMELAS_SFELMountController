@@ -124,6 +124,8 @@ private:
     template <typename ClbkT>
     void processGetDouble(const CommandRequest &request, CommandReply &reply);
     template <typename ClbkT>
+    void processGetUShort(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
     void processGetSixDoubles(const CommandRequest &request, CommandReply &reply);
     template <typename ClbkT>
     void processGetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);

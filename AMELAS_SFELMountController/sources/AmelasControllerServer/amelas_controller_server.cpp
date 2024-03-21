@@ -66,6 +66,8 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processSetString<controller::GetMountLogCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_TIME_SOURCE,
                                   &AmelasControllerServer::processSetUShort<controller::SetTimeSourceCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_TIME_SOURCE,
+                                  &AmelasControllerServer::processGetUShort<controller::GetTimeSourceCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_NTP,
                                   &AmelasControllerServer::processSetNTPserver<controller::DoSyncTimeNTPCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_MANUAL,
@@ -163,7 +165,7 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION,
                                   &AmelasControllerServer::processEmptyArguments<controller::SetCalibrationMotionCallback>);
     this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CPF_MOTION,
-                                  &AmelasControllerServer::processEmptyArguments<controller::SetCPFMotionCallback>);
+                                  &AmelasControllerServer::processSetUShort<controller::SetCPFMotionCallback>);
 
     // -- OTHER FUNCTIONS
     this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,

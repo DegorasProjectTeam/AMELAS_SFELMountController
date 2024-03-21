@@ -61,8 +61,18 @@ class AmelasController;
 
 enum AmelasClockSource : unsigned short int
 {
-    NTP    = 0,
-    MANUAL = 1
+    OFF     = 0,
+    NTP     = 1,
+    MANUAL  = 2,
+    UNKNOWN = 3
+};
+
+static constexpr std::array<const char*, 4> ClockSourceStr
+{
+    "OFF",
+    "NTP",
+    "MANUAL",
+    "UNKNOWN"
 };
 
 enum class AmelasError : std::int32_t
@@ -358,6 +368,7 @@ using GetMountLogCallback                = std::function<AmelasError(const std::
 using GetMountStatusCallback             = std::function<AmelasError(std::string&)>;
 using GetDeviceInfoCallback              = std::function<AmelasError(std::string&)>;
 using SetTimeSourceCallback              = std::function<AmelasError(const unsigned short int&)>;
+using GetTimeSourceCallback              = std::function<AmelasError(unsigned short int&)>;
 using DoSyncTimeManualCallback           = std::function<AmelasError(const std::string&)>;
 // TODO: using DoSyncTimeNTPCallback              = std::function<AmelasError(const std::string&, const unsigned&, const unsigned&)>;
 using DoSyncTimeNTPCallback              = std::function<AmelasError(const std::string&, const unsigned&)>; // PRUEBA
@@ -408,7 +419,7 @@ using SetHomingMotionCallback        = std::function<AmelasError()>;
 using SetIdleMotionCallback          = std::function<AmelasError()>;
 using SetParkMotionCallback          = std::function<AmelasError()>;
 using SetCalibrationMotionCallback   = std::function<AmelasError()>;
-using SetCPFMotionCallback           = std::function<AmelasError()>;
+using SetCPFMotionCallback           = std::function<AmelasError(const unsigned short int&)>;
 
 // -- OTHER FUNCTIONS
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
