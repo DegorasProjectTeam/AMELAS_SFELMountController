@@ -2600,11 +2600,6 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                 mjd.add(0.1L);
             }
 
-            size_t numElementos = results.size();
-            _plc->write("ENTRY_POINT_TRACKING.tracking.pruebalon", numElementos - 1);
-            bool initLoop = false;
-            unsigned long long i = 0;
-
             // Iterate the real time simulated predictions.
             for(const auto& pred : results)
             {
@@ -2629,25 +2624,35 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                     file_realtime_track << track_el                                                                                << ";";
                     file_realtime_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.az, 7, 4)               << ";";
                     file_realtime_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.el, 7, 4);
+                }
+            }
 
-                    /*// Functionality
-                    const std::string bButton  = "ENTRY_POINT_TRACKING.tracking.bButton";
-                    const std::string aBuffer1 = "ENTRY_POINT_TRACKING.tracking.aBuffer1[";
-                    const std::string aBuffer2 = "ENTRY_POINT_TRACKING.tracking.aBuffer2[";
+            size_t numElementos = results.size();
+            _plc->write("ENTRY_POINT_TRACKING.tracking.pruebalon", numElementos - 1);
+            bool initLoop = false;
+            unsigned long long i = 0;
 
-                    unsigned long long cMin = _plc->read<unsigned long long>("ENTRY_POINT_TRACKING.tracking.cMin");
-                    unsigned long long cMax = _plc->read<unsigned long long>("ENTRY_POINT_TRACKING.tracking.cMax");
+            const std::string bButton  = "ENTRY_POINT_TRACKING.tracking.bButton";
+            const std::string aBuffer1 = "ENTRY_POINT_TRACKING.tracking.aBuffer1[";
+            const std::string aBuffer2 = "ENTRY_POINT_TRACKING.tracking.aBuffer2[";
 
+            unsigned long long cMin = _plc->read<unsigned long long>("ENTRY_POINT_TRACKING.tracking.cMin");
+            unsigned long long cMax = _plc->read<unsigned long long>("ENTRY_POINT_TRACKING.tracking.cMax");
+
+            for(const auto& pred : results)
+            {
+                if(pred.status != dpslr::mount::PositionStatus::OUT_OF_TRACK)
+                {
                     if (initLoop != true)
                     {
                         _plc->write(bButton, true);
                         initLoop = true;
                     }
 
-                    std::string aBuffer;
-
                     if (i <= (cMax*2+1))
                     {
+                        std::string aBuffer;
+
                         if (i <= cMax)
                             aBuffer = aBuffer1;
                         else
@@ -2662,36 +2667,9 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                             _plc->write(aBuffer + std::to_string(i) + "].bWritten", true);
                             i++;
                         }
-                    }*/
+                    }
                 }
             }
-
-            /*// Iterate the real time simulated predictions.
-            for(const auto& pred : results)
-            {
-                // Auxiliar container for track data.
-                std::string track_az = "";
-                std::string track_el = "";
-
-                // At this point, you only must check if the prediction is outside track. This is becaouse, for example,
-                // the beginning of the real satellite pass may coincide with the Sun sector, so at those points there
-                // would be no data from the mount's track, only the real pass.
-                if(pred.status != dpslr::mount::PositionStatus::OUT_OF_TRACK)
-                {
-                    track_az = dpslr::helpers::strings::numberToStr(pred.mount_pos->altaz_coord.az, 7, 4);
-                    track_el = dpslr::helpers::strings::numberToStr(pred.mount_pos->altaz_coord.el, 7, 4);
-
-                    // Store the data.
-                    file_realtime_track << '\n';
-                    file_realtime_track << std::to_string(pred.mjdt.datetime())                                                    << ";";
-                    file_realtime_track << dpslr::helpers::strings::numberToStr(pred.slr_pred->instant_data->altaz_coord.az, 7, 4) << ";";
-                    file_realtime_track << dpslr::helpers::strings::numberToStr(pred.slr_pred->instant_data->altaz_coord.el, 7, 4) << ";";
-                    file_realtime_track << track_az                                                                                << ";";
-                    file_realtime_track << track_el                                                                                << ";";
-                    file_realtime_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.az, 7, 4)               << ";";
-                    file_realtime_track << dpslr::helpers::strings::numberToStr(pred.sun_pred->altaz_coord.el, 7, 4);
-                }
-            }*/
 
             // Close the file.
             file_realtime_track.close();
