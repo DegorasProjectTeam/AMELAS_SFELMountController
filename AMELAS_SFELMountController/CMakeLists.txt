@@ -67,6 +67,7 @@ set(FORCE_INSTALL_DIR TRUE)
 
 # External dependecies path.
 set(ZMQUTILS_PATH ${CMAKE_SOURCE_DIR}/external/LibZMQUtils)
+set(DEGORASSLR_PATH ${CMAKE_SOURCE_DIR}/external/LibDegorasSLR)
 
 # JSON library
 set(JSON_BuildTests OFF CACHE INTERNAL "")
@@ -81,6 +82,7 @@ macro_prepare_install_dir(INSTALL_BIN INSTALL_LIB ${CMAKE_CURRENT_SOURCE_DIR}/..
 # Generic Includes.
 include_directories(${CMAKE_SOURCE_DIR}/includes)
 include_directories(${ZMQUTILS_PATH}/includes)
+include_directories(${DEGORASSLR_PATH}/include)
 include_directories(external/spdlog/include)
 # Beckhoff's TwinCAT ADS
 include_directories("C:/TwinCAT/AdsApi/TcAdsDll/Include")
@@ -121,6 +123,7 @@ macro_get_files_without_extension(ALIAS includes/*)
 # Show external libs.
 if(SHOW_EXTERNALS)
     file(GLOB_RECURSE EXTERN ${ZMQUTILS_PATH}/includes/*.h)
+    file(GLOB_RECURSE EXTERN ${DEGORASSLR_PATH}/include/*.h)
 endif()
 
 # Create a custom group for the templates, aliases and externals.
@@ -160,6 +163,7 @@ if (WIN32)
             debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libzmq-v142-mt-4_3_4.dll
             optimized ${ZMQUTILS_PATH}/lib/mingw-x86_64_release/libsodium.dll
             debug ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug/libsodium.dll
+            ${DEGORASSLR_PATH}/lib/LibDegorasSLR.dll
             spdlog::spdlog
             nlohmann_json::nlohmann_json
             "C:/TwinCAT/AdsApi/TcAdsDll/x64/lib/TcAdsDll.lib")
@@ -171,6 +175,7 @@ if (WIN32)
             debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/libzmq-v142-mt-4_3_4.lib
             optimized ${ZMQUTILS_PATH}/lib/msvc-x86_64_release/LibZMQUtils.lib
             debug ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug/LibZMQUtils.lib
+            ${DEGORASSLR_PATH}/lib/LibDegorasSLR.dll
             spdlog::spdlog
             nlohmann_json::nlohmann_json
             "C:/TwinCAT/AdsApi/TcAdsDll/x64/lib/TcAdsDll.lib")
@@ -245,16 +250,20 @@ if(WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         if(MINGW)
             set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/mingw-x86_64_debug)
+            set(EXTERNAL_LIBS_PATH ${DEGORASSLR_PATH}/lib)
         elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
             set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/msvc-x86_64_debug)
+            set(EXTERNAL_LIBS_PATH ${DEGORASSLR_PATH}/lib)
         else()
             message(FATAL_ERROR "Compiler not supported by default.")
         endif()
     else()
         if(MINGW)
             set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/mingw-x86_64_release)
+            set(EXTERNAL_LIBS_PATH ${DEGORASSLR_PATH}/lib)
         elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
             set(EXTERNAL_LIBS_PATH ${ZMQUTILS_PATH}/lib/msvc-x86_64_release)
+            set(EXTERNAL_LIBS_PATH ${DEGORASSLR_PATH}/lib)
         else()
             message(FATAL_ERROR "Compiler not supported by default.")
         endif()
@@ -271,6 +280,10 @@ if(WIN32)
 
     # Install the include files of ZMQ.
     install(DIRECTORY ${ZMQUTILS_PATH}/includes/zmq
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/includes/)
+
+    # Install the include files of LibDegorasSLR.
+    install(DIRECTORY ${DEGORASSLR_PATH}/includes
             DESTINATION ${CMAKE_INSTALL_PREFIX}/includes/)
 
     # Install the binaries to the specified install directory.

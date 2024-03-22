@@ -49,6 +49,8 @@ class AmelasAdsClient
         template<typename T>
         T read(const std::string &symbol);
 
+        int executeCommand(const std::string &symbol);
+
         /**
          * @brief Subscribe to a PLC variable and get notifications when the value changes
          * 

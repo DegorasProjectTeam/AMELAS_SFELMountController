@@ -100,13 +100,481 @@ void parseCommand(CommandClientBase &client, const std::string &command)
         {
             std::cout << "Sending REQ_GET_SERVER_TIME command." << std::endl;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION))
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_RESET_STATE))
         {
-            std::cout << "Sending get home position command." << std::endl;
+            std::cout << "Sending REQ_DO_RESET_STATE command." << std::endl;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOME_POSITION))
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TIME_SOURCE))
         {
-            std::cout << "Sending set home position command." << std::endl;
+            std::cout << "Sending REQ_SET_TIME_SOURCE command." << std::endl;
+
+            bool valid_params = true;
+            unsigned short int enable = 0;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                enable = (unsigned short int) std::stoi(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << enable << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(enable);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TIME_SOURCE))
+        {
+            std::cout << "Sending REQ_GET_TIME_SOURCE command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_NTP))
+        {
+            std::cout << "Sending REQ_DO_SYNC_NTP command." << std::endl;
+
+            bool valid_params = true;
+            std::string name = "";
+            unsigned port = 0;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                name = std::string(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter name.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    port = std::stoi(param_token);
+                }
+                catch(...)
+                {
+                    std::cerr << "Bad parameter port.";
+                    valid_params = false;
+                }
+                
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << name << " " << port << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(name, port);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, port);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_AVOID_SUN)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_EXT_PPS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL))
+        {
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_AVOID_SUN))
+                std::cout << "Sending REQ_EN_AVOID_SUN command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_EXT_PPS))
+                std::cout << "Sending REQ_EN_EXT_PPS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_TRACK_ADJ))
+                std::cout << "Sending REQ_EN_TRACK_ADJ command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_POWER))
+                std::cout << "Sending REQ_EN_MOUNT_POWER command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_EN_MOUNT_MODEL))
+                std::cout << "Sending REQ_EN_MOUNT_MODEL command." << std::endl;
+
+            bool valid_params = true;
+            bool enable = false;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                enable = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << enable << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(enable);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_CONNECT_PLC))
+        {
+            std::cout << "Sending REQ_DO_CONNECT_PLC command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_DISCONNECT_PLC))
+        {
+            std::cout << "Sending REQ_DO_DISCONNECT_PLC command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
+        {
+            std::cout << "Sending REQ_GET_PLC_REGISTERS command." << std::endl;
+
+            bool valid_params = true;
+            std::string symbol = "";
+            std::string type = "";
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                symbol = param_token;
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter symbol issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    type = param_token;
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter type issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << symbol << " " << type << std::endl;
+
+                /*PLCAddress address(symbol, type);
+
+                BinarySerializer serializer;
+
+                serializer.write(address);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, address);*/
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, symbol);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_PRUEBA))
+        {
+            std::cout << "Sending REQ_GET_PLC_PRUEBA command." << std::endl;
+
+            bool valid_params = true;
+            std::string name, type;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                name = std::string(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter name issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    type = std::string(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter type issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << name << " " << type << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(name, type);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name, type);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, name);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_LOG))
+        {
+            std::cout << "Sending REQ_GET_MOUNT_LOG command." << std::endl;
+
+            bool valid_params = true;
+            std::string day;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                day = std::string(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter day issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << day << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(day);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_NTP))
+        {
+            std::cout << "Sending REQ_DO_SYNC_NTP command." << std::endl;
+
+            bool valid_params = true;
+            std::string host = "";
+            unsigned port = 0, timeout = 0;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                host = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter host issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    port = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter port issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    timeout = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter timeout issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << host << " " << port << " " << timeout << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(host, port, timeout);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, host, port, timeout);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, host, port, timeout);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_MANUAL))
+        {
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_SYNC_MANUAL))
+                std::cout << "Sending REQ_DO_SYNC_MANUAL command." << std::endl;
+
+            bool valid_params = true;
+            std::string datetime = "";
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                datetime = std::string(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter datetime issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << datetime << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(datetime);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, datetime);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, datetime);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_STATUS))
+        {
+            std::cout << "Sending REQ_GET_MOUNT_STATUS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_INFO))
+        {
+            std::cout << "Sending REQ_GET_MOUNT_INFO command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
+        {
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS))
+                std::cout << "Sending REQ_SET_IDLE_POS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS))
+                std::cout << "Sending REQ_SET_PARK_POS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS))
+                std::cout << "Sending REQ_SET_CALIBRATION_POS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_OFFSETS))
+                std::cout << "Sending REQ_SET_HOMING_OFFSETS command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_SLEW_SPEED))
+                std::cout << "Sending REQ_SET_SLEW_SPEED command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET))
+                std::cout << "Sending REQ_SET_TRACK_POS_OFFSET command." << std::endl;
 
             bool valid_params = true;
             double az = 0., el = 0.;
@@ -139,7 +607,7 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             if (valid_params)
             {
-                std::cout<<"Sending: " << az <<" "<<el<<std::endl;
+                std::cout << "Sending: " << az << " " << el << std::endl;
 
                 AltAzPos pos(az, el);
 
@@ -147,15 +615,711 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 serializer.write(pos);
 
-                std::cout<<serializer.toJsonString();
+                std::cout << serializer.toJsonString();
 
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos);
 
-                std::cout<<std::endl;
+                std::cout << std::endl;
             }
             else
             {
-                std::cout<<"Sending invalid command: "<<std::endl;
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED))
+        {
+            std::cout << "Sending REQ_GET_SLEW_SPEED command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
+        {
+            std::cout << "Sending REQ_GET_IDLE_POS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS))
+        {
+            std::cout << "Sending REQ_GET_PARK_POS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_CALIBRATION_POS))
+        {
+            std::cout << "Sending REQ_GET_CALIBRATION_POS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_POS_HERE))
+        {
+            std::cout << "Sending REQ_SET_IDLE_POS_HERE command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_POS_HERE))
+        {
+            std::cout << "Sending REQ_SET_PARK_POS_HERE command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_POS_HERE))
+        {
+            std::cout << "Sending REQ_SET_CALIBRATION_POS_HERE command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_WAIT_ALT)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS))
+        {
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_WAIT_ALT))
+                std::cout << "Sending REQ_SET_WAIT_ALT command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS))
+                std::cout << "Sending REQ_SET_TRACK_TIME_BIAS command." << std::endl;
+
+            bool valid_params = true;
+            double alt = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                alt = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << alt << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(alt);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, alt);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, alt);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT))
+        {
+            std::cout << "Sending REQ_GET_WAIT_ALT command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOMING_OFFSETS))
+        {
+            std::cout << "Sending REQ_GET_HOMING_OFFSETS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS))
+        {
+            std::cout << "Sending set REQ_SET_MOUNT_MODEL_COEFS command." << std::endl;
+
+            bool valid_params = true;
+            double lat = 0., lon = 0., alt = 0.;
+            double x = 0., y = 0., z = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                lat = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter latitude issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    lon = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter longitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    alt = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter altitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    x = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter x issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    y = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter y issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    z = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter z issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(lat, lon, alt, x, y, z);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS_FILE))
+        {
+            std::cout << "Sending REQ_SET_MOUNT_MODEL_COEFS_FILE command." << std::endl;
+
+            bool valid_params = true;
+            std::string day;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                day = std::string(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter day issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << day << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(day);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, day);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_APP_MOUNT_MODEL_CORRECT))
+        {
+            std::cout << "Sending set REQ_APP_MOUNT_MODEL_CORRECT command." << std::endl;
+
+            bool valid_params = true;
+            bool lat = false, lon = false, alt = false;
+            bool x = false, y = false, z = false;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                lat = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter latitude issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    lon = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter longitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    alt = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter altitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    x = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter x issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    y = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter y issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    z = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter z issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(lat, lon, alt, x, y, z);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS))
+        {
+            std::cout << "Sending REQ_GET_MOUNT_MODEL_COEFS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_LOCATION))
+        {
+            std::cout << "Sending set REQ_SET_LOCATION command." << std::endl;
+
+            bool valid_params = true;
+            double lat = 0., lon = 0., alt = 0.;
+            double x = 0., y = 0., z = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                lat = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter latitude issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    lon = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter longitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    alt = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter altitude issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    x = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter x issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    y = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter y issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    z = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter z issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << lat << " " << lon << " " << alt << " " << x << " " << y << " " << z << std::endl;
+
+                /*WGS84Coords wgs84(lat, lon, alt);
+                ECEFCoords ecef(x, y, z);
+                StationLocation loc(wgs84, ecef);*/
+
+                BinarySerializer serializer;
+
+                serializer.write(lat, lon, alt, x, y, z);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat, lon, alt, x, y, z);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, lat);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_LOCATION))
+        {
+            std::cout << "Sending REQ_GET_LOCATION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_METEO_DATA))
+        {
+            std::cout << "Sending REQ_SET_METEO_DATA command." << std::endl;
+
+            bool valid_params = true;
+            double press = 0.;
+            double temp = 0.;
+            double hr = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                press = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter press issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    temp = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter temp issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    hr = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter hr issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << press << " " << temp << " " << hr << std::endl;
+
+                //MeteoData meteo(press, temp, hr);
+
+                BinarySerializer serializer;
+
+                serializer.write(press, temp, hr);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, press, temp, hr);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, press);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_METEO_DATA))
+        {
+            std::cout << "Sending REQ_GET_METEO_DATA command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_MODE))
+        {
+            std::cout << "Sending REQ_GET_MOTION_MODE command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_STATE))
+        {
+            std::cout << "Sending REQ_GET_MOTION_STATE command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_START_MOTION))
+        {
+            std::cout << "Sending REQ_DO_START_MOTION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_PAUSE_MOTION))
+        {
+            std::cout << "Sending REQ_DO_PAUSE_MOTION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_STOP_MOTION))
+        {
+            std::cout << "Sending REQ_DO_STOP_MOTION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET))
+        {
+            std::cout << "Sending REQ_GET_TRACK_POS_OFFSET command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS))
+        {
+            std::cout << "Sending REQ_GET_TRACK_TIME_BIAS command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION)
+                || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION))
+        {
+            if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION))
+                std::cout << "Sending REQ_SET_ABS_ALTAZ_MOTION command." << std::endl;
+            else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION))
+                std::cout << "Sending REQ_SET_REL_ALTAZ_MOTION command." << std::endl;
+
+            bool valid_params = true;
+            double az = 0., el = 0.;
+            double az_vel = 0., el_vel = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                az = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter azimuth issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    el = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter elevation issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    az_vel = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter 3 issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    el_vel = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter elevation issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << az << " " << el << " " << az_vel << " " << el_vel << std::endl;
+
+                AltAzPos pos(az, el);
+                AltAzVel vel(az_vel, el_vel);
+
+                BinarySerializer serializer;
+
+                serializer.write(pos, vel);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos, vel);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
                 command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
 
                 valid_params = true;
@@ -163,6 +1327,127 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             valid = valid_params;
 
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CON_ALTAZ_MOTION))
+        {
+            std::cout << "Sending REQ_SET_CON_ALTAZ_MOTION command." << std::endl;
+
+            bool valid_params = true;
+            double az = 0., el = 0.;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                az = std::stod(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter azimuth issued.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                param_token = std::strtok(nullptr, " ");
+
+                try
+                {
+                    el = std::stod(param_token);
+                }
+                catch (...)
+                {
+                    std::cerr << "Bad parameter elevation issued.";
+                    valid_params = false;
+                }
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << az << " " << el << std::endl;
+
+                AltAzPos pos(az, el);
+
+                BinarySerializer serializer;
+
+                serializer.write(pos);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, pos);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, az);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_HOMING_MOTION))
+        {
+            std::cout << "Sending REQ_SET_HOMING_MOTION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_IDLE_MOTION))
+        {
+            std::cout << "Sending REQ_SET_IDLE_MOTION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_PARK_MOTION))
+        {
+            std::cout << "Sending REQ_SET_PARK_MOTION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION))
+        {
+            std::cout << "Sending REQ_SET_CALIBRATION_MOTION command." << std::endl;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_SET_CPF_MOTION))
+        {
+            std::cout << "Sending REQ_SET_CPF_MOTION command." << std::endl;
+
+            bool valid_params = true;
+            unsigned short int enable = 0;
+            char *param_token = std::strtok(nullptr, " ");
+
+            try
+            {
+                enable = (unsigned short int) std::stoi(param_token);
+            }
+            catch (...)
+            {
+                std::cerr << "Bad parameter.";
+                valid_params = false;
+            }
+
+            if (valid_params)
+            {
+                std::cout << "Sending: " << enable << std::endl;
+
+                BinarySerializer serializer;
+
+                serializer.write(enable);
+
+                std::cout << serializer.toJsonString();
+
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                std::cout << std::endl;
+            }
+            else
+            {
+                std::cout << "Sending invalid command: " << std::endl;
+                command_msg.params_size = BinarySerializer::fastSerialization(command_msg.params, enable);
+
+                valid_params = true;
+            }
+
+            valid = valid_params;
+        }
+        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES))
+        {
+            std::cout << "Sending REQ_DO_PRUEBA_BUCLES command." << std::endl;
         }
         else
         {
@@ -183,15 +1468,13 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             if(command_msg.command == ServerCommand::REQ_CONNECT)
             {
-                client_result = client.doConnect();
+                client_result = client.doConnect(true);
 
                 if (client_result == OperationResult::CLIENT_STOPPED)
                 {
                     delete[] command_str;
                     return;
                 }
-
-
             }
             else if(command_msg.command == ServerCommand::REQ_GET_SERVER_TIME)
             {
@@ -200,26 +1483,23 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
                 if (client_result == OperationResult::COMMAND_OK)
                 {
-                    std::cout<<"Server time: "<<datetime<<std::endl;
+                    std::cout << "Server time: " << datetime << std::endl;
 
                     delete[] command_str;
                     return;
                 }
-
             }
             else
                 client_result = client.sendCommand(command_msg, reply);
 
-            std::cerr << "Client Result: " << static_cast<int>(client_result)<<std::endl;
+            std::cerr << "Client Result: " << static_cast<int>(client_result) <<std::endl;
 
             if (client_result != OperationResult::COMMAND_OK)
             {
             }
             else
             {
-
-
-                std::cout<<"Server result: "<<static_cast<int>(reply.server_result)<<std::endl;
+                std::cout << "Server result: " << static_cast<int>(reply.server_result) << std::endl;
 
                 if(reply.server_result != OperationResult::COMMAND_OK)
                 {
@@ -235,14 +1515,19 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                     AmelasError error;
 
                     BinarySerializer ser(reply.params.get(), reply.params_size);
-                    std::cout<<ser.toJsonString()<<std::endl;
+                    std::cout << ser.toJsonString() << std::endl;
 
                     ser.read(error);
 
-                    std::cout<<"Controller error: "<<static_cast<int>(error)<<std::endl;
+                    std::cout << "Controller error: " << static_cast<int>(error) << std::endl;
                 }
 
-                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOME_POSITION))
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_CALIBRATION_POS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOMING_OFFSETS)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED))
                 {
                     try
                     {
@@ -253,13 +1538,299 @@ void parseCommand(CommandClientBase &client, const std::string &command)
                         // Deserialize the parameters.
                         BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, az, el);
 
-                        // Generate the struct.
-                        std::cout<<"Az: "<<az<<std::endl;
-                        std::cout<<"El: "<<el<<std::endl;
+                        std::cout << "" << std::endl;
+
+                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_IDLE_POS))
+                            std::cout << "Idle position:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PARK_POS))
+                            std::cout << "Parking position:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_CALIBRATION_POS))
+                            std::cout << "Calibration position:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET))
+                            std::cout << "Tracking position offsets:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_HOMING_OFFSETS))
+                            std::cout << "Homing offsets:" << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED))
+                            std::cout << "Slew speed:" << std::endl;
+
+                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_SLEW_SPEED)) {
+                            std::cout << "  Az: " << az << " \370/s" << std::endl;
+                            std::cout << "  El: " << el << " \370/s" << std::endl;
+                        }
+                        else {
+                            std::cout << "  Az: " << az << " \370" << std::endl;
+                            std::cout << "  El: " << el << " \370" << std::endl;
+                        }
                     }
                     catch(...)
                     {
-                        std::cout<<"BAD PARAMS"<<std::endl;
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_PLC_REGISTERS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        std::string address;
+                        std::string address_type;
+                        std::string symbol;
+                        std::string type;
+                        std::string value;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, address, address_type, symbol, type, value);
+
+                        // Generate the struct.
+                        std::cout << "Symbol: " << symbol << " <" << type << "> = " << value << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_METEO_DATA))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double press;
+                        double temp;
+                        double hr;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, press, temp, hr);
+
+                        std::cout << "" << std::endl;
+                        std::cout << "Meteo data: "                   << std::endl;
+                        std::cout << "  Press: " << press << " mbar"  << std::endl;
+                        std::cout << "  Temp:  " << temp  << " \370C" << std::endl;
+                        std::cout << "  Hr:    " << hr    << " %"     << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double an, aw, ca, npae, ie, ia;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, an, aw, ca, npae, ie, ia);
+
+                        std::cout << "" << std::endl;
+                        std::cout << "Mount model coefs: " << std::endl;
+                        std::cout << "  AN:   " << an   << " \"" << std::endl;
+                        std::cout << "  AW:   " << aw   << " \"" << std::endl;
+                        std::cout << "  CA:   " << ca   << " \"" << std::endl;
+                        std::cout << "  NPAE: " << npae << " \"" << std::endl;
+                        std::cout << "  IE:   " << ie   << " \"" << std::endl;
+                        std::cout << "  IA:   " << ia   << " \"" << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_LOCATION))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double lat;
+                        double lon;
+                        double alt;
+                        double x;
+                        double y;
+                        double z;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, lat, lon, alt, x, y, z);
+
+                        std::cout << "" << std::endl;
+                        std::cout << "Station location: " << std::endl;
+                        std::cout << "  Geodetic coordinates: " << std::endl;
+                        std::cout << "    Lat: " << std::fixed << std::setprecision(8) << lat << " \370" << std::endl;
+                        std::cout << "    Lon: " << std::fixed << std::setprecision(8) << lon << " \370" << std::endl;
+                        std::cout << "    Alt: " << std::fixed << std::setprecision(3) << alt << " m" << std::endl;
+                        std::cout << "  Geocentric coordinates: " << std::endl;
+                        std::cout << "    x:   " << std::fixed << std::setprecision(3) << x << " m" << std::endl;
+                        std::cout << "    y:   " << std::fixed << std::setprecision(3) << y << " m" << std::endl;
+                        std::cout << "    z:   " << std::fixed << std::setprecision(3) << z << " m" << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_STATUS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        std::string strVal;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, strVal);
+
+                        // Generate the struct.
+                        std::cout << "" << std::endl;
+                        std::cout << strVal;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOUNT_INFO))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        std::string strVal;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, strVal);
+
+                        // Generate the struct.
+                        std::cout << "" << std::endl;
+                        std::cout << strVal;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_MODE))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        AmelasMotionMode mode;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, mode);
+
+                        // Generate the struct.
+                        std::string motion_str = MotionModeStr[static_cast<size_t>(mode)];
+                        std::cout << "" << std::endl;
+                        std::cout << "Motion mode: " << motion_str << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_MOTION_STATE))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        AmelasMotionState state;
+                        double az;
+                        double el;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, state, az, el);
+
+                        // Generate the struct.
+                        std::string motion_str = MotionStateStr[static_cast<size_t>(state)];
+                        
+                        std::cout << "" << std::endl;
+
+                        if (state == AmelasMotionState::STOPPED
+                            || state == AmelasMotionState::IDLE
+                            || state == AmelasMotionState::PARK
+                            || state == AmelasMotionState::CALIBRATION
+                            || state == AmelasMotionState::MOVING)
+                        {
+                            std::cout << "Motion state: " << motion_str    << std::endl;
+                            std::cout << "  Position: "                    << std::endl;
+                            std::cout << "    Az: "       << az << " \370" << std::endl;
+                            std::cout << "    El: "       << el << " \370" << std::endl;
+                        }
+                        else
+                            std::cout << "Motion state: " << motion_str << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT)
+                    || command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        double waitAlt;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, waitAlt);
+
+                        // Generate the struct.
+                        std::cout << "" << std::endl;
+                        if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_WAIT_ALT))
+                            std::cout << "Wait alt: " << waitAlt << std::endl;
+                        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS))
+                            std::cout << "Track time bias: " << waitAlt << " ms" << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
+                        // RETURN BAD PARAMS
+                        //result = ClientResult::
+                    }
+                }
+
+                if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_GET_TIME_SOURCE))
+                {
+                    try
+                    {
+                        AmelasError error;   // Trash. The controller error must be checked.
+                        unsigned short int waitAlt;
+
+                        // Deserialize the parameters.
+                        BinarySerializer::fastDeserialization(reply.params.get(), reply.params_size, error, waitAlt);
+
+                        // Generate the struct.
+                        std::cout << "" << std::endl;
+                        std::cout << "Clock source: " << ClockSourceStr[static_cast<size_t>(waitAlt)] << std::endl;
+                    }
+                    catch(...)
+                    {
+                        std::cout << "BAD PARAMS" << std::endl;
                         // RETURN BAD PARAMS
                         //result = ClientResult::
                     }
@@ -293,6 +1864,8 @@ int main(int, char**)
     // Configuration variables.
     unsigned port = 9999;
     std::string ip = "127.0.0.1";
+    // std::string ip = "169.254.58.154"; // AVS
+    // std::string ip = "10.50.3.1"; // PLC prueba
 
     std::string endpoint = "tcp://" + ip + ":" + std::to_string(port);
     
@@ -314,7 +1887,7 @@ int main(int, char**)
 
     if(!started)
     {
-        std::cout<<"Unable to start the client.";
+        std::cout << "Unable to start the client.";
         return 1;
     }
 
@@ -325,21 +1898,24 @@ int main(int, char**)
     while(!console_cfg.closeStatus())
     {
         // Get the command and parameters.
-        std::cout<<"------------------------------------------------------"<<std::endl;
-        std::cout<<"-- Commands --"<<std::endl;
-        std::cout<<"- REQ_CONNECT:          0"<<std::endl;
-        std::cout<<"- REQ_DISCONNECT:       1"<<std::endl;
-        std::cout<<"- REQ_ALIVE:            2"<<std::endl;
-        std::cout<<"- REQ_GET_SERVER_TIME:  3"<<std::endl;
-        std::cout<<"- CUSTOM:         cmd param1 param2 ..."<<std::endl;
-        std::cout<<"-- Other --"<<std::endl;
-        std::cout<<"- Client exit:             exit"<<std::endl;
-        std::cout<<"- Enable auto-alive:       auto_alive_en"<<std::endl;
-        std::cout<<"- Disable auto-alive:      auto_alive_ds"<<std::endl;
-        std::cout<<"- Enable auto-alive clbk:  auto_alive_clbk_en"<<std::endl;
-        std::cout<<"- Disable auto-alive clbk: auto_alive_clbk_ds"<<std::endl;
-        std::cout<<"------------------------------------------------------"<<std::endl;
-        std::cout<<"Write a command: ";
+        std::cout << "" << std::endl;
+        std::cout << "------------------------------------------------------" << std::endl;
+        std::cout << "-- Commands --" << std::endl;
+        std::cout << "- REQ_CONNECT:                   0" << std::endl;
+        std::cout << "- REQ_DISCONNECT:                1" << std::endl;
+        std::cout << "- REQ_ALIVE:                     2" << std::endl;
+        std::cout << "- REQ_GET_SERVER_TIME:           3" << std::endl;
+        std::cout << "- CUSTOM:                        cmd param1 param2 ..." << std::endl;
+        std::cout << "" << std::endl;
+        std::cout << "-- Other --" << std::endl;
+        std::cout << "- Client exit:                   exit" << std::endl;
+        std::cout << "- Enable auto-alive:             auto_alive_en" << std::endl;
+        std::cout << "- Disable auto-alive:            auto_alive_ds" << std::endl;
+        std::cout << "- Enable auto-alive clbk:        auto_alive_clbk_en" << std::endl;
+        std::cout << "- Disable auto-alive clbk:       auto_alive_clbk_ds" << std::endl;
+        std::cout << "- Shows all the custom commands: commands" << std::endl;
+        std::cout << "------------------------------------------------------" << std::endl;
+        std::cout << "Write a command: ";
         std::getline(std::cin, command);
 
         // Check for other commands.
@@ -372,6 +1948,87 @@ int main(int, char**)
         {
             std::cout << "Disabling auto-alive clbk..." << std::endl;
             client.setAliveCallbacksEnabled(false);
+            continue;
+        }
+        else if(command == "commands")
+        {
+            std::cout << "Showing all custom commands:"                                                                            << std::endl;
+            std::cout << ""                                                                                                        << std::endl;
+            std::cout << "\t- DO_CONNECT_PLC:              87"                                                                     << std::endl;
+            std::cout << "\t- DO_DISCONNECT_PLC:           88"                                                                     << std::endl;
+            std::cout << ""                                                                                                        << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "    SAFETY RELATED FUNCTIONS"                                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "\t- DO_RESET_STATE:              33"                                                                     << std::endl;
+            std::cout << "\t- EN_AVOID_SUN:                34 bool"                                                                << std::endl;
+            std::cout << ""                                                                                                        << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "    LOW LEVEL PLC REGISTERS RELATED FUNCTIONS"                                                           << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "\t- GET_PLC_REGISTERS:           35 (TODO)"                                                              << std::endl;
+            std::cout << "\t- GET_PLC_REGISTER:            36 (TODO)"                                                              << std::endl;
+            std::cout << "\t- GET_PLC_PRUEBA:             101 string(symbol) string(type)"                                         << std::endl;
+            std::cout << ""                                                                                                        << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "    STATUS & CONFIGURATION RELATED FUNCTIONS"                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "\t- GET_MOUNT_LOG:               37 string(YYYY-MM-DD)"                                                  << std::endl;
+            std::cout << "\t- GET_MOUNT_STATUS:            38"                                                                     << std::endl;
+            std::cout << "\t- GET_MOUNT_INFO:              39"                                                                     << std::endl;
+            std::cout << "\t- SET_TIME_SOURCE:             40 u_short(0: OFF    1: NTP    2: MANUAL)"                              << std::endl;
+            std::cout << "\t- GET_TIME_SOURCE:             41"                                                                     << std::endl;
+            std::cout << "\t- DO_SYNC_MANUAL:              42 string(YYYY-MM-DDTHH:MM:SS.sssZ) or string(YYYYMMDDTHHMMSS.sssZ)"    << std::endl;
+            std::cout << "\t- DO_SYNC_NTP:                 43 (TODO)"                                                              << std::endl;
+            std::cout << "\t- EN_EXT_PPS:                  44 bool"                                                                << std::endl;
+            std::cout << "\t- EN_TRACK_ADJ:                45 bool"                                                                << std::endl;
+            std::cout << "\t- EN_MOUNT_POWER:              46 bool"                                                                << std::endl;
+            std::cout << "\t- SET_IDLE_POS:                47 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_IDLE_POS:                48"                                                                     << std::endl;
+            std::cout << "\t- SET_PARK_POS:                49 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_PARK_POS:                50"                                                                     << std::endl;
+            std::cout << "\t- SET_CALIBRATION_POS:         51 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_CALIBRATION_POS:         52"                                                                     << std::endl;
+            std::cout << "\t- SET_IDLE_POS_HERE:           53"                                                                     << std::endl;
+            std::cout << "\t- SET_PARK_POS_HERE:           54"                                                                     << std::endl;
+            std::cout << "\t- SET_CALIBRATION_POS_HERE:    55"                                                                     << std::endl;
+            std::cout << "\t- SET_WAIT_ALT:                56 double(alt)"                                                         << std::endl;
+            std::cout << "\t- GET_WAIT_ALT:                57"                                                                     << std::endl;
+            std::cout << "\t- SET_HOMING_OFFSETS:          58 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_HOMING_OFFSETS:          59"                                                                     << std::endl;
+            std::cout << "\t- EN_MOUNT_MODEL:              60 bool"                                                                << std::endl;
+            std::cout << "\t- SET_MOUNT_MODEL_COEFS:       61 double(AN) double(AW) double(CA) double(NPAE) double(IE) double(IA)" << std::endl;
+            std::cout << "\t- SET_MOUNT_MODEL_COEFS_FILE: 102 string(test_azel_model_v1)"                                          << std::endl;
+            std::cout << "\t- APP_MOUNT_MODEL_CORRECT:    103 bool(AN) bool(AW) bool(CA) bool(NPAE) bool(IE) bool(IA)"             << std::endl;
+            std::cout << "\t- GET_MOUNT_MODEL_COEFS:       62"                                                                     << std::endl;
+            std::cout << "\t- SET_LOCATION:                63 double(lat) double(lon) double(alt) double(x) double(y) double(z)"   << std::endl;
+            std::cout << "\t- GET_LOCATION:                64"                                                                     << std::endl;
+            std::cout << "\t- SET_METEO_DATA:              65 double(press) double(temp) double(hr)"                               << std::endl;
+            std::cout << "\t- GET_METEO_DATA:              66"                                                                     << std::endl;
+            std::cout << "\t- SET_SLEW_SPEED:              67 double(vel.az) double(vel.el)"                                       << std::endl;
+            std::cout << "\t- GET_SLEW_SPEED:              68"                                                                     << std::endl;
+            std::cout << ""                                                                                                        << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "    MOTION RELATED FUNCTIONS"                                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "\t- GET_MOTION_MODE:             69"                                                                     << std::endl;
+            std::cout << "\t- GET_MOTION_STATE:            70"                                                                     << std::endl;
+            std::cout << "\t- DO_START_MOTION:             71"                                                                     << std::endl;
+            std::cout << "\t- DO_PAUSE_MOTION:             72"                                                                     << std::endl;
+            std::cout << "\t- DO_STOP_MOTION:              73"                                                                     << std::endl;
+            std::cout << "\t- SET_TRACK_POS_OFFSET:        74 double(pos.az) double(pos.el)"                                       << std::endl;
+            std::cout << "\t- GET_TRACK_POS_OFFSET:        75"                                                                     << std::endl;
+            std::cout << "\t- SET_TRACK_TIME_BIAS:         76 double(time)"                                                        << std::endl;
+            std::cout << "\t- GET_TRACK_TIME_BIAS:         77"                                                                     << std::endl;
+            std::cout << "\t- SET_ABS_ALTAZ_MOTION:        78 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
+            std::cout << "\t- SET_REL_ALTAZ_MOTION:        79 double(pos.az) double(pos.el) double(vel.az) double(vel.el)"         << std::endl;
+            std::cout << "\t- SET_CON_ALTAZ_MOTION:        80 double(vel.az) double(vel.el)"                                       << std::endl;
+            std::cout << "\t- SET_HOMING_MOTION:           81"                                                                     << std::endl;
+            std::cout << "\t- SET_IDLE_MOTION:             82"                                                                     << std::endl;
+            std::cout << "\t- SET_PARK_MOTION:             83"                                                                     << std::endl;
+            std::cout << "\t- SET_CALIBRATION_MOTION:      84"                                                                     << std::endl;
+            std::cout << "\t- SET_CPF_MOTION:              85 (TODO)"                                                              << std::endl;
+            std::cout << "\t- SET_STAR_MOTION:             86 (TODO)"                                                              << std::endl;
             continue;
         }
 

@@ -105,6 +105,22 @@ void AmelasAdsClient::disconnect()
     _isConnected = false;
 }
 
+int AmelasAdsClient::executeCommand(const std::string &symbol)
+{
+    write(symbol + ".cmd", true);
+
+    if (read<bool>(symbol + ".ack"))
+    {
+        return 0;
+    }
+    else if (read<bool>(symbol + ".nack"))
+    {
+        return read<int>(symbol + ".code");
+    }
+    else
+        return 0;
+}
+
 void __stdcall AmelasAdsClient::BoolCallback(AmsAddr* pAddr, AdsNotificationHeader* pNotification, ULONG hUser)
 {
     bool value = *(bool *)pNotification->data;

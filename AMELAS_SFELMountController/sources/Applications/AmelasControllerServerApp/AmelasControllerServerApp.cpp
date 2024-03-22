@@ -173,15 +173,189 @@ int main(int, char**)
     // ---------------------------------------
 
     // Set the controller callbacks in the server.
-
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOME_POSITION,
+    // -- SAFETY RELATED FUNCTIONS
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_RESET_STATE,
                                              &amelas_controller,
-                                             &AmelasController::setHomePosition);
-
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_HOME_POSITION,
+                                             &AmelasController::doResetState);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_AVOID_SUN,
                                              &amelas_controller,
-                                             &AmelasController::getHomePosition);
+                                             &AmelasController::enableAvoidSun);
 
+    // -- LOW LEVEL PLC REGISTERS RELATED FUNCTIONS
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_CONNECT_PLC,
+                                             &amelas_controller,
+                                             &AmelasController::doConnectPLC);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_DISCONNECT_PLC,
+                                             &amelas_controller,
+                                             &AmelasController::doDisconnectPLC);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
+                                             &amelas_controller,
+                                             &AmelasController::getPLCregister);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PLC_PRUEBA,
+                                             &amelas_controller,
+                                             &AmelasController::getPLCprueba); // PRUEBA
+
+    // -- STATUS AND CONFIGURATION RELATED FUNCTIONS
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOUNT_LOG,
+                                             &amelas_controller,
+                                             &AmelasController::getMountLog);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_TIME_SOURCE,
+                                             &amelas_controller,
+                                             &AmelasController::setTimeSource);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_TIME_SOURCE,
+                                             &amelas_controller,
+                                             &AmelasController::getTimeSource);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_SYNC_NTP,
+                                             &amelas_controller,
+                                             &AmelasController::doSyncTimeNTP); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_SYNC_MANUAL,
+                                             &amelas_controller,
+                                             &AmelasController::doSyncTimeManual);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_EXT_PPS,
+                                             &amelas_controller,
+                                             &AmelasController::enableExtPPS);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOUNT_STATUS,
+                                             &amelas_controller,
+                                             &AmelasController::getMountStatus);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOUNT_INFO,
+                                             &amelas_controller,
+                                             &AmelasController::getDeviceInfo);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_TRACK_ADJ,
+                                             &amelas_controller,
+                                             &AmelasController::enableTrackingAdjusts);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_MOUNT_POWER,
+                                             &amelas_controller,
+                                             &AmelasController::enableMountPower);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_SLEW_SPEED,
+                                             &amelas_controller,
+                                             &AmelasController::setSlewSpeed);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_SLEW_SPEED,
+                                             &amelas_controller,
+                                             &AmelasController::getSlewSpeed);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_IDLE_POS,
+                                             &amelas_controller,
+                                             &AmelasController::setIdlePosition);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_IDLE_POS,
+                                             &amelas_controller,
+                                             &AmelasController::getIdlePosition);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_PARK_POS,
+                                             &amelas_controller,
+                                             &AmelasController::setParkPosition);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_PARK_POS,
+                                             &amelas_controller,
+                                             &AmelasController::getParkPosition);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_POS,
+                                             &amelas_controller,
+                                             &AmelasController::setCalibrationPosition);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_CALIBRATION_POS,
+                                             &amelas_controller,
+                                             &AmelasController::getCalibrationPosition);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_IDLE_POS_HERE,
+                                             &amelas_controller,
+                                             &AmelasController::setIdlePositionHere);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_PARK_POS_HERE,
+                                             &amelas_controller,
+                                             &AmelasController::setParkPositionHere);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_POS_HERE,
+                                             &amelas_controller,
+                                             &AmelasController::setCalibrationPositionHere);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_WAIT_ALT,
+                                             &amelas_controller,
+                                             &AmelasController::setWaitAlt);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_WAIT_ALT,
+                                             &amelas_controller,
+                                             &AmelasController::getWaitAlt);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOMING_OFFSETS,
+                                             &amelas_controller,
+                                             &AmelasController::setHomingOffsets);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
+                                             &amelas_controller,
+                                             &AmelasController::getHomingOffsets);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_EN_MOUNT_MODEL,
+                                             &amelas_controller,
+                                             &AmelasController::enableMountModel);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS,
+                                             &amelas_controller,
+                                             &AmelasController::setMountModelCoefs); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS_FILE,
+                                             &amelas_controller,
+                                             &AmelasController::setMountModelCoefsFile); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS,
+                                             &amelas_controller,
+                                             &AmelasController::getMountModelCoefs); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_APP_MOUNT_MODEL_CORRECT,
+                                             &amelas_controller,
+                                             &AmelasController::applyMountModelCorrections); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_LOCATION,
+                                             &amelas_controller,
+                                             &AmelasController::setLocation); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_LOCATION,
+                                             &amelas_controller,
+                                             &AmelasController::getLocation);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_METEO_DATA,
+                                             &amelas_controller,
+                                             &AmelasController::setMeteoData); // PRUEBA
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_METEO_DATA,
+                                             &amelas_controller,
+                                             &AmelasController::getMeteoData);
+
+    // -- MOTION RELATED FUNCTIONS
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOTION_MODE,
+                                             &amelas_controller,
+                                             &AmelasController::getMotionMode);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_MOTION_STATE,
+                                             &amelas_controller,
+                                             &AmelasController::getMotionState);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_START_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::doStartMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_PAUSE_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::doPauseMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_STOP_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::doStopMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET,
+                                             &amelas_controller,
+                                             &AmelasController::setTrackPosOffset);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET,
+                                             &amelas_controller,
+                                             &AmelasController::getTrackPosOffset);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS,
+                                             &amelas_controller,
+                                             &AmelasController::setTrackTimeBias);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS,
+                                             &amelas_controller,
+                                             &AmelasController::getTrackTimeBias);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setAbsoluteAltAzMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setRelativeAltAzMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CON_ALTAZ_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setContAltAzMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOMING_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setHomingMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_IDLE_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setIdleMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_PARK_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setParkMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setCalibrationMotion);
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_CPF_MOTION,
+                                             &amelas_controller,
+                                             &AmelasController::setCPFMotion);
+
+    // -- OTHER FUNCTIONS
+    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
+                                            &amelas_controller,
+                                            &AmelasController::pruebaBucles); // PRUEBA
     // ---------------------------------------
 
     // Start the server.

@@ -45,65 +45,134 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
     _logger(logger)
 {
     // Register each internal specific process function in the base server.
+    // -- SAFETY RELATED FUNCTIONS
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_RESET_STATE,
+                                  &AmelasControllerServer::processEmptyArguments<controller::DoResetStateCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_AVOID_SUN,
+                                  &AmelasControllerServer::processSetBool<controller::EnableAvoidSunCallback>);
 
-    // REQ_SET_HOME_POSITION
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_HOME_POSITION,
-                                  &AmelasControllerServer::processSetHomePosition);
+    // -- LOW LEVEL PLC REGISTERS RELATED FUNCTIONS
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_CONNECT_PLC,
+                                  &AmelasControllerServer::processEmptyArguments<controller::DoConnectPLCCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_DISCONNECT_PLC,
+                                  &AmelasControllerServer::processEmptyArguments<controller::DoDisconnectPLCCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_PLC_REGISTERS,
+                                  &AmelasControllerServer::processGetPLCRegister<controller::GetPLCRegisterCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_PLC_PRUEBA,
+                                  &AmelasControllerServer::processGetPLCprueba<controller::GetPLCpruebaCallback>); // PRUEBA
 
-    // REQ_GET_HOME_POSITION.
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_HOME_POSITION,
-                                  &AmelasControllerServer::processGetHomePosition);
+    // -- STATUS AND CONFIGURATION RELATED FUNCTIONS
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_LOG,
+                                  &AmelasControllerServer::processSetString<controller::GetMountLogCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_TIME_SOURCE,
+                                  &AmelasControllerServer::processSetUShort<controller::SetTimeSourceCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_TIME_SOURCE,
+                                  &AmelasControllerServer::processGetUShort<controller::GetTimeSourceCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_NTP,
+                                  &AmelasControllerServer::processSetNTPserver<controller::DoSyncTimeNTPCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_SYNC_MANUAL,
+                                  &AmelasControllerServer::processSetString<controller::DoSyncTimeManualCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_EXT_PPS,
+                                  &AmelasControllerServer::processSetBool<controller::EnableExtPPSCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_STATUS,
+                                  &AmelasControllerServer::processGetString<controller::GetMountStatusCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_INFO,
+                                  &AmelasControllerServer::processGetString<controller::GetDeviceInfoCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_TRACK_ADJ,
+                                  &AmelasControllerServer::processSetBool<controller::EnableTrackingAdjustsCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_MOUNT_POWER,
+                                  &AmelasControllerServer::processSetBool<controller::EnableMountPowerCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_SLEW_SPEED,
+                                  &AmelasControllerServer::processSetPositionOrSpeed<controller::SetSlewSpeedCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_SLEW_SPEED,
+                                  &AmelasControllerServer::processGetPositionOrSpeed<controller::GetSlewSpeedCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_IDLE_POS,
+                                  &AmelasControllerServer::processSetPositionOrSpeed<controller::SetIdlePositionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_IDLE_POS,
+                                  &AmelasControllerServer::processGetPositionOrSpeed<controller::GetIdlePositionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_PARK_POS,
+                                  &AmelasControllerServer::processSetPositionOrSpeed<controller::SetParkPositionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_PARK_POS,
+                                  &AmelasControllerServer::processGetPositionOrSpeed<controller::GetParkPositionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CALIBRATION_POS,
+                                  &AmelasControllerServer::processSetPositionOrSpeed<controller::SetCalibrationPositionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_CALIBRATION_POS,
+                                  &AmelasControllerServer::processGetPositionOrSpeed<controller::GetCalibrationPositionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_IDLE_POS_HERE,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetIdlePositionHereCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_PARK_POS_HERE,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetParkPositionHereCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CALIBRATION_POS_HERE,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetCalibrationPositionHereCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_WAIT_ALT,
+                                  &AmelasControllerServer::processSetDouble<controller::SetWaitAltCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_WAIT_ALT,
+                                  &AmelasControllerServer::processGetDouble<controller::GetWaitAltCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_HOMING_OFFSETS,
+                                  &AmelasControllerServer::processSetPositionOrSpeed<controller::SetHomingOffsetsCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_HOMING_OFFSETS,
+                                  &AmelasControllerServer::processGetPositionOrSpeed<controller::GetHomingOffsetsCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_EN_MOUNT_MODEL,
+                                  &AmelasControllerServer::processSetBool<controller::EnableMountModelCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS,
+                                  &AmelasControllerServer::processSetLocation<controller::SetMountModelCoefsCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_MOUNT_MODEL_COEFS_FILE,
+                                  &AmelasControllerServer::processSetString<controller::SetMountModelCoefsFileCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOUNT_MODEL_COEFS,
+                                  &AmelasControllerServer::processGetSixDoubles<controller::GetMountModelCoefsCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_APP_MOUNT_MODEL_CORRECT,
+                                  &AmelasControllerServer::processSetSixBool<controller::ApplyMountModelCorrectionsCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_LOCATION,
+                                  &AmelasControllerServer::processSetLocation<controller::SetLocationCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_LOCATION,
+                                  &AmelasControllerServer::processGetLocation<controller::GetLocationCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_METEO_DATA,
+                                  &AmelasControllerServer::processSetMeteoData<controller::SetMeteoDataCallback>); // PRUEBA
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_METEO_DATA,
+                                  &AmelasControllerServer::processGetMeteoData<controller::GetMeteoDataCallback>);
+
+    // -- MOTION RELATED FUNCTIONS
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOTION_MODE,
+                                  &AmelasControllerServer::processGetMotionMode<controller::GetMotionModeCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_MOTION_STATE,
+                                  &AmelasControllerServer::processGetMotionState<controller::GetMotionStateCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_START_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetDoStartMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_PAUSE_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetDoPauseMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_STOP_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetDoStopMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_TRACK_POS_OFFSET,
+                                  &AmelasControllerServer::processSetPositionOrSpeed<controller::SetTrackPosOffsetCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_TRACK_POS_OFFSET,
+                                  &AmelasControllerServer::processGetPositionOrSpeed<controller::GetTrackPosOffsetCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_TRACK_TIME_BIAS,
+                                  &AmelasControllerServer::processSetDouble<controller::SetTrackTimeBiasCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_GET_TRACK_TIME_BIAS,
+                                  &AmelasControllerServer::processGetDouble<controller::GetTrackTimeBiasCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_ABS_ALTAZ_MOTION,
+                                   &AmelasControllerServer::processSetAbsRelAltAzMotion<controller::SetAbsoluteAltAzMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_REL_ALTAZ_MOTION,
+                                   &AmelasControllerServer::processSetAbsRelAltAzMotion<controller::SetRelativeAltAzMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CON_ALTAZ_MOTION,
+                                   &AmelasControllerServer::processSetPositionOrSpeed<controller::SetContAltAzMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_HOMING_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetHomingMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_IDLE_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetIdleMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_PARK_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetParkMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CALIBRATION_MOTION,
+                                  &AmelasControllerServer::processEmptyArguments<controller::SetCalibrationMotionCallback>);
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_SET_CPF_MOTION,
+                                  &AmelasControllerServer::processSetUShort<controller::SetCPFMotionCallback>);
+
+    // -- OTHER FUNCTIONS
+    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
+                                  &AmelasControllerServer::processEmptyArguments<controller::DoPruebaBucles>);
 }
 
 AmelasControllerServer::~AmelasControllerServer() {}
-
-void AmelasControllerServer::processSetHomePosition(const CommandRequest& request, CommandReply& reply)
-{
-    // Auxiliar variables and containers.
-    controller::AmelasError ctrl_err;
-
-    // Position struct.
-    controller::AltAzPos pos;
-
-    // Check the request parameters size.
-    if (request.params_size == 0 || !request.params)
-    {
-        reply.server_result = OperationResult::EMPTY_PARAMS;
-        return;
-    }
-
-    // Try to read the parameters data.
-    try
-    {
-        BinarySerializer::fastDeserialization(request.params.get(), request.params_size, pos);
-    }
-    catch(...)
-    {
-        reply.server_result = OperationResult::BAD_PARAMETERS;
-        return;
-    }
-
-    // Now we will process the command in the controller.
-    ctrl_err = this->invokeCallback<controller::SetHomePositionCallback>(request, reply, pos);
-
-    // Serialize parameters if all ok.
-    if(reply.server_result == OperationResult::COMMAND_OK)
-        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err);
-}
-
-void AmelasControllerServer::processGetHomePosition(const CommandRequest& request, CommandReply &reply)
-{
-    // Auxiliar variables and containers.
-    controller::AmelasError ctrl_err;
-    controller::AltAzPos pos;
-
-    // Now we will process the command in the controller.
-    ctrl_err = this->invokeCallback<controller::GetHomePositionCallback>(request, reply, pos);
-
-    // Serialize parameters if all ok.
-    if(reply.server_result == OperationResult::COMMAND_OK)
-        reply.params_size = BinarySerializer::fastSerialization(reply.params, ctrl_err, pos.az, pos.el);
-}
 
 void AmelasControllerServer::registerRequestProcFunc(AmelasServerCommand command, AmelasRequestProcFunc func)
 {

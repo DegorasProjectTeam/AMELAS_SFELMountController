@@ -66,6 +66,7 @@ using zmqutils::common::OperationResult;
 using zmqutils::common::ServerCommand;
 using zmqutils::common::HostInfo;
 using zmqutils::utils::CallbackHandler;
+using zmqutils::utils::BinarySerializer;
 // ---------------------------------------------------------------------------------------------------------------------
 
 // Example of creating a command server from the base.
@@ -96,8 +97,53 @@ private:
     // -----------------------------------------------------------------------------------------------------------------
 
     // Process functions for all the specific commands.
-    void processSetHomePosition(const CommandRequest&, CommandReply&);
-    void processGetHomePosition(const CommandRequest&, CommandReply&);
+    template <typename ClbkT>
+    void processSetBool(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetSixBool(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetUShort(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetDouble(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetLocation(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetMeteoData(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetAbsRelAltAzMotion(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetString(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processSetNTPserver(const CommandRequest &request, CommandReply &reply);
+
+
+    template <typename ClbkT>
+    void processEmptyArguments(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetDouble(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetUShort(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetSixDoubles(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetPositionOrSpeed(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetMotionMode(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetMotionState(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetLocation(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetMeteoData(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetPLCRegister(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetPLCprueba(const CommandRequest &request, CommandReply &reply);
+    template <typename ClbkT>
+    void processGetString(const CommandRequest &request, CommandReply &reply);
+
 
     // Subclass register process function helper.
     void registerRequestProcFunc(AmelasServerCommand command, AmelasRequestProcFunc func);
@@ -149,6 +195,8 @@ private:
 
     const std::shared_ptr<spdlog::logger> _logger;
 };
+
+#include "amelas_controller_server.tpp"
 
 }} // END NAMESPACES.
 // =====================================================================================================================

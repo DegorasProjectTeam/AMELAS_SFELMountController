@@ -97,14 +97,6 @@ int main(int, char**)
 
     // Set the controller callbacks in the server.
 
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_SET_HOME_POSITION,
-                                             &amelas_controller,
-                                             &AmelasController::setHomePosition);
-
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_GET_HOME_POSITION,
-                                             &amelas_controller,
-                                             &AmelasController::getHomePosition);
-
     // ---------------------------------------
 
     // Start the server.

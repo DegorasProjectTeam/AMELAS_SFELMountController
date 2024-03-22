@@ -23,7 +23,6 @@ void AmelasAdsClient::write(const std::string &symbol, const T data)
         _logger->error(oss.str());
         // TODO: Throw here
     }
-    
 }
 
 template <typename T>
