@@ -52,6 +52,7 @@
 #include "common.h"
 #include "libamelas_global.h"
 #include "AmelasAdsClient/amelas_ads_client.h"
+#include "LibDegorasSLR/Timing/types/datetime_types.h"
 // =====================================================================================================================
 
 // AMELAS NAMESPACES
@@ -199,6 +200,7 @@ private:
     double arcsec_to_radians(const double& arcsec);
     double arcsec_to_deg(const double& arcsec);
     unsigned long long iso8601DatetimeTowin32Ticks(const std::string& datetime);
+    unsigned long long modifiedJulianDateTimeTowin32Ticks(const dpslr::timing::types::MJDateTime& mjdt);
 
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
