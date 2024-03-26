@@ -1445,10 +1445,6 @@ void parseCommand(CommandClientBase &client, const std::string &command)
 
             valid = valid_params;
         }
-        else if (command_id == static_cast<CommandType>(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES))
-        {
-            std::cout << "Sending REQ_DO_PRUEBA_BUCLES command." << std::endl;
-        }
         else
         {
             valid = false;

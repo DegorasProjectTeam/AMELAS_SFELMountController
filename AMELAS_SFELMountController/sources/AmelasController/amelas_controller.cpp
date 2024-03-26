@@ -2215,52 +2215,6 @@ AmelasError AmelasController::setCalibrationMotion()
     return error;
 }
 
-AmelasError AmelasController::pruebaBucles()
-{
-    // Auxiliar result
-    AmelasError error = AmelasError::SUCCESS;
-
-    // Command used for log
-    const std::string command = "DO_PRUEBA_BUCLES";
-
-    // Symbols used for PLC
-    const std::string bButton  = "ENTRY_POINT_TRACKING.tracking.bButton";
-    const std::string aBuffer1 = "ENTRY_POINT_TRACKING.tracking.aBuffer1[";
-    const std::string aBuffer2 = "ENTRY_POINT_TRACKING.tracking.aBuffer2[";
-
-    // Variables used for this function
-    unsigned short int cMin = _plc->read<unsigned short int>("ENTRY_POINT_TRACKING.tracking.cMin");
-    unsigned short int cMax = _plc->read<unsigned short int>("ENTRY_POINT_TRACKING.tracking.cMax");
-    unsigned short int i    = 0;
-
-    // Functionality
-    _plc->write(bButton, true);
-
-    while (i <= cMax*2+1)
-    {
-        std::string aBuffer;
-
-        if (i <= cMax)
-            aBuffer = aBuffer1;
-        else
-            aBuffer = aBuffer2;
-
-        if (_plc->read<bool>(aBuffer + std::to_string(i) + "].bRead") == true)
-        {
-            _plc->write(aBuffer + std::to_string(i) + "].bRead", false);
-            _plc->write(aBuffer + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(i));
-            _plc->write(aBuffer + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(i));
-            _plc->write(aBuffer + std::to_string(i) + "].bWritten", true);
-            i++;
-        }
-    }
-
-    // Log
-    setLog(command, "", error);
-
-    return error;
-}
-
 // TODO: AmelasError AmelasController::setCPFMotion(const file &cpf, AmelasTracking &tracking)
 
 AmelasError AmelasController::setCPFMotion(const unsigned short int &example_selector)
@@ -2628,7 +2582,7 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
             }
 
             size_t numElementos = results.size();
-            _plc->write("ENTRY_POINT_TRACKING.tracking.pruebalon", numElementos - 1);
+            _plc->write("ENTRY_POINT_TRACKING.tracking.predictArrayLength", numElementos - 1);
             bool initLoop = false;
             unsigned long long i = 0;
 

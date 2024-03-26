@@ -423,7 +423,6 @@ using SetCPFMotionCallback           = std::function<AmelasError(const unsigned 
 
 // -- OTHER FUNCTIONS
 using GetDatetimeCallback = std::function<AmelasError(std::string&)>;
-using DoPruebaBucles      = std::function<AmelasError()>; // PRUEBA
 
 // =====================================================================================================================
 

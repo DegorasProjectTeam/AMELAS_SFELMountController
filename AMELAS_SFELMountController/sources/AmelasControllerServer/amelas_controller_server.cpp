@@ -168,8 +168,6 @@ AmelasControllerServer::AmelasControllerServer(const std::shared_ptr<spdlog::log
                                   &AmelasControllerServer::processSetUShort<controller::SetCPFMotionCallback>);
 
     // -- OTHER FUNCTIONS
-    this->registerRequestProcFunc(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
-                                  &AmelasControllerServer::processEmptyArguments<controller::DoPruebaBucles>);
 }
 
 AmelasControllerServer::~AmelasControllerServer() {}

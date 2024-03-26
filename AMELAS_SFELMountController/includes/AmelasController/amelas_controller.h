@@ -183,7 +183,6 @@ public:
     // OTHER FUNCTIONS
     //=====================================================================================================================
     LIBAMELAS_EXPORT AmelasError getDatetime(std::string&);
-    LIBAMELAS_EXPORT AmelasError pruebaBucles(); // PRUEBA (para testear bucles sobre arrays)
     //=====================================================================================================================
 
 

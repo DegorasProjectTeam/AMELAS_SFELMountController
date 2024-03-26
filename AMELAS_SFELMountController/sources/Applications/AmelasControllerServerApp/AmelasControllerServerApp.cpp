@@ -353,9 +353,6 @@ int main(int, char**)
                                              &AmelasController::setCPFMotion);
 
     // -- OTHER FUNCTIONS
-    amelas_server.registerControllerCallback(AmelasServerCommand::REQ_DO_PRUEBA_BUCLES,
-                                            &amelas_controller,
-                                            &AmelasController::pruebaBucles); // PRUEBA
     // ---------------------------------------
 
     // Start the server.
