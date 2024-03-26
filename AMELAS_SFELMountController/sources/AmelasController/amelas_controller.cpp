@@ -2581,10 +2581,12 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                 }
             }
 
-            size_t numElementos = results.size();
-            _plc->write("ENTRY_POINT_TRACKING.tracking.predictArrayLength", numElementos - 1);
+            size_t numElementos = results.size() - 1;
+            _plc->write("ENTRY_POINT_TRACKING.tracking.predictArrayLength", numElementos);
             bool initLoop = false;
             unsigned long long i = 0;
+            unsigned long long iAux = 0;
+            unsigned long long iCounter = 0;
 
             const std::string bButton  = "ENTRY_POINT_TRACKING.tracking.bButton";
             const std::string aBuffer1 = "ENTRY_POINT_TRACKING.tracking.aBuffer1[";
@@ -2603,23 +2605,51 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                         initLoop = true;
                     }
 
-                    if (i <= (cMax*2+1))
+                    if (_plc->read<bool>("ENTRY_POINT_TRACKING.tracking.bBuffer1Read") && iAux <= cMax)
                     {
-                        std::string aBuffer;
+                        _plc->write(aBuffer1 + std::to_string(i) + "].bRead", false);
+                        _plc->write(aBuffer1 + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(pred.mount_pos->altaz_coord.az));
+                        _plc->write(aBuffer1 + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(pred.mount_pos->altaz_coord.el));
+                        _plc->write(aBuffer1 + std::to_string(i) + "].nTime", modifiedJulianDateTimeTowin32Ticks(pred.mjdt));
+                        _plc->write(aBuffer1 + std::to_string(i) + "].bWritten", true);
 
-                        if (i <= cMax)
-                            aBuffer = aBuffer1;
-                        else
-                            aBuffer = aBuffer2;
-
-                        if (_plc->read<bool>(aBuffer + std::to_string(i) + "].bRead") == true)
+                        if (i == cMax || iCounter == numElementos)
                         {
-                            _plc->write(aBuffer + std::to_string(i) + "].bRead", false);
-                            _plc->write(aBuffer + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(pred.mount_pos->altaz_coord.az));
-                            _plc->write(aBuffer + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(pred.mount_pos->altaz_coord.el));
-                            _plc->write(aBuffer + std::to_string(i) + "].nTime", modifiedJulianDateTimeTowin32Ticks(pred.mjdt));
-                            _plc->write(aBuffer + std::to_string(i) + "].bWritten", true);
+                            _plc->write("ENTRY_POINT_TRACKING.tracking.bBuffer1Filled", true);
+                            _plc->write("ENTRY_POINT_TRACKING.tracking.bBuffer1Read", false);
+                            i = cMin;
+                            iAux++;
+                            iCounter++;
+                        }
+                        else
+                        {
                             i++;
+                            iAux++;
+                            iCounter++;
+                        }
+                    }
+
+                    if (_plc->read<bool>("ENTRY_POINT_TRACKING.tracking.bBuffer2Read") && iAux > cMax)
+                    {
+                        _plc->write(aBuffer2 + std::to_string(i) + "].bRead", false);
+                        _plc->write(aBuffer2 + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(pred.mount_pos->altaz_coord.az));
+                        _plc->write(aBuffer2 + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(pred.mount_pos->altaz_coord.el));
+                        _plc->write(aBuffer2 + std::to_string(i) + "].nTime", modifiedJulianDateTimeTowin32Ticks(pred.mjdt));
+                        _plc->write(aBuffer2 + std::to_string(i) + "].bWritten", true);
+
+                        if (i == cMax || iCounter == numElementos)
+                        {
+                            _plc->write("ENTRY_POINT_TRACKING.tracking.bBuffer2Filled", true);
+                            _plc->write("ENTRY_POINT_TRACKING.tracking.bBuffer2Read", false);
+                            i = cMin;
+                            iAux = cMin;
+                            iCounter++;
+                        }
+                        else
+                        {
+                            i++;
+                            iAux++;
+                            iCounter++;
                         }
                     }
                 }
