@@ -607,6 +607,116 @@ unsigned long long AmelasController::modifiedJulianDateTimeTowin32Ticks(const MJ
     return ticks;
 }
 
+void AmelasController::applyTPOINTCorrections(const double &az, const double &el, const bool &bAN, const bool &bAW, const bool &bCA, const bool &bNPAE, const bool &bIE, const bool &bIA, double &azOffset, double &elOffset)
+{
+    // Variable used for this function
+    std::ostringstream oss;
+    // -- Current position in radians
+    AltAzPos setPosRad(az, el/*deg_to_radians(pos.az), deg_to_radians(pos.el)*/);
+    // -- Offset for each coefficient
+    double azOffset_IE = 0.0;
+    double elOffset_IE = 0.0;
+    double azOffset_IA = 0.0;
+    double elOffset_IA = 0.0;
+    double azOffset_CA = 0.0;
+    double elOffset_CA = 0.0;
+    double azOffset_AN = 0.0;
+    double elOffset_AN = 0.0;
+    double azOffset_AW = 0.0;
+    double elOffset_AW = 0.0;
+    double azOffset_NPAE = 0.0;
+    double elOffset_NPAE = 0.0;
+
+    // Functionality
+    // -- Pass everything to deg
+    double ie = arcsec_to_deg(_ie_tpoint);
+    double ia = arcsec_to_deg(_ia_tpoint);
+    double ca = arcsec_to_deg(_ca_tpoint);
+    double an = arcsec_to_deg(_an_tpoint);
+    double aw = arcsec_to_deg(_aw_tpoint);
+    double npae = arcsec_to_deg(_npae_tpoint);
+
+    // --> Elevation index error
+    if (bIE)
+    {
+        azOffset_IE = 0.0;
+        elOffset_IE = ie;
+    }
+    else
+    {
+        azOffset_IE = 0.0;
+        elOffset_IE = 0.0;
+    }
+
+    // --> Azimuth index error
+    if (bIA)
+    {
+        azOffset_IA = -ia;
+        elOffset_IA = 0.0;
+    }
+    else
+    {
+        azOffset_IA = 0.0;
+        elOffset_IA = 0.0;
+    }
+
+    // --> LR collimation error
+    if (bCA)
+    {
+        if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+            azOffset_CA = -ca * 1 / cos(setPosRad.el);
+        elOffset_CA = 0.0;
+    }
+    else
+    {
+        azOffset_CA = 0.0;
+        elOffset_CA = 0.0;
+    }
+
+    // --> Azimuth axis misalignment NS
+    if (bAN)
+    {
+        if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+            azOffset_AN = -an * sin(setPosRad.az) * tan(setPosRad.el);
+        elOffset_AN = -an * cos(setPosRad.az);
+    }
+    else
+    {
+        azOffset_AN = 0.0;
+        elOffset_AN = 0.0;
+    }
+
+    // --> Azimuth axis misalignment EW
+    if (bAW)
+    {
+        if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+            azOffset_AW = -aw * cos(setPosRad.az) * tan(setPosRad.el);
+        elOffset_AW = aw * sin(setPosRad.az);
+    }
+    else
+    {
+        azOffset_AW = 0.0;
+        elOffset_AW = 0.0;
+    }
+
+    // --> Az/El non-perpendicularity
+    if (bNPAE)
+    {
+        if (setPosRad.el != (M_PI / 2) && setPosRad.el != (3 * M_PI / 2))
+            azOffset_NPAE = -npae * tan(setPosRad.el);
+        elOffset_NPAE = 0.0;
+    }
+    else
+    {
+        azOffset_NPAE = 0.0;
+        elOffset_NPAE = 0.0;
+    }
+
+    // -- Sum of all partial offsets
+    azOffset = azOffset_AN + azOffset_AW + azOffset_CA + azOffset_IA + azOffset_IE + azOffset_NPAE;
+    elOffset = elOffset_AN + elOffset_AW + elOffset_CA + elOffset_IA + elOffset_IE + elOffset_NPAE;
+}
+
 AmelasError AmelasController::getMountLog(const std::string &day)
 {
     // Auxiliar result
@@ -1144,15 +1254,6 @@ AmelasError AmelasController::getHomingOffsets(AltAzAdj &pos)
 
 AmelasError AmelasController::enableMountModel(const bool &enabled)
 {
-    /*// Command used for log
-    const std::string command = "EN_MOUNT_MODEL";
-
-    // Symbol used for PLC
-    const std::string symbol = "MAIN.commander.enableMountModel";
-
-    // Functionality
-    return setEnable(enabled, symbol, command)*/
-    
     // Auxiliar result
     AmelasError error = AmelasError::SUCCESS;
 
@@ -2282,7 +2383,7 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
     DegreesU min_el = 10;             // Minimum acceptable elevation for the mount.
     DegreesU max_el = 85;             // Maximum acceptable elevation for the mount.
     DegreesU sun_avoid_angle = 15;    // Sun avoidance angle to make Sun the security sectors.
-    bool avoid_sun = true;            // Flag for enable or disable the Sun avoidance utility.
+    bool avoid_sun = _avoid_sun;      // Flag for enable or disable the Sun avoidance utility.
 
     // Configure the CPF input folder.
     std::string current_dir = dpslr::helpers::files::getCurrentDir();
@@ -2605,11 +2706,21 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                         initLoop = true;
                     }
 
+                    if (_enable_mount_model)
+                    {
+                        applyTPOINTCorrections(static_cast<double>(pred.mount_pos->altaz_coord.az), static_cast<double>(pred.mount_pos->altaz_coord.el), true, true, true, true, true, true, _azOffset, _elOffset);
+                    }
+                    else
+                    {
+                        _azOffset = 0.0;
+                        _elOffset = 0.0;
+                    }
+
                     if (_plc->read<bool>("ENTRY_POINT_TRACKING.tracking.bBuffer1Read") && iAux <= cMax)
                     {
                         _plc->write(aBuffer1 + std::to_string(i) + "].bRead", false);
-                        _plc->write(aBuffer1 + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(pred.mount_pos->altaz_coord.az));
-                        _plc->write(aBuffer1 + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(pred.mount_pos->altaz_coord.el));
+                        _plc->write(aBuffer1 + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(pred.mount_pos->altaz_coord.az) + _azOffset);
+                        _plc->write(aBuffer1 + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(pred.mount_pos->altaz_coord.el) + _elOffset);
                         _plc->write(aBuffer1 + std::to_string(i) + "].nTime", modifiedJulianDateTimeTowin32Ticks(pred.mjdt));
                         _plc->write(aBuffer1 + std::to_string(i) + "].bWritten", true);
 
@@ -2632,8 +2743,8 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                     if (_plc->read<bool>("ENTRY_POINT_TRACKING.tracking.bBuffer2Read") && iAux > cMax)
                     {
                         _plc->write(aBuffer2 + std::to_string(i) + "].bRead", false);
-                        _plc->write(aBuffer2 + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(pred.mount_pos->altaz_coord.az));
-                        _plc->write(aBuffer2 + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(pred.mount_pos->altaz_coord.el));
+                        _plc->write(aBuffer2 + std::to_string(i) + "].nPosition.Azimuth", static_cast<double>(pred.mount_pos->altaz_coord.az) + _azOffset);
+                        _plc->write(aBuffer2 + std::to_string(i) + "].nPosition.Elevation", static_cast<double>(pred.mount_pos->altaz_coord.el) + _elOffset);
                         _plc->write(aBuffer2 + std::to_string(i) + "].nTime", modifiedJulianDateTimeTowin32Ticks(pred.mjdt));
                         _plc->write(aBuffer2 + std::to_string(i) + "].bWritten", true);
 
@@ -2654,6 +2765,10 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
                     }
                 }
             }
+
+            // Help out of the loop in the PLC, just in case
+            if (_plc->read<bool>(bButton))
+                _plc->write("ENTRY_POINT_TRACKING.tracking.nElementCounter", numElementos + 1);
 
             // Close the file.
             file_realtime_track.close();

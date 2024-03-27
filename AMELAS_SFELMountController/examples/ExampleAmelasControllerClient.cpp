@@ -1950,6 +1950,9 @@ int main(int, char**)
         {
             std::cout << "Showing all custom commands:"                                                                            << std::endl;
             std::cout << ""                                                                                                        << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
+            std::cout << "    CONNECTION TO PLC"                                                                            << std::endl;
+            std::cout << "    " << std::string(70, '-')                                                                            << '\n';
             std::cout << "\t- DO_CONNECT_PLC:              87"                                                                     << std::endl;
             std::cout << "\t- DO_DISCONNECT_PLC:           88"                                                                     << std::endl;
             std::cout << ""                                                                                                        << std::endl;

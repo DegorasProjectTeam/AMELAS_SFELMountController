@@ -200,12 +200,15 @@ private:
     double arcsec_to_deg(const double& arcsec);
     unsigned long long iso8601DatetimeTowin32Ticks(const std::string& datetime);
     unsigned long long modifiedJulianDateTimeTowin32Ticks(const dpslr::timing::types::MJDateTime& mjdt);
+    void applyTPOINTCorrections(const double& az, const double& el, const bool& bAN, const bool& bAW, const bool& bCA, const bool& bNPAE, const bool& bIE, const bool& bIA, double& azOffset, double& elOffset);
 
     const AmelasControllerConfig _config;
     const std::shared_ptr<spdlog::logger> _logger;
     std::shared_ptr<AmelasAdsClient> _plc;
 
     bool _avoid_sun = false;
+    unsigned short int _clockSource = 0;
+    // -- TPOINT
     bool _enable_mount_model = false;
     double _ie_tpoint = 0.0;
     double _ia_tpoint = 0.0;
@@ -215,7 +218,6 @@ private:
     double _npae_tpoint = 0.0;
     double _elOffset = 0.0;
     double _azOffset = 0.0;
-    unsigned short int _clockSource = 0;
 };
 
 }} // END NAMESPACES.
