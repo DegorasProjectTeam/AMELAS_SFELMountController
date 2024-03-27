@@ -857,8 +857,9 @@ AmelasError AmelasController::setTimeSource(const unsigned short int &clock)
 
     if (clock == AmelasClockSource::OFF)
     {
-        if (_clockSource == AmelasClockSource::OFF || (!_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+        if (!_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual))
         {
+            _clockSource = AmelasClockSource::OFF;
             error = AmelasError::ENABLE_WARN;
             oss << "The clock is already OFF." << '\n';
         }
@@ -883,8 +884,9 @@ AmelasError AmelasController::setTimeSource(const unsigned short int &clock)
     }
     else if (clock == AmelasClockSource::NTP)
     {
-        if (_clockSource == AmelasClockSource::NTP || (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+        if (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual))
         {
+            _clockSource = AmelasClockSource::NTP;
             error = AmelasError::ENABLE_WARN;
             oss << "NTP sync is already activated." << '\n';
         }
@@ -909,8 +911,9 @@ AmelasError AmelasController::setTimeSource(const unsigned short int &clock)
     }
     else if (clock == AmelasClockSource::MANUAL)
     {
-        if (_clockSource == AmelasClockSource::MANUAL || (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual)))
+        if (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual))
         {
+            _clockSource = AmelasClockSource::MANUAL;
             error = AmelasError::ENABLE_WARN;
             oss << "MANUAL sync is already activated." << '\n';
         }
@@ -959,11 +962,11 @@ AmelasError AmelasController::getTimeSource(unsigned short int &clock)
     const std::string bEnableManual = "MAIN.timeManager._bEnableManualSync";
 
     // Functionality
-    if (_clockSource == AmelasClockSource::OFF || (!_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+    if (!_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual))
         clock = AmelasClockSource::OFF;
-    else if (_clockSource == AmelasClockSource::NTP || (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual)))
+    else if (_plc->read<bool>(bEnableNTP) && !_plc->read<bool>(bEnableManual))
         clock = AmelasClockSource::NTP;
-    else if (_clockSource == AmelasClockSource::MANUAL || (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual)))
+    else if (!_plc->read<bool>(bEnableNTP) && _plc->read<bool>(bEnableManual))
         clock = AmelasClockSource::MANUAL;
     else
         clock = AmelasClockSource::UNKNOWN;
@@ -2365,7 +2368,7 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
     // -------------------- EXAMPLES CONFIGURATION ---------------------------------------------------------------------
     // Example selector.
     //size_t example_selector = 1;  // Select the example to process.
-    bool plot_data = true;        // Flag for enable the data plotting using a Python3 (>3.9) helper script.
+    bool plot_data = false;        // Flag for enable the data plotting using a Python3 (>3.9) helper script.
 
     // SFEL station geodetic position in degrees (north and east > 0)
     // Altitude in meters
@@ -2708,7 +2711,7 @@ AmelasError AmelasController::setCPFMotion(const unsigned short int &example_sel
 
                     if (_enable_mount_model)
                     {
-                        applyTPOINTCorrections(static_cast<double>(pred.mount_pos->altaz_coord.az), static_cast<double>(pred.mount_pos->altaz_coord.el), true, true, true, true, true, true, _azOffset, _elOffset);
+                        applyTPOINTCorrections(static_cast<double>(pred.mount_pos->altaz_coord.az), static_cast<double>(pred.mount_pos->altaz_coord.el), true, true, true, true, true, true, _azOffset, _elOffset); // TODO: pasar los booleanos como argumento de entrada
                     }
                     else
                     {
